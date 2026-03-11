@@ -188,8 +188,9 @@ export default function LoginPage() {
             borderRadius: 'var(--r-md)', fontSize: '0.78rem', color: 'var(--text-muted)',
           }}>
             <p style={{ fontWeight: 600, marginBottom: 6 }}>🔑 Demo credentials:</p>
-            <p><strong>Admin:</strong> admin@mindfulspace.com / admin123</p>
+            <p><strong>Admin:</strong> rosie@abide.co.uk / admin123</p>
             <p><strong>Client:</strong> sarah.chen@email.com / client123</p>
+            <p><strong>Client:</strong> user@abide.co.uk / client123</p>
           </div>
         </div>
       </main>

@@ -31,6 +31,15 @@ export const MOCK_USERS = [
     avatar: 'PK',
     color: 'blush',
   },
+    {
+    id: 'user-4',
+    email: 'user@abide.co.uk',
+    name: 'John Doe',
+    role: 'client',
+    joinedAt: '2024-02-20',
+    avatar: 'JD',
+    color: 'blush',
+  },
   {
     id: 'admin-1',
     email: 'admin@mindfulspace.com',
@@ -40,6 +49,15 @@ export const MOCK_USERS = [
     avatar: 'AM',
     color: 'sky',
   },
+  {
+    id: 'admin-2',
+    email: 'admin@abide.co.uk',
+    name: 'Rosie M',
+    role: 'admin',
+    joinedAt: '2023-11-15',
+    avatar: 'ED',
+    color: 'peach',
+  }
 ];
 
 export const MOCK_QUESTIONNAIRES = [
@@ -166,4 +184,6 @@ export const MOCK_CREDENTIALS = {
   'sarah.chen@email.com':   { password: 'client123', userId: 'user-1' },
   'marcus.j@email.com':     { password: 'client123', userId: 'user-2' },
   'priya.k@email.com':      { password: 'client123', userId: 'user-3' },
+  'rosie@abide.co.uk':      { password: 'admin123', userId: 'admin-2' },
+  'user@abide.co.uk':       { password: 'client123', userId: 'user-4' }
 };
