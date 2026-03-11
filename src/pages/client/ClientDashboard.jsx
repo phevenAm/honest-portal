@@ -6,12 +6,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../store/slices/authSlice';
-import { selectUserQuestionnaireResponses } from '../store/slices/responsesSlice';
-import { selectActiveQuestionnaires } from '../store/slices/questionnairesSlice';
-import ProgressChart from '../components/shared/ProgressChart';
-import Card from '../components/shared/Card';
-import Button from '../components/shared/Button';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import { selectUserQuestionnaireResponses } from '../../store/slices/responsesSlice';
+import { selectActiveQuestionnaires } from '../../store/slices/questionnairesSlice';
+import ProgressChart from '../../components/shared/ProgressChart';
+import Card from '../../components/shared/Card';
+import Button from '../../components/shared/Button';
 
 // Stat card sub-component
 function StatCard({ label, value, sub, color }) {

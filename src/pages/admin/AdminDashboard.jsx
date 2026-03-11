@@ -5,13 +5,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectAllUsers } from '../store/slices/usersSlice';
-import { selectAllQuestionnaires } from '../store/slices/questionnairesSlice';
-import { selectAllResources } from '../store/slices/resourcesSlice';
-import { selectCurrentUser } from '../store/slices/authSlice';
-import Card from '../components/shared/Card';
-import Avatar from '../components/shared/Avatar';
-import Button from '../components/shared/Button';
+import { selectAllUsers } from '../../store/slices/usersSlice';
+import { selectAllQuestionnaires } from '../../store/slices/questionnairesSlice';
+import { selectAllResources } from '../../store/slices/resourcesSlice';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import Card from '../../components/shared/Card';
+import Avatar from '../../components/shared/Avatar';
+import Button from '../../components/shared/Button';
 
 function MetricCard({ label, value, icon, color, to }) {
   const content = (
