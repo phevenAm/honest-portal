@@ -6,6 +6,7 @@ import { selectThemeMode } from './store/slices/themeSlice.js'
 import { selectIsAuthenticated, selectIsAdmin } from './store/slices/authSlice.js'
 
 import LoginPage               from './pages/LoginPage.jsx'
+import SignUpPage              from './pages/SignUpPage.jsx'
 import ClientDashboard         from './pages/client/ClientDashboard.jsx'
 import CheckInPage             from './pages/client/CheckInPage.jsx'
 import ResourcesPage           from './pages/client/ResourcesPage.jsx'
@@ -46,6 +47,7 @@ function AppRoutes() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage  />} />
           <Route path="/dashboard" element={<ProtectedRoute requiredRole="client"><AppLayout><ClientDashboard /></AppLayout></ProtectedRoute>} />
           <Route path="/check-in"  element={<ProtectedRoute requiredRole="client"><AppLayout><CheckInPage /></AppLayout></ProtectedRoute>} />
           <Route path="/resources" element={<ProtectedRoute requiredRole="client"><AppLayout><ResourcesPage /></AppLayout></ProtectedRoute>} />

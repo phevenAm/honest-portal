@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout, selectCurrentUser, selectIsAdmin } from '../../store/slices/authSlice';
+import { signOut, selectCurrentUser, selectIsAdmin } from '../../store/slices/authSlice';
 import { toggleTheme, selectThemeMode } from '../../store/slices/themeSlice';
 import Avatar from './Avatar';
 
@@ -44,7 +44,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(signOut());
     navigate('/login');
   };
 

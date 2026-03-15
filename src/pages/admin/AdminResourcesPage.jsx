@@ -139,7 +139,7 @@ export default function AdminResourcesPage() {
               key={t}
               onClick={() => setTypeFilter(t)}
               style={{
-                padding: '7px 16px', borderRadius: 'var(--r-full)', border: 'none',
+                padding: '7px 16px', borderRadius: 'var(--r-full)',
                 cursor: 'pointer', fontFamily: 'var(--font-sans)', fontSize: '0.85rem', fontWeight: 500,
                 background: typeFilter === t ? 'var(--accent)' : 'var(--bg-card)',
                 color: typeFilter === t ? 'var(--text-inverse)' : 'var(--text-secondary)',

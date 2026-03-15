@@ -1,80 +1,65 @@
-// ============================================================
-// AUTH SLICE — Redux Toolkit
-//
-// Redux architecture lesson:
-//   createSlice() bundles your: initial state + reducers + action creators
-//   into one tidy object. You export the actions and the reducer separately.
-//
-//   Flow: Component dispatches action → reducer updates state → component re-renders
-// ============================================================
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { supabase } from '../../lib/supabase.js'
 
-import { createSlice } from '@reduxjs/toolkit';
-import { MOCK_CREDENTIALS, MOCK_USERS } from '../../data/mockData';
+// ── Async thunks ──────────────────────────────────────────
+// createAsyncThunk handles the pending/fulfilled/rejected states for you
 
-// Shape of the auth state in the Redux store
-const initialState = {
-  currentUser: null,      // The logged-in user object (or null)
-  isAuthenticated: false,
-  loginError: null,
-  // In a real app you'd store a JWT token here:
-  // token: null,
-};
+export const signUp = createAsyncThunk('auth/signUp', async ({ email, password }, { rejectWithValue }) => {
+  const { data, error } = await supabase.auth.signUp({ email, password })
+  if (error) return rejectWithValue(error.message)
+  return data.user
+})
 
+export const signIn = createAsyncThunk('auth/signIn', async ({ email, password }, { rejectWithValue }) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return rejectWithValue(error.message)
+  return data.user
+})
+
+export const signOut = createAsyncThunk('auth/signOut', async () => {
+  await supabase.auth.signOut()
+})
+
+export const getSession = createAsyncThunk('auth/getSession', async () => {
+  const { data } = await supabase.auth.getSession()
+  return data.session?.user ?? null
+})
+
+// ── Slice ─────────────────────────────────────────────────
 const authSlice = createSlice({
   name: 'auth',
-  initialState,
-
-  // Reducers are pure functions: (currentState, action) => newState
-  // RTK uses Immer under the hood, so you CAN "mutate" state directly here
-  reducers: {
-    loginSuccess: (state, action) => {
-      state.currentUser = action.payload;
-      state.isAuthenticated = true;
-      state.loginError = null;
-    },
-    loginFailure: (state, action) => {
-      state.loginError = action.payload;
-      state.isAuthenticated = false;
-      state.currentUser = null;
-    },
-    logout: (state) => {
-      state.currentUser = null;
-      state.isAuthenticated = false;
-      state.loginError = null;
-    },
-    clearError: (state) => {
-      state.loginError = null;
-    },
+  initialState: {
+    currentUser:     null,
+    isAuthenticated: false,
+    loading:         false,
+    error:           null,
   },
-});
+  reducers: {
+    clearError: (state) => { state.error = null },
+  },
+  extraReducers: (builder) => {
+    // Sign in
+    builder.addCase(signIn.pending,    (state) => { state.loading = true; state.error = null })
+    builder.addCase(signIn.fulfilled,  (state, action) => { state.loading = false; state.currentUser = action.payload; state.isAuthenticated = true })
+    builder.addCase(signIn.rejected,   (state, action) => { state.loading = false; state.error = action.payload })
+    // Sign up
+    builder.addCase(signUp.pending,    (state) => { state.loading = true; state.error = null })
+    builder.addCase(signUp.fulfilled,  (state, action) => { state.loading = false; state.currentUser = action.payload; state.isAuthenticated = true })
+    builder.addCase(signUp.rejected,   (state, action) => { state.loading = false; state.error = action.payload })
+    // Sign out
+    builder.addCase(signOut.fulfilled, (state) => { state.currentUser = null; state.isAuthenticated = false })
+    // Restore session on page load
+    builder.addCase(getSession.fulfilled, (state, action) => { state.currentUser = action.payload; state.isAuthenticated = !!action.payload })
+  },
+})
 
-// Export actions (these are the "dispatch-able" functions)
-export const { loginSuccess, loginFailure, logout, clearError } = authSlice.actions;
+export const { clearError } = authSlice.actions
 
-// ── Thunks ────────────────────────────────────────────────
-// Thunks are functions that return functions — they let you do async work
-// before dispatching to the store. RTK ships with createAsyncThunk but
-// manual thunks like this are great for learning the pattern.
+export const selectCurrentUser    = (state) => state.auth.currentUser
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated
+export const selectAuthLoading    = (state) => state.auth.loading
+export const selectLoginError     = (state) => state.auth.error
+// Role is now stored in Supabase user_metadata
+export const selectIsAdmin        = (state) => state.auth.currentUser?.user_metadata?.role === 'admin'
 
-export const loginUser = (email, password) => (dispatch) => {
-  const creds = MOCK_CREDENTIALS[email];
-  if (creds && creds.password === password) {
-    const user = MOCK_USERS.find(u => u.id === creds.userId);
-    // In real app: const { data } = await axios.post('/api/auth/login', { email, password })
-    dispatch(loginSuccess(user));
-    return { success: true, role: user.role };
-  } else {
-    dispatch(loginFailure('Invalid email or password. Try admin@mindfulspace.com / admin123'));
-    return { success: false };
-  }
-};
-
-// ── Selectors ─────────────────────────────────────────────
-// Selectors are functions that extract data from the store.
-// Centralising them here means you change them in one place.
-export const selectCurrentUser    = (state) => state.auth.currentUser;
-export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
-export const selectLoginError     = (state) => state.auth.loginError;
-export const selectIsAdmin        = (state) => state.auth.currentUser?.role === 'admin';
-
-export default authSlice.reducer;
+export default authSlice.reducer
