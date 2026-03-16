@@ -30,7 +30,7 @@ export default function SignUpPage() {
     }
     setLoading(true);
     try {
-      await signUp(email, password, { firstName, lastName });
+      await signUp(email, password, { firstName, lastName, dob });
       setDone(true);
     } catch (err) {
       setError(err.message);

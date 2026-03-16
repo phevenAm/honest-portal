@@ -1,0 +1,54 @@
+
+<div style="background: #f3f0eb; padding: 40px 20px; font-family: Georgia, serif;">
+
+  <div style="max-width: 560px; margin: 0 auto;">
+
+    <div style="background: #8bb898; border-radius: 16px 16px 0 0; padding: 32px 40px; text-align: center;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 26px;">🌿</div>
+      <h1 style="font-family: Georgia, serif; font-size: 22px; font-weight: 500; color: #fff; margin: 0; letter-spacing: 0.02em;">MindfulSpace</h1>
+      <p style="font-size: 13px; color: rgba(255,255,255,0.8); margin: 6px 0 0; font-family: system-ui, sans-serif;">A safe space for your journey</p>
+    </div>
+
+    <div style="background: #ffffff; padding: 44px 40px 36px; border-left: 1px solid #e0dbd4; border-right: 1px solid #e0dbd4;">
+      <p style="font-family: system-ui, sans-serif; font-size: 13px; color: #9e9894; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.08em;">Welcome</p>
+      <h2 style="font-family: Georgia, serif; font-size: 26px; font-weight: 500; color: #2d2926; margin: 0 0 20px; line-height: 1.3;">We're glad you're here, {{ .Data.first_name }}</h2>
+
+      <p style="font-family: system-ui, sans-serif; font-size: 15px; color: #6b6460; line-height: 1.75; margin: 0 0 20px;">
+        Thank you for creating your MindfulSpace account. This is a place to check in with yourself, track how you're feeling over time, and access resources shared by your practitioner.
+      </p>
+
+      <p style="font-family: system-ui, sans-serif; font-size: 15px; color: #6b6460; line-height: 1.75; margin: 0 0 32px;">
+        To get started, please confirm your email address by clicking the button below.
+      </p>
+
+      <div style="text-align: center; margin: 0 0 36px;">
+        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background: #5a8a6a; color: #ffffff; font-family: system-ui, sans-serif; font-size: 15px; font-weight: 500; text-decoration: none; padding: 14px 36px; border-radius: 999px; letter-spacing: 0.01em;">
+          Confirm my email address
+        </a>
+      </div>
+
+      <div style="background: #f3f0eb; border-radius: 12px; padding: 18px 22px;">
+        <p style="font-family: system-ui, sans-serif; font-size: 13px; color: #9e9894; line-height: 1.6; margin: 0;">
+          If you didn't create an account with MindfulSpace, you can safely ignore this email. This link will expire in 24 hours.
+        </p>
+      </div>
+    </div>
+
+    <div style="background: #2d2926; border-radius: 0 0 16px 16px; padding: 28px 40px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(139,184,152,0.25); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">🌿</div>
+        <span style="font-family: Georgia, serif; font-size: 14px; color: #f0ece8; font-weight: 500;">MindfulSpace</span>
+      </div>
+      <p style="font-family: system-ui, sans-serif; font-size: 12px; color: #706c68; line-height: 1.7; margin: 0 0 12px;">
+        This email was sent because an account was created using this address. If you have any questions, please reach out to your practitioner directly.
+      </p>
+      <div style="border-top: 1px solid #3a3834; padding-top: 14px; display: flex; gap: 20px; flex-wrap: wrap;">
+        <a href="#" style="font-family: system-ui, sans-serif; font-size: 12px; color: #8bb898; text-decoration: none;">Privacy policy</a>
+        <a href="#" style="font-family: system-ui, sans-serif; font-size: 12px; color: #8bb898; text-decoration: none;">Terms of service</a>
+        <a href="#" style="font-family: system-ui, sans-serif; font-size: 12px; color: #8bb898; text-decoration: none;">Unsubscribe</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
