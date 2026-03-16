@@ -6,7 +6,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../store/slices/authSlice';
+import { selectCurrentUser, selectProfile } from '../../store/slices/authSlice';
 import { selectUserQuestionnaireResponses } from '../../store/slices/responsesSlice';
 import { selectActiveQuestionnaires } from '../../store/slices/questionnairesSlice';
 import ProgressChart from '../../components/shared/ProgressChart';
@@ -39,7 +39,7 @@ function StatCard({ label, value, sub, color }) {
 }
 
 export default function ClientDashboard() {
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector(selectProfile);
   // Get this user's responses for the weekly questionnaire (q-1)
   const responses = useSelector(selectUserQuestionnaireResponses(user?.id, 'q-1'));
   const questionnaires = useSelector(selectActiveQuestionnaires);
@@ -60,7 +60,7 @@ export default function ClientDashboard() {
 
   const timeOfDay = new Date().getHours();
   const greeting  = timeOfDay < 12 ? 'Good morning' : timeOfDay < 17 ? 'Good afternoon' : 'Good evening';
-  const firstName = user?.name?.split(' ')[0] || 'there';
+  const firstName = user?.first_name;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>

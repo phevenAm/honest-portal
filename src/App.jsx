@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Provider, useSelector } from 'react-redux'
 import { store } from './store/index.js'
 import { selectThemeMode } from './store/slices/themeSlice.js'
-import { selectIsAuthenticated, selectIsAdmin } from './store/slices/authSlice.js'
+import { selectIsAuthenticated, selectIsAdmin } from './store/slices/authSlice.tsx'
 
 import LoginPage               from './pages/LoginPage.jsx'
 import SignUpPage              from './pages/SignUpPage.jsx'

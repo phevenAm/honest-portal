@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { selectAllUsers } from '../../store/slices/usersSlice';
 import { selectAllQuestionnaires } from '../../store/slices/questionnairesSlice';
 import { selectAllResources } from '../../store/slices/resourcesSlice';
-import { selectCurrentUser } from '../../store/slices/authSlice';
+import { selectProfile } from '../../store/slices/authSlice';
 import Card from '../../components/shared/Card';
 import Avatar from '../../components/shared/Avatar';
 import Button from '../../components/shared/Button';
@@ -32,7 +32,7 @@ function MetricCard({ label, value, icon, color, to }) {
 }
 
 export default function AdminDashboard() {
-  const admin          = useSelector(selectCurrentUser);
+  const profile          = useSelector(selectProfile);
   const users          = useSelector(selectAllUsers);
   const questionnaires = useSelector(selectAllQuestionnaires);
   const resources      = useSelector(selectAllResources);
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 500, marginBottom: 6 }}>
-            Welcome back, {admin?.name?.split(' ')[0]} 👋
+            Welcome back, {profile?.first_name} 👋
           </h1>
           <p style={{ color: 'var(--text-muted)' }}>Here's a summary of your practice portal</p>
         </div>
