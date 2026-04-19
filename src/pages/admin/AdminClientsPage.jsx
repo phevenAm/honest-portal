@@ -30,7 +30,7 @@ const exportClientPDF = async (user, responses) => {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
   doc.setTextColor(255, 255, 255);
-  doc.text('MindfulSpace', margin, 18);
+  doc.text('WithMe', margin, 18);
 
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
@@ -102,7 +102,7 @@ const exportClientPDF = async (user, responses) => {
   // Footer
   doc.setFontSize(8);
   doc.setTextColor(170, 170, 170);
-  doc.text('Confidential — MindfulSpace Client Report', margin, 285);
+  doc.text('Confidential — WithMe Client Report', margin, 285);
 
   doc.save(`${user.name.replace(' ', '_')}_progress_report.pdf`);
 };

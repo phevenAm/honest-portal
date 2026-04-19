@@ -1,4 +1,4 @@
-# 🌿 MindfulSpace — Counselling Client Portal
+# 🌿 WithMe — Counselling Client Portal
 
 A full-featured mental health counselling portal built in React, designed as a learning project scaffolded with Redux, React Router, and mock auth — ready for you to extend with a real backend.
 

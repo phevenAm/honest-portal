@@ -86,7 +86,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           to={isAdmin ? '/admin' : '/dashboard'}
-          aria-label="MindfulSpace — home"
+          aria-label="WithMe — home"
           style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}
         >
           <div style={{
@@ -96,7 +96,7 @@ export default function Navbar() {
             fontSize: 16,
           }}>🌿</div>
           <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 500 }}>
-            MindfulSpace
+            WithMe
           </span>
           {isAdmin && (
             <span style={{
