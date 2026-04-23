@@ -18,12 +18,14 @@ export const signIn = createAsyncThunk(
     if (error) return rejectWithValue(error.message);
 
     const { data: profileData } = await supabase
-      .from('profiles')
+      .from('users')
       .select('role')
       .eq('id', data.user.id)
       .single();
 
-    const { first_name, last_name, dob } = data.user.user_metadata || 
+      console.log('Fetched profile data:', profileData);
+
+    const { first_name, last_name, dob, disabled } = data.user.user_metadata || 
       data.user.identities?.[0]?.identity_data || {};
 
     const profile: User = {
@@ -33,6 +35,10 @@ export const signIn = createAsyncThunk(
       last_name:  last_name ?? '',
       dob:        dob ?? '',
       role:       profileData?.role ?? 'user',
+      jointedAt:  data.user.created_at,
+      avatar:     (first_name?.[0] ?? '') + (last_name?.[0] ?? ''),
+      color:      'sage', // Default color, can be enhanced to be dynamic
+      disabled:   disabled ?? false, // Example of handling disabled status
     }
 
     return { user: data.user, profile }
