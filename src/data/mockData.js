@@ -125,6 +125,7 @@ export const MOCK_RESPONSES = [
   ...generateResponses('user-1', 'q-1'),
   ...generateResponses('user-2', 'q-1'),
   ...generateResponses('user-3', 'q-1'),
+  ...generateResponses('user-1', 'q-2', 30),
 ];
 
 export const MOCK_RESOURCES = [
@@ -180,7 +181,7 @@ export const MOCK_RESOURCES = [
 
 // Credentials for mock auth — in real app, this would be JWT from your backend
 export const MOCK_CREDENTIALS = {
-  'admin@mindfulspace.com': { password: 'admin123', userId: 'admin-1' },
+  'smissah94@hotmail.co.uk': { password: 'admin123', userId: 'admin-1' },
   'sarah.chen@email.com':   { password: 'client123', userId: 'user-1' },
   'marcus.j@email.com':     { password: 'client123', userId: 'user-2' },
   'priya.k@email.com':      { password: 'client123', userId: 'user-3' },

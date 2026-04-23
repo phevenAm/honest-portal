@@ -55,7 +55,7 @@ dispatch(signIn({ email, password })) .then(result => {
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'linear-gradient(135deg, var(--sage-light), var(--lavender-light))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 14px' }}>🌿</div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 500, margin: '0 0 5px' }}>MindfulSpace</h1>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 500, margin: '0 0 5px' }}>WithMe</h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>A safe space for your journey</p>
         </div>
 

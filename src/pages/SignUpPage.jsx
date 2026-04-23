@@ -164,7 +164,7 @@ export default function SignUpPage() {
               margin: "0 0 5px",
             }}
           >
-            MindfulSpace
+            WithMe
           </h1>
           <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>
             Create your account
