@@ -6,8 +6,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
     "@supabase/supabase-js": "^2.99.1",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "react": "^18.2.0",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8"
+    "vite": "^5.4.21"
   },
   "scripts": {
     "start": "vite",
