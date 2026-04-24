@@ -17,8 +17,9 @@ export const fetchUsers = createAsyncThunk(
       .from("users")
       .select("*")
       .eq("role", "client");
+      console.log("fetchUsers request:", { data, error });
 
-    console.log("Fetched users from Supabase:", data, error);
+    console.log("fetchUsers response:", { data, error });
 
     if (error) return rejectWithValue(error.message);
     return data;

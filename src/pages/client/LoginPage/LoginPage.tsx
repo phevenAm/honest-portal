@@ -1,40 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { signIn, selectIsAuthenticated, selectLoginError, selectIsAdmin, clearError } from '../store/slices/authSlice';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function LoginPage() {
-  const dispatch        = useDispatch();
-  const navigate        = useNavigate();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isAdmin         = useSelector(selectIsAdmin);
-  const loginError = useSelector(selectLoginError)
+  const navigate = useNavigate();
+  const { signIn, loading, isAuthenticated, isAdmin, error } = useAuth();
+
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       navigate(isAdmin ? '/admin' : '/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isAdmin, navigate]);
-
-  // Clear error when user starts typing again
-  useEffect(() => {
-    if (loginError) dispatch(clearError());
-  }, [email, password]); // eslint-disable-line
+  }, [loading, isAuthenticated, isAdmin, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-dispatch(signIn({ email, password })) .then(result => {
-    if (result.success) {
-      navigate(result.role === 'admin' ? '/admin' : '/dashboard');
+    setSubmitting(true);
+    try {
+      await signIn(email, password);
+      // Navigation happens via the useEffect above once isAuthenticated flips
+    } catch {
+      // error is already set in AuthContext
+    } finally {
+      setSubmitting(false);
     }
-})
-
-    setLoading(false);
   };
 
   const inputStyle = {
@@ -43,7 +36,9 @@ dispatch(signIn({ email, password })) .then(result => {
     background: 'var(--bg-muted)', color: 'var(--text-primary)',
     fontFamily: 'var(--font-sans)', fontSize: 14,
     outline: 'none', boxSizing: 'border-box',
-  }
+  };
+
+  const isLoading = submitting || loading;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
@@ -62,9 +57,9 @@ dispatch(signIn({ email, password })) .then(result => {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: 32, boxShadow: 'var(--shadow-lg)' }}>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 500, margin: '0 0 22px' }}>Hello!</h2>
 
-          {loginError && (
+          {error && (
             <div role="alert" style={{ background: 'var(--blush-light)', color: 'var(--danger)', border: '1px solid var(--blush)', borderRadius: 12, padding: '10px 14px', marginBottom: 16, fontSize: 13 }}>
-              {loginError}
+              {error}
             </div>
           )}
 
@@ -87,8 +82,8 @@ dispatch(signIn({ email, password })) .then(result => {
                 style={inputStyle}
               />
             </div>
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: 11, background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 999, fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Signing in…' : 'Sign in'}
+            <button type="submit" disabled={isLoading} style={{ width: '100%', padding: 11, background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 999, fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500, cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.7 : 1 }}>
+              {isLoading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 
@@ -99,5 +94,5 @@ dispatch(signIn({ email, password })) .then(result => {
         </div>
       </div>
     </div>
-  )
+  );
 }

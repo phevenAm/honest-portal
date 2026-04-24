@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../store/slices/authSlice';
+import { useAuth } from '../../context/AuthContext';
 import { selectActiveQuestionnaires } from '../../store/slices/questionnairesSlice';
 import { submitResponse } from '../../store/slices/responsesSlice';
 import Card from '../../components/shared/Card';
@@ -63,7 +63,7 @@ function ScaleQuestion({ question, value, onChange }) {
 export default function CheckInPage() {
   const dispatch       = useDispatch();
   const navigate       = useNavigate();
-  const user           = useSelector(selectCurrentUser);
+  const {user}          = useAuth();
   const questionnaires = useSelector(selectActiveQuestionnaires);
 
   // For simplicity, use the first assigned questionnaire

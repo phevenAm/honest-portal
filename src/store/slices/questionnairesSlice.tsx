@@ -2,7 +2,7 @@
 // QUESTIONNAIRES SLICE
 // ============================================================
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { MOCK_QUESTIONNAIRES } from '../../data/mockData';
 
 const initialState = {
@@ -38,8 +38,11 @@ const questionnairesSlice = createSlice({
 
 export const { addQuestionnaire, updateQuestionnaire, deleteQuestionnaire, toggleActive } = questionnairesSlice.actions;
 
-export const selectAllQuestionnaires   = (state) => state.questionnaires.questionnaires;
-export const selectActiveQuestionnaires = (state) => state.questionnaires.questionnaires.filter(q => q.isActive);
-export const selectQuestionnaireById   = (id) => (state) => state.questionnaires.questionnaires.find(q => q.id === id);
+export const selectAllQuestionnaires    = (state) => state.questionnaires.questionnaires;
+export const selectActiveQuestionnaires = createSelector(
+  selectAllQuestionnaires,
+  (questionnaires) => questionnaires.filter(q => q.isActive)
+);
+export const selectQuestionnaireById    = (id) => (state) => state.questionnaires.questionnaires.find(q => q.id === id);
 
 export default questionnairesSlice.reducer;

@@ -8,7 +8,7 @@
 // ============================================================
 
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './slices/authSlice';
+// import authReducer from './slices/authSlice';
 import usersReducer from './slices/usersSlice';
 import questionnairesReducer from './slices/questionnairesSlice';
 import responsesReducer from './slices/responsesSlice';
@@ -17,7 +17,7 @@ import themeReducer from './slices/themeSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
+    // auth: authReducer,
     users: usersReducer,
     questionnaires: questionnairesReducer,
     responses: responsesReducer,

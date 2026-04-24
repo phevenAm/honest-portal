@@ -11,7 +11,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import Card from '../shared/Card';
+import Card from './Card';
 
 // ── Custom Tooltip for the line chart ──────────────────────
 const CustomTooltip = ({ active, payload, label }) => {

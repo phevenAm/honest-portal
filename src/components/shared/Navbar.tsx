@@ -6,9 +6,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { signOut, selectCurrentUser, selectIsAdmin } from '../../store/slices/authSlice';
 import { toggleTheme, selectThemeMode } from '../../store/slices/themeSlice';
 import Avatar from './Avatar';
+import { useAuth } from '../../context/AuthContext';
 
 const SunIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -38,14 +38,22 @@ export default function Navbar() {
   const dispatch    = useDispatch();
   const navigate    = useNavigate();
   const location    = useLocation();
-  const user        = useSelector(selectCurrentUser);
-  const isAdmin     = useSelector(selectIsAdmin);
+  // const user        = useSelector(selectCurrentUser);
+  // const isAdmin     = useSelector(selectIsAdmin);
   const themeMode   = useSelector(selectThemeMode);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    dispatch(signOut());
-    navigate('/login');
+const { isAdmin, isAuthenticated, signOut, profile } = useAuth();
+
+  const handleLogout = async () => {
+    console.log('signing out?')
+    try {
+      await signOut();
+      // navigate('/login');
+      console.log('signout successful?')
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const adminLinks = [
@@ -157,25 +165,23 @@ export default function Navbar() {
             {themeMode === 'light' ? <MoonIcon /> : <SunIcon />}
           </button>
 
-          {/* User info */}
-          {user && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Avatar initials={user.avatar} color={user.color} size={34} />
-              <button
-                onClick={handleLogout}
-                aria-label="Sign out"
-                style={{
-                  background: 'none', border: '1px solid var(--border)',
-                  borderRadius: 'var(--r-full)', padding: '6px 14px',
-                  cursor: 'pointer', color: 'var(--text-secondary)',
-                  fontSize: '0.85rem', transition: 'all var(--transition)',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
-                Sign out
-              </button>
-            </div>
-          )}
+  {/* User info */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {profile && <Avatar initials={profile.avatar} color={profile.color} size={34} />}
+            <button
+              onClick={handleLogout}
+              aria-label="Sign out"
+              style={{
+                background: 'none', border: '1px solid var(--border)',
+                borderRadius: 'var(--r-full)', padding: '6px 14px',
+                cursor: 'pointer', color: 'var(--text-secondary)',
+                fontSize: '0.85rem', transition: 'all var(--transition)',
+                fontFamily: 'var(--font-sans)',
+              }}
+            >
+              Sign out
+            </button>
+          </div>
 
           {/* Mobile menu button */}
           <button
