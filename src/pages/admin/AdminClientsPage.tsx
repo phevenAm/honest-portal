@@ -240,11 +240,11 @@ function ClientRow({ user }) {
 
 // ── Main page ──────────────────────────────────────────────
 export default function AdminClientsPage() {
-  const users      = useSelector(selectAllUsers);
+  const allClients      = useSelector(selectAllUsers);
   const [showAdd, setShowAdd] = useState(false);
   const [search, setSearch]   = useState('');
 
-  const filtered = users.filter(u =>
+  const filtered = allClients.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
   );
@@ -256,7 +256,7 @@ export default function AdminClientsPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 500, marginBottom: 6 }}>Clients</h1>
-            <p style={{ color: 'var(--text-muted)' }}>{users.length} active {users.length === 1 ? 'client' : 'clients'}</p>
+            <p style={{ color: 'var(--text-muted)' }}>{allClients.length} active {allClients.length === 1 ? 'client' : 'clients'}</p>
           </div>
           <Button onClick={() => setShowAdd(true)}>＋ Add client</Button>
         </div>
@@ -281,7 +281,7 @@ export default function AdminClientsPage() {
         <Card>
           {filtered.length === 0 ? (
             <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              {users.length === 0 ? 'No clients yet. Add your first client above.' : 'No clients match your search.'}
+              {allClients.length === 0 ? 'No clients yet. Add your first client above.' : 'No clients match your search.'}
             </div>
           ) : (
             filtered.map(u => <ClientRow key={u.id} user={u} />)
