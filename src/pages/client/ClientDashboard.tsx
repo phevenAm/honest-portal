@@ -1,3 +1,4 @@
+
 // ============================================================
 // CLIENT DASHBOARD — "My Progress"
 // Shows: greeting, progress chart, recent check-ins, quick actions
@@ -6,12 +7,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser, selectProfile } from '../../store/slices/authSlice';
 import { selectUserQuestionnaireResponses } from '../../store/slices/responsesSlice';
 import { selectActiveQuestionnaires } from '../../store/slices/questionnairesSlice';
 import ProgressChart from '../../components/shared/ProgressChart';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
+import { useAuth } from '../../context/AuthContext';
 
 // Stat card sub-component
 function StatCard({ label, value, sub, color }) {
@@ -39,7 +40,7 @@ function StatCard({ label, value, sub, color }) {
 }
 
 export default function ClientDashboard() {
-  const user = useSelector(selectProfile);
+  const {user} = useAuth();
   // Get this user's responses for the weekly questionnaire (q-1)
   const responses = useSelector(selectUserQuestionnaireResponses(user?.id, 'q-1'));
   const questionnaires = useSelector(selectActiveQuestionnaires);
