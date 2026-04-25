@@ -8,8 +8,7 @@
 // ============================================================
 
 import { configureStore } from '@reduxjs/toolkit';
-// import authReducer from './slices/authSlice';
-import usersReducer from './slices/usersSlice';
+import userDirectoryReducer from './slices/userDirectorySlice';
 import questionnairesReducer from './slices/questionnairesSlice';
 import responsesReducer from './slices/responsesSlice';
 import resourcesReducer from './slices/resourcesSlice';
@@ -17,13 +16,14 @@ import themeReducer from './slices/themeSlice';
 
 export const store = configureStore({
   reducer: {
-    // auth: authReducer,
-    users: usersReducer,
+    userDirectory: userDirectoryReducer,
     questionnaires: questionnairesReducer,
     responses: responsesReducer,
     resources: resourcesReducer,
     theme: themeReducer,
   },
 });
+
+export type AppDispatch = typeof store.dispatch;
 
 export default store;

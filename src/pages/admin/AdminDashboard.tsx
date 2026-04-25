@@ -4,7 +4,7 @@
 
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { selectAllUsers, fetchUsers } from "../../store/slices/usersSlice";
+import { selectAllUsers, fetchAllUsers } from "../../store/slices/userDirectorySlice";
 import { selectAllQuestionnaires } from "../../store/slices/questionnairesSlice";
 import { selectAllResources } from "../../store/slices/resourcesSlice";
 import Card from "../../components/shared/Card";
@@ -12,6 +12,8 @@ import Avatar from "../../components/shared/Avatar";
 import Button from "../../components/shared/Button";
 import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import type { AppDispatch } from "../../store/index";
+
 
 function MetricCard({ label, value, icon, color, to }) {
   const content = (
@@ -27,14 +29,14 @@ function MetricCard({ label, value, icon, color, to }) {
 }
 
 export default function AdminDashboard() {
-  const { profile } = useAuth();
-  const dispatch = useDispatch();
+  const { userProfile } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const allClients = useSelector(selectAllUsers);
   const questionnaires = useSelector(selectAllQuestionnaires);
   const resources = useSelector(selectAllResources);
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchAllUsers());
   }, [dispatch]);
 
   const publishedResources = resources.filter((r) => r.isPublished).length;
@@ -45,7 +47,7 @@ export default function AdminDashboard() {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ marginBottom: 36 }}>
           <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "1.9rem", fontWeight: 500, marginBottom: 6 }}>
-            Welcome back, {profile?.first_name} 👋
+            Welcome back, {userProfile?.first_name} 👋
           </h1>
           <p style={{ color: "var(--text-muted)" }}>Here's a summary of your practice portal</p>
         </div>

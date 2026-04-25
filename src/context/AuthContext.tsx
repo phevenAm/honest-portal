@@ -1,20 +1,41 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
+import type {
+  AuthUser,
+  UserProfile,
+} from "../models/globalTypes";
 
-const AuthContext = createContext({});
-export const useAuth = () => useContext(AuthContext);
+import type { Session } from "@supabase/supabase-js";
 
-export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null); // rename to authUser
-  const [profile, setProfile] = useState(null); // rename to user aprole
+type AuthContextType = {
+  authUser: AuthUser | null;
+  userProfile: UserProfile | null;
+  loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, meta?: any) => Promise<void>;
+  signOut: () => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
+};
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const prevUserIdRef = useRef(null);
+  const prevUserIdRef = useRef<string | null>(null);
 
-  const fetchProfile = async (authUser) => {
-    if (!authUser) return null;
-
+  const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
     const { data, error } = await supabase
       .from("users")
       .select("*")
@@ -29,49 +50,62 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  useEffect(() => {
-    const handleSession = async (session) => {
-      const authUser = session?.user ?? null; //rename to session user
-      const newUserId = authUser?.id ?? null;
 
-      setUser(authUser);
 
-      // Only refetch profile if user actually changed
-      if (newUserId !== prevUserIdRef.current) {
-        prevUserIdRef.current = newUserId;
+const handleSession = async (session: Session | null) => {
+    const authUser = session?.user ?? null;
+    const newUserId = authUser?.id ?? null;
 
-        if (authUser) {
-          const profileData = await fetchProfile(authUser);
-          setProfile(profileData);
-        } else {
-          setProfile(null);
-        }
+    setAuthUser(authUser);
+
+    if (newUserId !== prevUserIdRef.current) {
+      prevUserIdRef.current = newUserId;
+
+      if (authUser) {
+        const profileData = await fetchProfile(authUser);
+        setUserProfile(profileData);
+      } else {
+        setUserProfile(null);
       }
+    }
 
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      await handleSession(data.session);
       setLoading(false);
     };
 
-    // Subscribe to auth changes (handles initial load too)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+    init();
+
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_event, session) => {
         handleSession(session);
-      }
-    );
+      });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email, password) => {
+  const signIn = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       setError(error.message);
       throw error;
     }
   };
 
-  const signUp = async (email, password, meta) => {
+  const signUp = async (email: string, password: string, meta?: any) => {
     setError(null);
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -86,19 +120,23 @@ export function AuthProvider({ children }) {
 
   const signOut = async () => {
     setError(null);
+
     const { error } = await supabase.auth.signOut();
-    if (error) console.error("signOut error:", error.message);
+
+    if (error) {
+      console.error("signOut error:", error.message);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        profile,
+        authUser,
+        userProfile,
         error,
         loading,
-        isAuthenticated: !!user,
-        isAdmin: profile?.role === "admin",
+        isAuthenticated: !!authUser,
+        isAdmin: userProfile?.role === "admin",
         signIn,
         signUp,
         signOut,
