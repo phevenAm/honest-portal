@@ -44,7 +44,9 @@
   display: block;
   transition: transform var(--transition-base);
 
-  &:hover { transform: translateY(-2px); }
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .metricIcon {
@@ -57,10 +59,23 @@
   margin-bottom: $sp-4;
   color: var(--accent-dark);
 
-  &.teal    { background: var(--accent-light); }
-  &.stone   { background: #e5e0dc; }
-  &.sky     { background: #dbeafe; color: #1e40af; }
-  &.peach   { background: #fce8d4; color: #92400e; }
+  &.teal {
+    background: var(--accent-light);
+  }
+
+  &.stone {
+    background: #e5e0dc;
+  }
+
+  &.sky {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.peach {
+    background: #fce8d4;
+    color: #92400e;
+  }
 }
 
 .metricValue {
@@ -123,7 +138,9 @@
   background: var(--bg-muted);
 }
 
-.clientInfo { flex: 1; }
+.clientInfo {
+  flex: 1;
+}
 
 .clientName {
   font-size: 0.9rem;
@@ -179,16 +196,38 @@
   align-items: center;
   gap: $sp-3;
 
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 
-  &.teal  { background: var(--accent-light); }
-  &.stone { background: #ede8e3; }
-  &.warm  { background: #fce8d4; }
+  &.teal {
+    background: var(--accent-light);
+  }
 
-  [data-theme = 'dark'] & {
+  &.stone {
+    background: #ede8e3;
+  }
 
-    .stone, .warm {
-      color: black !important; // example of theme-specific override
+  &.warm {
+    background: #fce8d4;
+  }
+
+
+
+}
+
+:global(html.dark) {
+  .actionItem {
+    &.stone,
+    &.warm {
+      color:  var(--text-inverse);
+
+      svg,
+      svg * {
+        color:  var(--text-inverse);
+        fill:  var(--text-inverse);
+        stroke:  var(--text-inverse);
+      }
     }
   }
 }
