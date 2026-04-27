@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
-import styles from './LoginPage.module.scss';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+import styles from "./LoginPage.module.scss";
 
 const LogoIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M12 22V12"/>
-    <path d="M12 12C12 7 7 3 2 3c0 5 4 9 10 9z"/>
-    <path d="M12 12C12 7 17 3 22 3c0 5-4 9-10 9z"/>
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 22V12" />
+    <path d="M12 12C12 7 7 3 2 3c0 5 4 9 10 9z" />
+    <path d="M12 12C12 7 17 3 22 3c0 5-4 9-10 9z" />
   </svg>
 );
 
@@ -15,13 +25,13 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { signIn, loading, isAuthenticated, isAdmin, error } = useAuth();
 
-  const [email, setEmail]           = useState('');
-  const [password, setPassword]     = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      navigate(isAdmin ? '/admin' : '/dashboard', { replace: true });
+      navigate(isAdmin ? "/admin" : "/dashboard", { replace: true });
     }
   }, [loading, isAuthenticated, isAdmin, navigate]);
 
@@ -41,12 +51,11 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.blobTop} aria-hidden="true" />
-      <div className={styles.blobBottom} aria-hidden="true" />
-
       <div className={styles.container}>
         <div className={styles.logoWrap}>
-          <div className={styles.logoMark}><LogoIcon /></div>
+          <div className={styles.logoMark}>
+            <LogoIcon />
+          </div>
           <h1 className={styles.logoTitle}>WithMe</h1>
           <p className={styles.logoSub}>A safe space for your journey</p>
         </div>
@@ -55,33 +64,39 @@ export default function LoginPage() {
           <h2 className={styles.heading}>Welcome back</h2>
 
           {error && (
-            <div role="alert" className={styles.error}>{error}</div>
+            <div role="alert" className={styles.error}>
+              {error}
+            </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate>
             <div className={styles.field}>
-              <label htmlFor="email" className={styles.label}>Email address</label>
+              <label htmlFor="email" className={styles.label}>
+                Email address
+              </label>
               <input
                 id="email"
                 type="email"
                 required
                 autoComplete="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className={styles.input}
               />
             </div>
 
             <div className={`${styles.field} ${styles.fieldLast}`}>
-              <label htmlFor="password" className={styles.label}>Password</label>
+              <label htmlFor="password" className={styles.label}>
+                Password
+              </label>
               <input
                 id="password"
                 type="password"
                 required
                 autoComplete="current-password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className={styles.input}
               />
@@ -92,13 +107,15 @@ export default function LoginPage() {
               disabled={isLoading || !email || !password}
               className={styles.submitBtn}
             >
-              {isLoading ? 'Signing in…' : 'Sign in'}
+              {isLoading ? "Signing in…" : "Sign in"}
             </button>
           </form>
 
           <p className={styles.footer}>
-            Don't have an account?{' '}
-            <Link to="/signup" className={styles.link}>Sign up</Link>
+            Don't have an account?{" "}
+            <Link to="/signup" className={styles.link}>
+              Sign up
+            </Link>
           </p>
         </div>
       </div>
