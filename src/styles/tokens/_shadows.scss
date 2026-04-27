@@ -1,0 +1,12 @@
+:root {
+  --shadow-sm: 0 1px 3px rgba(39, 37, 31, 0.08);
+  --shadow-md: 0 4px 16px rgba(39, 37, 31, 0.1);
+  --shadow-lg: 0 10px 34px rgba(39, 37, 31, 0.14);
+  --transition: 180ms ease;
+  --transition-slow: 350ms ease;
+}
+.dark {
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.35);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg: 0 10px 34px rgba(0,0,0,0.55);
+}

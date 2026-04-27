@@ -1,0 +1,145 @@
+// _page-layout.scss  — shared base for all authenticated pages
+// Import into each page's SCSS file: @use '../../styles/page-layout' as *;
+@use 'spacing' as *;
+
+// ── Shared page shell ──────────────────────────────────────
+%page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
+}
+
+%inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+// ── Page header (title + subtitle + optional CTA) ──────────
+%page-header {
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+%page-header-row {
+  @extend %page-header;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $sp-4;
+}
+
+// ── Form inputs (shared across modal forms etc) ─────────────
+%form-input {
+  width: 100%;
+  padding: $sp-3 $sp-4;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--transition-base);
+
+  &:focus { border-color: var(--border-focus); }
+  &::placeholder { color: var(--text-muted); }
+}
+
+%form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: $sp-2;
+  letter-spacing: 0.01em;
+}
+
+// ── Status badges ──────────────────────────────────────────
+%badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: var(--r-full);
+}
+
+%badge-active {
+  @extend %badge;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+%badge-inactive {
+  @extend %badge;
+  background: var(--bg-muted);
+  color: var(--text-muted);
+}
+
+// ── Modal overlay ──────────────────────────────────────────
+%modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px $sp-6;
+  overflow-y: auto;
+}
+
+// ── Filter tab row ─────────────────────────────────────────
+%filter-tabs {
+  display: flex;
+  gap: $sp-2;
+  margin-bottom: $sp-6;
+  flex-wrap: wrap;
+}
+
+%filter-tab {
+  padding: $sp-2 $sp-4;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+  text-transform: capitalize;
+
+  &:hover { background: var(--bg-muted); }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+}
+
+%filter-tab-active {
+  @extend %filter-tab;
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+
+  &:hover { background: var(--accent-dark); }
+}

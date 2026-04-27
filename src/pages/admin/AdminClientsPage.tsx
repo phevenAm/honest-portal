@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUser, removeUser, selectAllUsers } from '../../store/slices/usersSlice';
+import { addUser, removeUser, selectAllUsers } from '../../store/slices/userDirectorySlice';
 import { selectUserQuestionnaireResponses } from '../../store/slices/responsesSlice';
 import Card from '../../components/shared/Card';
 import Avatar from '../../components/shared/Avatar';

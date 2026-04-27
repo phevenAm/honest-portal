@@ -1,0 +1,122 @@
+// ClientDashboard.scss
+@use '../../../styles/spacing' as *;
+
+.page { min-height: 100vh; background: var(--bg-base); }
+.inner { max-width: 1000px; margin: 0 auto; padding: $sp-8 $sp-6; }
+
+.header {
+  margin-bottom: $sp-8;
+  h1 { font-family: var(--font-serif); font-size: 1.9rem; font-weight: 500; color: var(--text-primary); margin: 0 0 $sp-2; }
+  p  { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+}
+
+// ── Stats row ──────────────────────────────────────────────
+.statsRow {
+  display: flex;
+  gap: $sp-3;
+  flex-wrap: wrap;
+  margin-bottom: $sp-7;
+}
+
+.statCard {
+  border-radius: var(--r-lg);
+  padding: $sp-5;
+  flex: 1 1 140px;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 $sp-2;
+}
+
+.statValue {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 $sp-1;
+  line-height: 1;
+}
+
+.statSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+// colour variants
+.teal   { background: var(--accent-light);  .statLabel { color: var(--accent-dark); } }
+.stone  { background: #ede8e3;              .statLabel { color: #5c4f48; } }
+.warm   { background: #fce8d4;              .statLabel { color: #92400e; } }
+.danger { background: var(--danger-light);  .statLabel { color: var(--danger); } }
+
+// ── Chart ──────────────────────────────────────────────────
+.chartWrap { margin-bottom: $sp-7; }
+
+// ── Bottom grid ────────────────────────────────────────────
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $sp-5;
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.cardPad { padding: $sp-6; }
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 $sp-4;
+}
+
+// ── Check-in list ──────────────────────────────────────────
+.checkInList { display: flex; flex-direction: column; gap: $sp-3; }
+
+.checkInRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $sp-3 $sp-4;
+  background: var(--bg-muted);
+  border-radius: var(--r-md);
+}
+
+.checkInTitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.checkInFreq {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.emptyText { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+
+// ── Resources teaser card ──────────────────────────────────
+.resourcesCard {
+  padding: $sp-6;
+  background: linear-gradient(135deg, var(--accent-subtle), var(--accent-light));
+}
+
+.resourcesTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 $sp-2;
+}
+
+.resourcesDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 $sp-5;
+  line-height: 1.6;
+}

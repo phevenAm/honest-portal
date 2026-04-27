@@ -1,0 +1,261 @@
+// AdminQuestionnairesPage.scss
+@use '../../../styles/spacing' as *;
+
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
+}
+
+.inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $sp-4;
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-1;
+  }
+
+  p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+}
+
+// ── Questionnaire card ─────────────────────────────────────
+.qCard {
+  padding: $sp-5 $sp-6;
+}
+
+.qCardInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $sp-4;
+}
+
+.qInfo { flex: 1; }
+
+.qTitleRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  margin-bottom: $sp-2;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: var(--r-full);
+
+  &.active   { background: var(--accent-light); color: var(--accent-dark); }
+  &.inactive { background: var(--bg-muted);     color: var(--text-muted); }
+}
+
+.qDesc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 $sp-2;
+  line-height: 1.5;
+}
+
+.qMeta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.qActions {
+  display: flex;
+  gap: $sp-2;
+  flex-shrink: 0;
+}
+
+.empty {
+  text-align: center;
+  padding: $sp-16;
+  color: var(--text-muted);
+}
+
+// ── Builder modal ──────────────────────────────────────────
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px $sp-6;
+}
+
+.modal {
+  width: 100%;
+  max-width: 640px;
+  padding: $sp-8;
+}
+
+.modalTitle {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 $sp-6;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $sp-4;
+  margin-bottom: $sp-5;
+}
+
+.fullCol { grid-column: 1 / -1; }
+
+.formField {
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: $sp-2;
+  }
+
+  input, select {
+    width: 100%;
+    padding: $sp-3 $sp-4;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color var(--transition-base);
+
+    &:focus { border-color: var(--border-focus); }
+  }
+}
+
+.questionsSection {
+  margin-bottom: $sp-5;
+}
+
+.questionsSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $sp-3;
+
+  h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+}
+
+.questionBlock {
+  background: var(--bg-muted);
+  border-radius: var(--r-md);
+  padding: $sp-4;
+  margin-bottom: $sp-3;
+}
+
+.questionBlockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $sp-3;
+}
+
+.questionNum {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--danger);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0;
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.questionInputs {
+  display: flex;
+  gap: $sp-3;
+  flex-wrap: wrap;
+
+  input, select {
+    flex: 1;
+    min-width: 120px;
+    padding: $sp-2 $sp-3;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: var(--border-focus); }
+  }
+}
+
+.questionTextInput {
+  width: 100%;
+  padding: $sp-2 $sp-3;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: $sp-3;
+
+  &:focus { border-color: var(--border-focus); }
+}
+
+.modalActions {
+  display: flex;
+  gap: $sp-3;
+  justify-content: flex-end;
+}
