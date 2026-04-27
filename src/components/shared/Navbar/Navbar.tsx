@@ -111,13 +111,13 @@ export default function Navbar() {
 
         {/* Right actions */}
         <div className={styles.actions}>
-          <button
+          {/* <button
             onClick={() => dispatch(toggleTheme())}
             aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
             className={styles.iconBtn}
           >
             {themeMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          </button>
+          </button> */}
 
           <div className={styles.userSection}>
             {profile && (
