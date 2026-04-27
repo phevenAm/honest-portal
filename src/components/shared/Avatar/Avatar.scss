@@ -1,0 +1,35 @@
+.avatar {
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-weight: var(--fw-semibold);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.avatar--sage {
+    background: var(--sage-light);
+    color: var(--sage-dark);
+}
+
+.avatar--lavender {
+    background: var(--lavender-light);
+    color: var(--lavender);
+}
+
+.avatar--blush {
+    background: var(--blush-light);
+    color: var(--blush);
+}
+
+.avatar--sky {
+    background: var(--sky-light);
+    color: var(--sky);
+}
+
+.avatar--peach {
+    background: var(--peach-light);
+    color: var(--peach);
+}

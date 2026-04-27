@@ -1,0 +1,54 @@
+// ============================================================
+// _spacing.scss
+// Spacing scale, radius, shadows, layout breakpoints
+// ============================================================
+
+// ── Spacing scale (4px base) ──────────────────────────────
+$sp-0:   0;
+$sp-1:   0.25rem;  //  4px
+$sp-2:   0.5rem;   //  8px
+$sp-3:   0.75rem;  // 12px
+$sp-4:   1rem;     // 16px
+$sp-5:   1.25rem;  // 20px
+$sp-6:   1.5rem;   // 24px
+$sp-7:   1.75rem;  // 28px
+$sp-8:   2rem;     // 32px
+$sp-10:  2.5rem;   // 40px
+$sp-12:  3rem;     // 48px
+$sp-16:  4rem;     // 64px
+$sp-20:  5rem;     // 80px
+$sp-24:  6rem;     // 96px
+
+// ── Border radius ──────────────────────────────────────────
+$r-sm:   6px;
+$r-md:   10px;
+$r-lg:   16px;
+$r-xl:   24px;
+$r-2xl:  32px;
+$r-full: 9999px;
+
+// ── Shadows ────────────────────────────────────────────────
+// Warm-tinted shadows to match the earthy palette
+$shadow-xs: 0 1px 2px rgba(29, 42, 38, 0.05);
+$shadow-sm: 0 1px 4px rgba(29, 42, 38, 0.07), 0 1px 2px rgba(29, 42, 38, 0.04);
+$shadow-md: 0 4px 12px rgba(29, 42, 38, 0.09), 0 2px 4px rgba(29, 42, 38, 0.05);
+$shadow-lg: 0 8px 28px rgba(29, 42, 38, 0.12), 0 4px 8px rgba(29, 42, 38, 0.06);
+$shadow-xl: 0 16px 48px rgba(29, 42, 38, 0.16), 0 6px 12px rgba(29, 42, 38, 0.08);
+
+// ── Layout ─────────────────────────────────────────────────
+$max-width-sm:   640px;
+$max-width-md:   768px;
+$max-width-lg:   1024px;
+$max-width-xl:   1200px;
+$navbar-height:  68px;
+
+// ── Breakpoints ────────────────────────────────────────────
+$bp-sm:  640px;
+$bp-md:  768px;
+$bp-lg:  1024px;
+$bp-xl:  1280px;
+
+// ── Transitions ────────────────────────────────────────────
+$transition-fast:   150ms ease;
+$transition-base:   200ms ease;
+$transition-slow:   350ms ease;

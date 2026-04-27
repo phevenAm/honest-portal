@@ -1,0 +1,19 @@
+// Avatar.scss
+.avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  flex-shrink: 0;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+// Teal-based colour variants matching new brand palette
+.teal    { background: #bfe5df; color: #1f4940; }
+.sage    { background: #cfe8e0; color: #1f4940; }
+.stone   { background: #e5e0dc; color: #3d3530; }
+.sky     { background: #bfdbf7; color: #1e3a5f; }
+.clay    { background: #f0ddd0; color: #7c3d1e; }

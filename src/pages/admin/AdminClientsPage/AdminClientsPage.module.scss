@@ -1,0 +1,204 @@
+// AdminClientsPage.scss
+@use '../../../styles/spacing' as *;
+
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
+}
+
+.inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $sp-4;
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-1;
+  }
+
+  p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+}
+
+.searchWrap {
+  margin-bottom: $sp-5;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 360px;
+  padding: $sp-3 $sp-4;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-base);
+
+  &:focus { border-color: var(--border-focus); }
+  &::placeholder { color: var(--text-muted); }
+}
+
+// ── Client row ─────────────────────────────────────────────
+.clientRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-4;
+  padding: $sp-4 $sp-5;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+
+  &:last-child { border-bottom: none; }
+}
+
+.clientMeta {
+  flex: 1;
+  min-width: 140px;
+}
+
+.clientName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.clientEmail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.statBlock {
+  text-align: center;
+  min-width: 55px;
+}
+
+.statValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1px;
+
+  span {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.rowActions {
+  display: flex;
+  gap: $sp-2;
+  flex-wrap: wrap;
+}
+
+// ── Expanded chart area ────────────────────────────────────
+.expandedChart {
+  padding: $sp-5;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+
+// ── Empty state ────────────────────────────────────────────
+.empty {
+  padding: $sp-12;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+// ── Add client modal ───────────────────────────────────────
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $sp-6;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  padding: $sp-8;
+}
+
+.modalTitle {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 $sp-6;
+}
+
+.modalError {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0 0 $sp-4;
+}
+
+.formRow {
+  display: flex;
+  gap: $sp-3;
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1;
+  min-width: 130px;
+  margin-bottom: $sp-4;
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: $sp-2;
+    text-transform: capitalize;
+  }
+
+  input {
+    width: 100%;
+    padding: $sp-3 $sp-4;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-muted);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color var(--transition-base);
+
+    &:focus { border-color: var(--border-focus); }
+  }
+}
+
+.modalActions {
+  display: flex;
+  gap: $sp-3;
+  justify-content: flex-end;
+  margin-top: $sp-6;
+}
