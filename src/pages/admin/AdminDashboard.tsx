@@ -36,7 +36,9 @@ export default function AdminDashboard() {
   const resources = useSelector(selectAllResources);
 
   useEffect(() => {
-    dispatch(fetchAllUsers());
+    dispatch(fetchAllUsers()).unwrap().catch((err) => {
+      console.error("Failed to fetch users:", err);
+    });
   }, [dispatch]);
 
   const publishedResources = resources.filter((r) => r.isPublished).length;
