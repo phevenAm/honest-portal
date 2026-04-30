@@ -1,48 +1,117 @@
-// ============================================================
-// QUESTIONNAIRES SLICE
-// ============================================================
+import {
+  createSlice,
+  createSelector,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+import { supabase } from "../../lib/supabase.js";
+import type { Questionnaire } from "../../models/globalTypes.js";
 
-import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { MOCK_QUESTIONNAIRES } from '../../data/mockData';
-
-const initialState = {
-  questionnaires: MOCK_QUESTIONNAIRES,
+type QuestionnairesState = {
+  questionnaires: Questionnaire[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
 };
 
+const initialState: QuestionnairesState = {
+  questionnaires: [],
+  status: "idle",
+  error: null,
+};
+
+export const createQuestionnaire = createAsyncThunk(
+  "questionnaires/createQuestionnaire",
+  async (data: Questionnaire, { rejectWithValue }) => {
+    console.log(' Creating questionnaire with data:', data);
+    const { data: questionnaire, error: questionnaireError } = await supabase
+      .from("questionnaires")
+      .insert({
+        title: data.title,
+        description: data.description,
+        frequency: data.frequency,
+        is_active: true,
+      })
+      .select()
+      .single();
+
+      console.log("createQuestionnaire response:", { questionnaire, questionnaireError });
+
+    if (questionnaireError) {
+      return rejectWithValue(questionnaireError.message);
+    }
+      console.log(' Creating questionnaire with data:', data);
+const questionRows = data.questions.map((question, index) => ({
+  questionnaire_id: questionnaire.id,
+  text: question.text,
+  type: question.type,
+  min_value: question.type === "scale" ? question.min ?? 1 : null,
+  max_value: question.type === "scale" ? question.max ?? 10 : null,
+  min_label: question.type === "scale" ? question.minLabel ?? null : null,
+  max_label: question.type === "scale" ? question.maxLabel ?? null : null,
+  order_index: question.orderIndex ?? index + 1,
+  is_required: question.is_required ?? true,
+}));
+
+    const { data: questions, error: questionsError } = await supabase
+      .from("questions")
+      .insert(questionRows)
+      .select();
+
+    if (questionsError) {
+      return rejectWithValue(questionsError.message);
+    }
+
+    return {
+      ...questionnaire,
+      questions,
+    };
+  }
+);
+
 const questionnairesSlice = createSlice({
-  name: 'questionnaires',
+  name: "questionnaires",
   initialState,
+
   reducers: {
-    addQuestionnaire: (state, action) => {
-      state.questionnaires.push({
-        id: `q-${Date.now()}`,
-        createdAt: new Date().toISOString().split('T')[0],
-        isActive: true,
-        assignedTo: [],
-        ...action.payload,
+    clearQuestionnaireError: (state) => {
+      state.error = null;
+    },
+  },
+
+  extraReducers: (builder) => {
+    builder
+      .addCase(createQuestionnaire.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createQuestionnaire.fulfilled, (state, action) => {
+        console.log("Questionnaire created successfully:", action.payload);
+        state.status = "succeeded";
+        state.questionnaires.push(action.payload);
+      })
+      .addCase(createQuestionnaire.rejected, (state, action) => {
+        console.error("Error creating questionnaire:", action.payload);
+        state.status = "failed";
+        state.error = action.payload as string;
       });
-    },
-    updateQuestionnaire: (state, action) => {
-      const index = state.questionnaires.findIndex(q => q.id === action.payload.id);
-      if (index !== -1) state.questionnaires[index] = { ...state.questionnaires[index], ...action.payload };
-    },
-    deleteQuestionnaire: (state, action) => {
-      state.questionnaires = state.questionnaires.filter(q => q.id !== action.payload);
-    },
-    toggleActive: (state, action) => {
-      const q = state.questionnaires.find(q => q.id === action.payload);
-      if (q) q.isActive = !q.isActive;
-    },
   },
 });
 
-export const { addQuestionnaire, updateQuestionnaire, deleteQuestionnaire, toggleActive } = questionnairesSlice.actions;
+export const { clearQuestionnaireError } = questionnairesSlice.actions;
 
-export const selectAllQuestionnaires    = (state) => state.questionnaires.questionnaires;
+type RootState = {
+  questionnaires: QuestionnairesState;
+};
+
+export const selectAllQuestionnaires = (state: RootState) =>
+  state.questionnaires.questionnaires;
+
 export const selectActiveQuestionnaires = createSelector(
   selectAllQuestionnaires,
-  (questionnaires) => questionnaires.filter(q => q.isActive)
+  (questionnaires) => questionnaires.filter((q) => q.is_active),
 );
-export const selectQuestionnaireById    = (id) => (state) => state.questionnaires.questionnaires.find(q => q.id === id);
+
+export const selectQuestionnairesByFrequency = (frequency: string) =>
+  createSelector(selectAllQuestionnaires, (questionnaires) =>
+    questionnaires.filter((q) => q.frequency === frequency),
+  );
 
 export default questionnairesSlice.reducer;
