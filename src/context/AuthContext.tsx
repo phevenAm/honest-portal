@@ -1,10 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
-import type {
-  AuthUser,
-  UserProfile,
-} from "../models/globalTypes";
-
+import type { AuthUser, UserProfile } from "../models/globalTypes";
 import type { Session } from "@supabase/supabase-js";
 
 type AuthContextType = {
@@ -35,6 +31,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const prevUserIdRef = useRef<string | null>(null);
 
+  
+
   const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
     const { data, error } = await supabase
       .from("users")
@@ -50,9 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data;
   };
 
-
-
-const handleSession = async (session: Session | null) => {
+  const handleSession = async (session: Session | null) => {
     const authUser = session?.user ?? null;
     const newUserId = authUser?.id ?? null;
 
@@ -72,31 +68,30 @@ const handleSession = async (session: Session | null) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      await handleSession(data.session);
-      setLoading(false);
-    };
+useEffect(() => {
+  let initialised = false;
 
-    init();
+  const init = async () => {
+    const { data } = await supabase.auth.getSession();
+    await handleSession(data.session);
+    initialised = true;
+  };
 
-    const { data: { subscription } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        handleSession(session);
-      });
+  init();
 
-    return () => subscription.unsubscribe();
-  }, []);
+  const { data: { subscription } } =
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log("onAuthStateChange event:", event);
+      if (!initialised) return; // ignore all events until getSession finishes
+      handleSession(session);
+    });
+
+  return () => subscription.unsubscribe();
+}, []);
 
   const signIn = async (email: string, password: string) => {
     setError(null);
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError(error.message);
       throw error;
@@ -105,13 +100,11 @@ const handleSession = async (session: Session | null) => {
 
   const signUp = async (email: string, password: string, meta?: any) => {
     setError(null);
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: meta },
     });
-
     if (error) {
       setError(error.message);
       throw error;
@@ -120,9 +113,7 @@ const handleSession = async (session: Session | null) => {
 
   const signOut = async () => {
     setError(null);
-
     const { error } = await supabase.auth.signOut();
-
     if (error) {
       console.error("signOut error:", error.message);
     }
