@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   createQuestionnaire,
-  selectActiveQuestionnaires,
-  selectQuestionnairesByFrequency,
+  toggleActive,
+  //selectActiveQuestionnaires,
+  //selectQuestionnairesByFrequency,
+  deleteQuestionnaire,
   selectAllQuestionnaires,
   fetchQuestionnaires,
 } from "../../../store/slices/questionnairesSlice";
@@ -236,14 +238,14 @@ export default function AdminQuestionnairesPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      //onClick={() => dispatch(toggleActive(q.id))}
+                      onClick={() => dispatch(toggleActive({id: q.id, is_active: !q.is_active}))}
                     >
                       {q.is_active ? "Pause" : "Activate"}
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
-                      //onClick={() => dispatch(deleteQuestionnaire(q.id))}
+                      onClick={() => dispatch(deleteQuestionnaire(q.id))}
                     >
                       Delete
                     </Button>

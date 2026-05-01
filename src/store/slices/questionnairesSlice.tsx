@@ -50,6 +50,7 @@ export const createQuestionnaire = createAsyncThunk(
     if (questionnaireError) {
       return rejectWithValue(questionnaireError.message);
     }
+
     const questionRows = data.questions.map((question, index) => ({
       questionnaire_id: questionnaire.id,
       text: question.text,
@@ -79,7 +80,36 @@ export const createQuestionnaire = createAsyncThunk(
     };
   },
 );
-``
+
+export const deleteQuestionnaire = createAsyncThunk<string, string>(
+  "questionnaires/deleteQuestionnaire",
+  async (id, { rejectWithValue }) => {
+    const { error } = await supabase
+      .from("questionnaires")
+      .delete()
+      .eq("id", id);
+
+    if (error) return rejectWithValue(error.message);
+    return id;
+  },
+);
+
+export const toggleActive = createAsyncThunk<
+  { id: string; is_active: boolean },
+  { id: string; is_active: boolean }
+>(
+  "questionnaires/toggleActive",
+  async ({ id, is_active }, { rejectWithValue }) => {
+    const { error } = await supabase
+      .from("questionnaires")
+      .update({ is_active })
+      .eq("id", id);
+
+    if (error) return rejectWithValue(error.message);
+    return { id, is_active };
+  },
+);
+
 const questionnairesSlice = createSlice({
   name: "questionnaires",
   initialState,
@@ -113,6 +143,33 @@ const questionnairesSlice = createSlice({
         state.questionnaires = action.payload;
       })
       .addCase(fetchQuestionnaires.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(deleteQuestionnaire.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteQuestionnaire.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.questionnaires = state.questionnaires.filter(
+          (q) => q.id !== action.payload,
+        );
+      })
+      .addCase(deleteQuestionnaire.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(toggleActive.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(toggleActive.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const q = state.questionnaires.find(
+          (q) => q.id === action.payload.id,
+        );
+        if (q) q.is_active = action.payload.is_active;
+      })
+      .addCase(toggleActive.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });
