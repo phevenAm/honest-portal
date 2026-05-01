@@ -6,4 +6,7 @@ export default defineConfig({
    css: {
     devSourcemap: true,  // ← shows which .scss file a style comes from in DevTools
   },
+    server: {
+    historyApiFallback: true,
+  }
 })
