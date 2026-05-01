@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   createQuestionnaire,
   selectActiveQuestionnaires,
   selectQuestionnairesByFrequency,
   selectAllQuestionnaires,
+  fetchQuestionnaires,
 } from "../../../store/slices/questionnairesSlice";
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminQuestionnairesPage.module.scss";
+import type { AppDispatch } from '../../../store/index';
+
 
 const QUESTION_TYPES = ["scale", "text"];
 
@@ -178,9 +181,23 @@ function QuestionnaireBuilder({
 }
 
 export default function AdminQuestionnairesPage() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const questionnaires = useSelector(selectAllQuestionnaires);
   const [showBuilder, setShowBuilder] = useState(false);
+
+  const questionnaireStatus = useSelector(
+    (state: RootState) => state.questionnaires.status,
+  );
+
+  useEffect(() => {
+    if (questionnaireStatus === "idle") {
+      dispatch(fetchQuestionnaires())
+        .unwrap()
+        .catch((err) => {
+          console.error("Failed to fetch questionnaires:", err);
+        });
+    }
+  }, [dispatch, questionnaireStatus]);
 
   return (
     <div className={styles.page}>
@@ -219,14 +236,14 @@ export default function AdminQuestionnairesPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => dispatch(toggleActive(q.id))}
+                      //onClick={() => dispatch(toggleActive(q.id))}
                     >
                       {q.is_active ? "Pause" : "Activate"}
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={() => dispatch(deleteQuestionnaire(q.id))}
+                      //onClick={() => dispatch(deleteQuestionnaire(q.id))}
                     >
                       Delete
                     </Button>
@@ -246,7 +263,6 @@ export default function AdminQuestionnairesPage() {
       {showBuilder && (
         <QuestionnaireBuilder
           onSave={(data) =>
-            console.log("Create questionnaire with data -- UI:", data) ||
             dispatch(createQuestionnaire(data))
           }
           onClose={() => setShowBuilder(false)}

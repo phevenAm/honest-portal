@@ -18,10 +18,24 @@ const initialState: QuestionnairesState = {
   error: null,
 };
 
+export const fetchQuestionnaires = createAsyncThunk<Questionnaire[], void>(
+  "questionnaires/fetchQuestionnaires",
+  async (_, { rejectWithValue }) => {
+    const { data, error } = await supabase.from("questionnaires").select(`
+      *,
+      questions (*)
+    `);
+
+    console.log("fetching questionnaires: ", { data, error });
+
+    if (error) return rejectWithValue(error.message);
+    return data;
+  },
+);
+
 export const createQuestionnaire = createAsyncThunk(
   "questionnaires/createQuestionnaire",
   async (data: Questionnaire, { rejectWithValue }) => {
-    console.log(' Creating questionnaire with data:', data);
     const { data: questionnaire, error: questionnaireError } = await supabase
       .from("questionnaires")
       .insert({
@@ -33,23 +47,22 @@ export const createQuestionnaire = createAsyncThunk(
       .select()
       .single();
 
-      console.log("createQuestionnaire response:", { questionnaire, questionnaireError });
-
     if (questionnaireError) {
       return rejectWithValue(questionnaireError.message);
     }
-      console.log(' Creating questionnaire with data:', data);
-const questionRows = data.questions.map((question, index) => ({
-  questionnaire_id: questionnaire.id,
-  text: question.text,
-  type: question.type,
-  min_value: question.type === "scale" ? question.min ?? 1 : null,
-  max_value: question.type === "scale" ? question.max ?? 10 : null,
-  min_label: question.type === "scale" ? question.minLabel ?? null : null,
-  max_label: question.type === "scale" ? question.maxLabel ?? null : null,
-  order_index: question.orderIndex ?? index + 1,
-  is_required: question.is_required ?? true,
-}));
+    const questionRows = data.questions.map((question, index) => ({
+      questionnaire_id: questionnaire.id,
+      text: question.text,
+      type: question.type,
+      min_value: question.type === "scale" ? (question.min_value ?? 1) : null,
+      max_value: question.type === "scale" ? (question.max_value ?? 10) : null,
+      min_label:
+        question.type === "scale" ? (question.min_label ?? null) : null,
+      max_label:
+        question.type === "scale" ? (question.max_label ?? null) : null,
+      order_index: question.order_index ?? index + 1,
+      is_required: question.is_required ?? true,
+    }));
 
     const { data: questions, error: questionsError } = await supabase
       .from("questions")
@@ -64,9 +77,9 @@ const questionRows = data.questions.map((question, index) => ({
       ...questionnaire,
       questions,
     };
-  }
+  },
 );
-
+``
 const questionnairesSlice = createSlice({
   name: "questionnaires",
   initialState,
@@ -89,6 +102,17 @@ const questionnairesSlice = createSlice({
       })
       .addCase(createQuestionnaire.rejected, (state, action) => {
         console.error("Error creating questionnaire:", action.payload);
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(fetchQuestionnaires.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchQuestionnaires.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.questionnaires = action.payload;
+      })
+      .addCase(fetchQuestionnaires.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });
