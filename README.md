@@ -1,18 +1,8 @@
 # 🌿 WithMe — Counselling Client Portal
 
-A full-featured mental health counselling portal built in React, designed as a learning project scaffolded with Redux, React Router, and mock auth — ready for you to extend with a real backend.
+A full-featured mental health counselling portal built in React.
 
 ---
-
-## 🚀 Getting Started
-
-```bash
-cd mindful-portal
-npm install
-npm start
-```
-
-Then open [http://localhost:3000](http://localhost:3000)
 
 ### Demo credentials
 | Role   | Email                        | Password   |
