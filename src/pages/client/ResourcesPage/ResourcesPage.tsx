@@ -1,23 +1,12 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectPublishedResources } from '../../../store/slices/resourcesSlice';
+import { selectPublishedResources, fetchPublishedResources } from '../../../store/slices/resourcesSlice';
 import Card from '../../../components/shared/Card/Card';
 import styles from './ResourcesPage.module.scss';
-
-const ArticleIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-  </svg>
-);
-
-const VideoIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polygon points="23 7 16 12 23 17 23 7"/>
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-  </svg>
-);
-
+  import type { Resource } from '../../../models/globalTypes';
+import { useFetchOnIdle } from "../../../Hooks/Hooks";
+import type { AppDispatch, RootState } from "../../../store/index";
+import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 function ResourceCard({ resource }: { resource: any }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -65,8 +54,18 @@ export default function ResourcesPage() {
   const resources = useSelector(selectPublishedResources);
   const [filter, setFilter] = useState('all');
 
-  const types    = ['all', ...Array.from(new Set(resources.map((r: any) => r.type)))];
-  const filtered = filter === 'all' ? resources : resources.filter((r: any) => r.type === filter);
+
+
+  useFetchOnIdle(
+    (state: RootState) => state.resources.status,
+    fetchPublishedResources,
+    "Failed to fetch resources:"
+  );
+
+  const types = ["all", ...new Set(resources.map((r) => r.type))];
+  const filtered =
+    filter === "all" ? resources : resources.filter((r) => r.type === filter);
+
 
   return (
     <div className={styles.page}>

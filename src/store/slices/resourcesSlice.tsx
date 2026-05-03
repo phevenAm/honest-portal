@@ -2,43 +2,183 @@
 // RESOURCES SLICE — articles, videos, and other content
 // ============================================================
 
-import { createSlice } from '@reduxjs/toolkit';
-import { MOCK_RESOURCES } from '../../data/mockData';
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
+import { supabase } from "../../lib/supabase.js";
+import type { Resource, UpdateResource } from "../../models/globalTypes.js";
 
-const initialState = {
-  resources: MOCK_RESOURCES,
+type ResourcesState = {
+  resources: Resource[];
+  status: "idle" | "loading" | "succeeded" | "failed";
+  error: string | null;
 };
 
+const initialState: ResourcesState = {
+  resources: [],
+  status: "idle",
+  error: null,
+};
+
+// ─── Thunks ────────────────────────────────────────────────
+
+// Admin: fetch all resources (published + unpublished)
+export const fetchResources = createAsyncThunk<Resource[]>(
+  "resources/fetchResources",
+  async (_, { rejectWithValue }) => {
+    const { data, error } = await supabase
+      .from("resources")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return rejectWithValue(error.message);
+    return data;
+  },
+);
+
+// Client: fetch only published resources
+export const fetchPublishedResources = createAsyncThunk<Resource[]>(
+  "resources/fetchPublishedResources",
+  async (_, { rejectWithValue }) => {
+    const { data, error } = await supabase
+      .from("resources")
+      .select("*")
+      .eq("is_published", true)
+      .order("updated_at", { ascending: false });
+    if (error) return rejectWithValue(error.message);
+    return data;
+  },
+);
+
+export const createResource = createAsyncThunk<Resource, Omit<Resource, "id" | "created_at" | "updated_at">>(
+  "resources/createResource",
+  async (payload, { rejectWithValue }) => {
+    const { data, error } = await supabase
+      .from("resources")
+      .insert({ ...payload })
+      .select()
+      .single();
+      console.log("createResource response:", { data, error });
+    if (error) return rejectWithValue(error.message);
+    return data;
+  },
+);
+
+export const updateResource = createAsyncThunk<Resource, UpdateResource>(
+  "resources/updateResource",
+  async ({ id, ...fields }, { rejectWithValue }) => {
+    const { data, error } = await supabase
+      .from("resources")
+      .update({ ...fields, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) return rejectWithValue(error.message);
+    return data;
+  },
+);
+
+export const deleteResource = createAsyncThunk<string, string>(
+  "resources/deleteResource",
+  async (id, { rejectWithValue }) => {
+    const { error } = await supabase.from("resources").delete().eq("id", id);
+    if (error) return rejectWithValue(error.message);
+    return id;
+  },
+);
+
+export const togglePublished = createAsyncThunk<{ id: string; is_published: boolean }, { id: string; is_published: boolean }>(
+  "resources/togglePublished",
+  async ({ id, is_published }, { getState, rejectWithValue }) => {
+    const state = getState() as { resources: ResourcesState };
+    const resource = state.resources.resources.find((r) => r.id === id);
+    const newValue = !resource?.is_published;
+    const { error } = await supabase
+      .from("resources")
+      .update({ is_published: newValue, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) return rejectWithValue(error.message);
+    return { id, is_published: newValue };
+  },
+);
+
+// ─── Slice ─────────────────────────────────────────────────
+
 const resourcesSlice = createSlice({
-  name: 'resources',
+  name: "resources",
   initialState,
   reducers: {
-    addResource: (state, action) => {
-      state.resources.push({
-        id: `res-${Date.now()}`,
-        publishedAt: new Date().toISOString().split('T')[0],
-        isPublished: false,
-        ...action.payload,
+    clearResourceError: (state) => { state.error = null; },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchResources.pending, (state) => { state.status = "loading"; })
+      .addCase(fetchResources.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.resources = action.payload;
+      })
+      .addCase(fetchResources.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(fetchPublishedResources.pending, (state) => { state.status = "loading"; })
+      .addCase(fetchPublishedResources.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.resources = action.payload;
+      })
+      .addCase(fetchPublishedResources.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      .addCase(createResource.fulfilled, (state, action) => {
+        state.resources.unshift(action.payload);
+      })
+      .addCase(createResource.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(updateResource.fulfilled, (state, action) => {
+        const index = state.resources.findIndex((r) => r.id === action.payload.id);
+        if (index !== -1) state.resources[index] = action.payload;
+      })
+      .addCase(updateResource.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(deleteResource.fulfilled, (state, action) => {
+        state.resources = state.resources.filter((r) => r.id !== action.payload);
+      })
+      .addCase(deleteResource.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(togglePublished.fulfilled, (state, action) => {
+        const r = state.resources.find((r) => r.id === action.payload.id);
+        if (r) r.is_published = action.payload.is_published;
+      })
+      .addCase(togglePublished.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
-    },
-    updateResource: (state, action) => {
-      const index = state.resources.findIndex(r => r.id === action.payload.id);
-      if (index !== -1) state.resources[index] = { ...state.resources[index], ...action.payload };
-    },
-    deleteResource: (state, action) => {
-      state.resources = state.resources.filter(r => r.id !== action.payload);
-    },
-    togglePublished: (state, action) => {
-      const r = state.resources.find(r => r.id === action.payload);
-      if (r) r.isPublished = !r.isPublished;
-    },
   },
 });
 
-export const { addResource, updateResource, deleteResource, togglePublished } = resourcesSlice.actions;
+export const { clearResourceError } = resourcesSlice.actions;
 
-export const selectAllResources       = (state) => state.resources.resources;
-export const selectPublishedResources = (state) => state.resources.resources.filter(r => r.isPublished);
-export const selectResourcesByType    = (type) => (state) => state.resources.resources.filter(r => r.type === type && r.isPublished);
+// ─── Selectors ─────────────────────────────────────────────
+
+type RootState = { resources: ResourcesState };
+
+export const selectAllResources     = (state: RootState) => state.resources.resources;
+export const selectResourcesStatus  = (state: RootState) => state.resources.status;
+export const selectResourcesError   = (state: RootState) => state.resources.error;
+
+export const selectPublishedResources = createSelector(
+  selectAllResources,
+  (resources) => resources.filter((r) => r.is_published),
+);
+
+export const selectResourcesByType = (type: string) =>
+  createSelector(selectAllResources, (resources) =>
+    resources.filter((r) => r.type === type && r.is_published),
+  );
+
+export const selectResourceById = (id: string) =>
+  createSelector(selectAllResources, (resources) =>
+    resources.find((r) => r.id === id),
+  );
 
 export default resourcesSlice.reducer;
