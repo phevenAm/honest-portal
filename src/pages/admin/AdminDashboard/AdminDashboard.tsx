@@ -9,102 +9,16 @@ import {
   fetchQuestionnaires,
   selectAllQuestionnaires,
 } from "../../../store/slices/questionnairesSlice";
-import { selectAllResources } from "../../../store/slices/resourcesSlice";
+import { fetchResources, selectAllResources } from "../../../store/slices/resourcesSlice";
 import Card from "../../../components/shared/Card/Card";
 import Avatar from "../../../components/shared/Avatar/Avatar";
 import Button from "../../../components/shared/Button/Button";
 import { useAuth } from "../../../context/AuthContext";
 import type { AppDispatch, RootState } from "../../../store/index";
+  import { useFetchOnIdle } from "../../../Hooks/Hooks";
+
 import styles from "./AdminDashboard.module.scss";
-
-// ── SVG Icons ──────────────────────────────────────────────
-const UsersIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-
-const ClipboardIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <rect x="9" y="2" width="6" height="4" rx="1" />
-    <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2" />
-    <line x1="12" y1="11" x2="12" y2="17" />
-    <line x1="9" y1="14" x2="15" y2="14" />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-    <polyline points="22 4 12 14.01 9 11.01" />
-  </svg>
-);
-
-const BookIcon = () => (
-  <svg
-    width="22"
-    height="22"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-  </svg>
-);
-
-const PlusIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    aria-hidden="true"
-  >
-    <line x1="12" y1="5" x2="12" y2="19" />
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
+import {UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon} from '../../../components/shared/Icons/Icons';
 
 const COLORS = ["teal", "sky", "teal", "peach"] as const;
 
@@ -114,9 +28,12 @@ export default function AdminDashboard() {
   const allClients = useSelector(selectAllUsers);
   const questionnaires = useSelector(selectAllQuestionnaires);
   const resources = useSelector(selectAllResources);
+
   const questionnaireStatus = useSelector(
     (state: RootState) => state.questionnaires.status,
   );
+
+  //const resourcesStateStatus = useSelector((state: RootState) => state.resources.status);
 
   useEffect(() => {
     dispatch(fetchAllUsers())
@@ -136,8 +53,14 @@ export default function AdminDashboard() {
     }
   }, [dispatch, questionnaireStatus]);
 
-  const publishedResources = resources.filter((r) => r.isPublished).length;
-  const activeQs = questionnaires.filter((q) => q.isActive).length;
+  useFetchOnIdle(
+    (state: RootState) => state.resources.status,
+    fetchResources,
+    "Failed to fetch resources:"
+  );
+
+  const publishedResources = resources.filter((r) => r.is_published).length;
+  const activeQs = questionnaires.filter((q) => q.is_active).length;
 
   const metrics = [
     {

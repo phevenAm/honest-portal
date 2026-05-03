@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   createQuestionnaire,
-  toggleActive,
-  //selectActiveQuestionnaires,
-  //selectQuestionnairesByFrequency,
+  pauseQuestionnaire,
   deleteQuestionnaire,
   selectAllQuestionnaires,
   fetchQuestionnaires,
@@ -12,8 +10,9 @@ import {
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminQuestionnairesPage.module.scss";
-import type { AppDispatch } from '../../../store/index';
+import type { AppDispatch, RootState } from "../../../store/index";
 
+import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 const QUESTION_TYPES = ["scale", "text"];
 
@@ -191,15 +190,11 @@ export default function AdminQuestionnairesPage() {
     (state: RootState) => state.questionnaires.status,
   );
 
-  useEffect(() => {
-    if (questionnaireStatus === "idle") {
-      dispatch(fetchQuestionnaires())
-        .unwrap()
-        .catch((err) => {
-          console.error("Failed to fetch questionnaires:", err);
-        });
-    }
-  }, [dispatch, questionnaireStatus]);
+  useFetchOnIdle(
+    (state: RootState) => state.questionnaires.status,
+    fetchQuestionnaires,
+    "Failed to fetch questionnaires:",
+  );
 
   return (
     <div className={styles.page}>
@@ -238,7 +233,14 @@ export default function AdminQuestionnairesPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => dispatch(toggleActive({id: q.id, is_active: !q.is_active}))}
+                      onClick={() =>
+                        dispatch(
+                          pauseQuestionnaire({
+                            id: q.id,
+                            is_active: !q.is_active,
+                          }),
+                        )
+                      }
                     >
                       {q.is_active ? "Pause" : "Activate"}
                     </Button>
@@ -264,9 +266,7 @@ export default function AdminQuestionnairesPage() {
 
       {showBuilder && (
         <QuestionnaireBuilder
-          onSave={(data) =>
-            dispatch(createQuestionnaire(data))
-          }
+          onSave={(data) => dispatch(createQuestionnaire(data))}
           onClose={() => setShowBuilder(false)}
         />
       )}
