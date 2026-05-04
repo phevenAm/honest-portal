@@ -1,27 +1,121 @@
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import Card from '../Card/Card';
-import styles from './ProgressChart.module.scss';
+import React, { useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import Card from "../Card/Card";
+import type {
+  Questionnaire,
+  Question,
+  Response,
+} from "../../../models/globalTypes";
+import styles from "./ProgressChart.module.scss";
 
-const WEEKS = 12;
+const LINE_COLORS = [
+  "#2d7264",
+  "#5a8a6a",
+  "#3a7fa8",
+  "#8a6a2d",
+  "#a8633a",
+  "#6a2d8a",
+];
 
-const scoreToHeatColor = (s: number) => {
-  if (!s) return 'var(--bg-muted)';
-  const stops = [[220,240,235],[180,220,210],[90,170,150],[31,73,64]] as const;
-  const t = ((s - 1) / 9) * (stops.length - 1);
-  const i = Math.floor(t), f = t - i;
+const scoreToHeatColor = (score: number) => {
+  if (!score) return "var(--bg-muted)";
+
+  const stops = [
+    [220, 240, 235],
+    [180, 220, 210],
+    [90, 170, 150],
+    [31, 73, 64],
+  ] as const;
+
+  const t = ((score - 1) / 9) * (stops.length - 1);
+  const i = Math.floor(t);
+  const f = t - i;
+
   const a = stops[Math.min(i, stops.length - 1)];
   const b = stops[Math.min(i + 1, stops.length - 1)];
-  return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
+
+  return `rgb(${Math.round(a[0] + (b[0] - a[0]) * f)}, ${Math.round(
+    a[1] + (b[1] - a[1]) * f,
+  )}, ${Math.round(a[2] + (b[2] - a[2]) * f)})`;
 };
+
+const formatDate = (iso?: string) => {
+  if (!iso) return "Unknown";
+  const date = new Date(iso);
+
+  if (Number.isNaN(date.getTime())) return "Unknown";
+
+  return `${date.getDate()}/${date.getMonth() + 1}`;
+};
+
+const getResponseDate = (response: Response) =>
+  response.submitted_at ?? response.created_at ?? "";
+
+const getScore = (response: Response, questionId: string) => {
+  const scores = response.scores as Record<string, number | string>;
+  const raw = scores?.[questionId];
+
+  if (raw === undefined || raw === null || raw === "") return 0;
+
+  return Number(raw);
+};
+
+const buildChartData = (responses: Response[], scaleQuestions: Question[]) =>
+  responses.map((response, index) => {
+    const point: Record<string, string | number> = {
+      label: formatDate(getResponseDate(response)),
+      index: index + 1,
+    };
+
+    scaleQuestions.forEach((question) => {
+      point[question.id] = getScore(response, question.id);
+    });
+
+    return point;
+  });
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
+
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '10px 14px', boxShadow: 'var(--shadow-md)' }}>
-      <p style={{ fontWeight: 600, marginBottom: 6, color: 'var(--text-primary)', fontSize: 13 }}>Week {label}</p>
+    <div
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--r-md)",
+        padding: "10px 14px",
+        boxShadow: "var(--shadow-md)",
+      }}
+    >
+      <p
+        style={{
+          fontWeight: 600,
+          marginBottom: 6,
+          color: "var(--text-primary)",
+          fontSize: 13,
+        }}
+      >
+        {label}
+      </p>
+
       {payload.map((entry: any) => (
-        <p key={entry.name} style={{ color: entry.color, fontSize: 12, marginBottom: 2 }}>
+        <p
+          key={entry.name}
+          style={{
+            color: entry.color,
+            fontSize: 12,
+            marginBottom: 2,
+          }}
+        >
           {entry.name}: <strong>{entry.value}/10</strong>
         </p>
       ))}
@@ -29,73 +123,132 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-const LINE_CONFIG = [
-  { key: 'Mood',       color: '#2d7264' },
-  { key: 'Sleep',      color: '#5a8a6a' },
-  { key: 'Connection', color: '#3a7fa8' },
-  { key: 'Coping',     color: '#8a6a2d' },
-];
-
-const DIMS = ['Mood', 'Sleep', 'Connection', 'Coping'];
-const SCORE_KEYS = ['q1-1', 'q1-2', 'q1-3', 'q1-4'];
-
-function LineView({ data }: { data: any[] }) {
-  const chartData = data.map(r => ({
-    week: r.week,
-    Mood:       r.scores['q1-1'],
-    Sleep:      r.scores['q1-2'],
-    Connection: r.scores['q1-3'],
-    Coping:     r.scores['q1-4'],
-  }));
-
+function LineView({
+  data,
+  scaleQuestions,
+}: {
+  data: Record<string, string | number>[];
+  scaleQuestions: Question[];
+}) {
   return (
-    <>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-          <XAxis dataKey="week" tickFormatter={v => `W${v}`} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-          <YAxis domain={[0, 10]} ticks={[0,2,4,6,8,10]} tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 14, color: 'var(--text-secondary)' }} />
-          {LINE_CONFIG.map(l => (
-            <Line key={l.key} type="monotone" dataKey={l.key} stroke={l.color} strokeWidth={2.5}
-              dot={{ r: 3, fill: l.color, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
-    </>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart
+        data={data}
+        margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="var(--border)"
+          vertical={false}
+        />
+
+        <XAxis
+          dataKey="label"
+          tick={{ fill: "var(--text-muted)", fontSize: 11 }}
+          axisLine={false}
+          tickLine={false}
+        />
+
+        <YAxis
+          domain={[0, 10]}
+          ticks={[0, 2, 4, 6, 8, 10]}
+          tick={{ fill: "var(--text-muted)", fontSize: 11 }}
+          axisLine={false}
+          tickLine={false}
+        />
+
+        <Tooltip content={<CustomTooltip />} />
+
+        <Legend
+          wrapperStyle={{
+            fontSize: 12,
+            paddingTop: 14,
+            color: "var(--text-secondary)",
+          }}
+        />
+
+        {scaleQuestions.map((question, index) => (
+          <Line
+            key={question.id}
+            type="monotone"
+            dataKey={question.id}
+            name={question.text}
+            stroke={LINE_COLORS[index % LINE_COLORS.length]}
+            strokeWidth={2.5}
+            dot={{
+              r: 3,
+              fill: LINE_COLORS[index % LINE_COLORS.length],
+              strokeWidth: 0,
+            }}
+            activeDot={{ r: 5 }}
+          />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
   );
 }
 
-function HeatView({ data }: { data: any[] }) {
-  const cols = data.length;
+function HeatView({
+  responses,
+  scaleQuestions,
+}: {
+  responses: Response[];
+  scaleQuestions: Question[];
+}) {
+  const cols = responses.length;
+
   return (
     <div className={styles.heatmapWrap}>
-      <div className={styles.heatmapGrid} style={{ gridTemplateColumns: `72px repeat(${cols}, 1fr)` }}>
+      <div
+        className={styles.heatmapGrid}
+        style={{ gridTemplateColumns: `120px repeat(${cols}, 1fr)` }}
+      >
         <div />
-        {data.map(r => (
-          <div key={r.week} className={styles.heatmapWeekLabel}>W{r.week}</div>
+
+        {responses.map((response) => (
+          <div key={response.id} className={styles.heatmapWeekLabel}>
+            {formatDate(getResponseDate(response))}
+          </div>
         ))}
-        {DIMS.map((dim, di) => (
-          <React.Fragment key={dim}>
-            <div className={styles.heatmapRowLabel}>{dim}</div>
-            {data.map(r => (
-              <div
-                key={r.week}
-                role="img"
-                aria-label={`${dim} week ${r.week}: ${r.scores[SCORE_KEYS[di]]}/10`}
-                title={`${dim} — Week ${r.week}: ${r.scores[SCORE_KEYS[di]]}/10`}
-                className={styles.heatCell}
-                style={{ background: scoreToHeatColor(r.scores[SCORE_KEYS[di]]) }}
-              />
-            ))}
+
+        {scaleQuestions.map((question) => (
+          <React.Fragment key={question.id}>
+            <div className={styles.heatmapRowLabel} title={question.text}>
+              {question.text.length > 18
+                ? `${question.text.slice(0, 18)}…`
+                : question.text}
+            </div>
+
+            {responses.map((response) => {
+              const score = getScore(response, question.id);
+
+              return (
+                <div
+                  key={`${response.id}-${question.id}`}
+                  role="img"
+                  aria-label={`${question.text} on ${formatDate(
+                    getResponseDate(response),
+                  )}: ${score}/10`}
+                  title={`${question.text} — ${formatDate(
+                    getResponseDate(response),
+                  )}: ${score}/10`}
+                  className={styles.heatCell}
+                  style={{ background: scoreToHeatColor(score) }}
+                />
+              );
+            })}
           </React.Fragment>
         ))}
       </div>
+
       <div className={styles.heatLegend}>
         <span>Low</span>
-        {[1,3,5,7,9].map(s => (
-          <div key={s} className={styles.heatLegendSwatch} style={{ background: scoreToHeatColor(s) }} />
+        {[1, 3, 5, 7, 9].map((score) => (
+          <div
+            key={score}
+            className={styles.heatLegendSwatch}
+            style={{ background: scoreToHeatColor(score) }}
+          />
         ))}
         <span>High</span>
       </div>
@@ -104,53 +257,85 @@ function HeatView({ data }: { data: any[] }) {
 }
 
 interface ProgressChartProps {
-  responses: any[];
-  title?:    string;
+  responses: Response[];
+  questionnaire: Questionnaire | null;
+  title?: string;
 }
 
-export default function ProgressChart({ responses, title = 'Your Progress' }: ProgressChartProps) {
-  const [view, setView] = useState<'line' | 'heat'>('line');
+export default function ProgressChart({
+  responses,
+  questionnaire,
+  title = "Your Progress",
+}: ProgressChartProps) {
+  console.log("ProgressChart mounted");
+
+  const [view, setView] = useState<"line" | "heat">("line");
+
+  const scaleQuestions =
+    questionnaire?.questions?.filter((question) => question.type === "scale") ??
+    [];
+
+    
 
   if (!responses || responses.length === 0) {
     return (
       <Card>
-        <p className={styles.empty}>No responses yet. Complete your first check-in to see your progress.</p>
+        <p className={styles.empty}>
+          No responses yet. Complete your first check-in to see your progress.
+        </p>
       </Card>
     );
   }
+
+  if (scaleQuestions.length === 0) {
+    return (
+      <Card>
+        <p className={styles.empty}>
+          No scale questions found, so there is nothing to plot yet.
+        </p>
+      </Card>
+    );
+  }
+
+  const chartData = buildChartData(responses, scaleQuestions);
+
+  console.log("responses", responses);
+console.log("questionnaire", questionnaire);
+console.log("scaleQuestions", scaleQuestions);
+console.log("chartData", chartData);
 
   return (
     <Card className={styles.card}>
       <div className={styles.chartHeader}>
         <div className={styles.chartMeta}>
           <h3>{title}</h3>
-          <p>{responses.length} weeks tracked</p>
+          <p>
+            {responses.length} check-in{responses.length !== 1 ? "s" : ""}{" "}
+            tracked
+          </p>
         </div>
+
         <div role="group" aria-label="Chart type" className={styles.toggle}>
-          {(['line', 'heat'] as const).map(v => (
+          {(["line", "heat"] as const).map((value) => (
             <button
-              key={v}
-              onClick={() => setView(v)}
-              aria-pressed={view === v}
-              className={view === v ? styles.toggleBtnActive : styles.toggleBtn}
+              key={value}
+              type="button"
+              onClick={() => setView(value)}
+              aria-pressed={view === value}
+              className={
+                view === value ? styles.toggleBtnActive : styles.toggleBtn
+              }
             >
-              {v === 'line' ? 'Line graph' : 'Heatmap'}
+              {value === "line" ? "Line graph" : "Heatmap"}
             </button>
           ))}
         </div>
       </div>
 
-      {view === 'line' ? <LineView data={responses} /> : <HeatView data={responses} />}
-
-      {view === 'line' && (
-        <div className={styles.legend}>
-          {LINE_CONFIG.map(l => (
-            <div key={l.key} className={styles.legendItem}>
-              <div className={styles.legendDot} style={{ background: l.color }} />
-              {l.key}
-            </div>
-          ))}
-        </div>
+      {view === "line" ? (
+        <LineView data={chartData} scaleQuestions={scaleQuestions} />
+      ) : (
+        <HeatView responses={responses} scaleQuestions={scaleQuestions} />
       )}
     </Card>
   );

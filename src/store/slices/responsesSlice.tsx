@@ -212,4 +212,9 @@ export const selectLatestResponsesByUser = (userId: string) =>
     return Array.from(latest.values());
   });
 
+  export const selectUserResponses = (userId: string) =>
+  createSelector(selectAllResponses, (responses) =>
+    responses.filter((response) => response.user_id === userId),
+  );
+
 export default responsesSlice.reducer;

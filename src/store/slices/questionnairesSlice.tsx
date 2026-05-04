@@ -4,10 +4,7 @@ import {
   createAsyncThunk,
 } from "@reduxjs/toolkit";
 import { supabase } from "../../lib/supabase.js";
-import type {
-  Questionnaire,
-  UpdateQuestionnaire,
-} from "../../models/globalTypes.js";
+import type { Questionnaire, UpdateQuestionnaire } from "../../models/globalTypes.js";
 
 type QuestionnairesState = {
   questionnaires: Questionnaire[];
@@ -26,77 +23,80 @@ export const fetchQuestionnaires = createAsyncThunk<Questionnaire[], void>(
   async (_, { rejectWithValue }) => {
     const { data, error } = await supabase.from("questionnaires").select(`
       *,
-      questions (*)
+      questions (*),
+      questionnaire_assignments (user_id)
     `);
     if (error) return rejectWithValue(error.message);
-    return data;
+
+    // Map questionnaire_assignments into assignedTo string[]
+    return data.map((q: any) => ({
+      ...q,
+      assignedTo: (q.questionnaire_assignments ?? []).map((a: any) => a.user_id),
+    }));
   },
 );
 
-export const createQuestionnaire = createAsyncThunk<
-  Questionnaire,
-  Questionnaire
->("questionnaires/createQuestionnaire", async (data, { rejectWithValue }) => {
-  const { data: questionnaire, error: questionnaireError } = await supabase
-    .from("questionnaires")
-    .insert({
-      title: data.title,
-      description: data.description,
-      frequency: data.frequency,
-      is_active: true,
-    })
-    .select()
-    .single();
+export const createQuestionnaire = createAsyncThunk<Questionnaire, Questionnaire>(
+  "questionnaires/createQuestionnaire",
+  async (data, { rejectWithValue }) => {
+    const { data: questionnaire, error: questionnaireError } = await supabase
+      .from("questionnaires")
+      .insert({
+        title: data.title,
+        description: data.description,
+        frequency: data.frequency,
+        is_active: true,
+      })
+      .select()
+      .single();
 
-  if (questionnaireError) return rejectWithValue(questionnaireError.message);
+    if (questionnaireError) return rejectWithValue(questionnaireError.message);
 
-  const questionRows = data.questions.map((question, index) => ({
-    questionnaire_id: questionnaire.id,
-    text: question.text,
-    type: question.type,
-    min_value: question.type === "scale" ? (question.min_value ?? 1) : null,
-    max_value: question.type === "scale" ? (question.max_value ?? 10) : null,
-    min_label: question.type === "scale" ? (question.min_label ?? null) : null,
-    max_label: question.type === "scale" ? (question.max_label ?? null) : null,
-    order_index: question.order_index ?? index + 1,
-    is_required: question.is_required ?? true,
-  }));
+    const questionRows = data.questions.map((question, index) => ({
+      questionnaire_id: questionnaire.id,
+      text: question.text,
+      type: question.type,
+      min_value: question.type === "scale" ? (question.min_value ?? 1) : null,
+      max_value: question.type === "scale" ? (question.max_value ?? 10) : null,
+      min_label: question.type === "scale" ? (question.min_label ?? null) : null,
+      max_label: question.type === "scale" ? (question.max_label ?? null) : null,
+      order_index: question.order_index ?? index + 1,
+      is_required: question.is_required ?? true,
+    }));
 
-  const { data: questions, error: questionsError } = await supabase
-    .from("questions")
-    .insert(questionRows)
-    .select();
+    const { data: questions, error: questionsError } = await supabase
+      .from("questions")
+      .insert(questionRows)
+      .select();
 
-  if (questionsError) return rejectWithValue(questionsError.message);
+    if (questionsError) return rejectWithValue(questionsError.message);
 
-  return { ...questionnaire, questions };
-});
+    return { ...questionnaire, questions, assignedTo: [] };
+  },
+);
 
-export const updateQuestionnaire = createAsyncThunk<
-  Questionnaire,
-  UpdateQuestionnaire
->(
+export const updateQuestionnaire = createAsyncThunk<Questionnaire, UpdateQuestionnaire>(
   "questionnaires/updateQuestionnaire",
   async ({ id, ...fields }, { rejectWithValue }) => {
     const { data, error } = await supabase
       .from("questionnaires")
       .update(fields)
       .eq("id", id)
-      .select("*, questions(*)")
+      .select("*, questions(*), questionnaire_assignments(user_id)")
       .single();
 
     if (error) return rejectWithValue(error.message);
-    return data;
+    return {
+      ...data,
+      assignedTo: (data.questionnaire_assignments ?? []).map((a: any) => a.user_id),
+    };
   },
 );
 
 export const deleteQuestionnaire = createAsyncThunk<string, string>(
   "questionnaires/deleteQuestionnaire",
   async (id, { rejectWithValue }) => {
-    const { error } = await supabase
-      .from("questionnaires")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("questionnaires").delete().eq("id", id);
     if (error) return rejectWithValue(error.message);
     return id;
   },
@@ -121,15 +121,24 @@ const questionnairesSlice = createSlice({
   name: "questionnaires",
   initialState,
   reducers: {
-    clearQuestionnaireError: (state) => {
-      state.error = null;
+    clearQuestionnaireError: (state) => { state.error = null; },
+    // Update assignedTo locally after assign/unassign so UI stays in sync
+    addAssignment: (state, action: { payload: { questionnaire_id: string; user_id: string } }) => {
+      const q = state.questionnaires.find((q) => q.id === action.payload.questionnaire_id);
+      if (q && !q.assignedTo.includes(action.payload.user_id)) {
+        q.assignedTo.push(action.payload.user_id);
+      }
+    },
+    removeAssignment: (state, action: { payload: { questionnaire_id: string; user_id: string } }) => {
+      const q = state.questionnaires.find((q) => q.id === action.payload.questionnaire_id);
+      if (q) {
+        q.assignedTo = q.assignedTo.filter((id) => id !== action.payload.user_id);
+      }
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchQuestionnaires.pending, (state) => {
-        state.status = "loading";
-      })
+      .addCase(fetchQuestionnaires.pending, (state) => { state.status = "loading"; })
       .addCase(fetchQuestionnaires.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.questionnaires = action.payload;
@@ -145,18 +154,14 @@ const questionnairesSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(updateQuestionnaire.fulfilled, (state, action) => {
-        const index = state.questionnaires.findIndex(
-          (q) => q.id === action.payload.id,
-        );
+        const index = state.questionnaires.findIndex((q) => q.id === action.payload.id);
         if (index !== -1) state.questionnaires[index] = action.payload;
       })
       .addCase(updateQuestionnaire.rejected, (state, action) => {
         state.error = action.payload as string;
       })
       .addCase(deleteQuestionnaire.fulfilled, (state, action) => {
-        state.questionnaires = state.questionnaires.filter(
-          (q) => q.id !== action.payload,
-        );
+        state.questionnaires = state.questionnaires.filter((q) => q.id !== action.payload);
       })
       .addCase(deleteQuestionnaire.rejected, (state, action) => {
         state.error = action.payload as string;
@@ -171,14 +176,12 @@ const questionnairesSlice = createSlice({
   },
 });
 
-export const { clearQuestionnaireError } = questionnairesSlice.actions;
+export const { clearQuestionnaireError, addAssignment, removeAssignment } = questionnairesSlice.actions;
 
 type RootState = { questionnaires: QuestionnairesState };
 
-export const selectAllQuestionnaires = (state: RootState) =>
-  state.questionnaires.questionnaires;
-export const selectQuestionnairesStatus = (state: RootState) =>
-  state.questionnaires.status;
+export const selectAllQuestionnaires = (state: RootState) => state.questionnaires.questionnaires;
+export const selectQuestionnairesStatus = (state: RootState) => state.questionnaires.status;
 
 export const selectActiveQuestionnaires = createSelector(
   selectAllQuestionnaires,

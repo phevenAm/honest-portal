@@ -45,14 +45,25 @@ export const fetchAllAssignments = createAsyncThunk<Assignment[]>(
 export const fetchAssignmentsByUser = createAsyncThunk<Assignment[], string>(
   "assignments/fetchAssignmentsByUser",
   async (userId, { rejectWithValue }) => {
+    console.log("fetchAssignmentsByUser userId:", userId);
+
     const { data, error } = await supabase
       .from("questionnaire_assignments")
-      .select("*, questionnaires(*)")
+      .select(`
+        *,
+        questionnaires (
+          *,
+          questions (*)
+        )
+      `)
       .eq("user_id", userId)
       .order("assigned_at", { ascending: false });
 
+    console.log("fetchAssignmentsByUser result:", { data, error });
+
     if (error) return rejectWithValue(error.message);
-    return data;
+
+    return data ?? [];
   },
 );
 
@@ -120,6 +131,8 @@ export const unassignQuestionnaireByIds = createAsyncThunk<
     return { questionnaire_id, user_id };
   },
 );
+
+
 
 // ─── Slice ─────────────────────────────────────────────────
 
