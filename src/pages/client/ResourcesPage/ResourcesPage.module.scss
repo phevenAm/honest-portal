@@ -131,3 +131,55 @@
     border: none;
   }
 }
+
+
+//!Modal for when user opens an article to read
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal {
+  width: min(720px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.modalTitle {
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.modalSummary {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.modalContent {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}

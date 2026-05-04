@@ -1,41 +1,52 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { selectPublishedResources, fetchPublishedResources } from '../../../store/slices/resourcesSlice';
-import Card from '../../../components/shared/Card/Card';
-import styles from './ResourcesPage.module.scss';
-  import type { Resource } from '../../../models/globalTypes';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  selectPublishedResources,
+  fetchPublishedResources,
+} from "../../../store/slices/resourcesSlice";
+import Card from "../../../components/shared/Card/Card";
+import styles from "./ResourcesPage.module.scss";
+import type { Resource } from "../../../models/globalTypes";
 import { useFetchOnIdle } from "../../../Hooks/Hooks";
-import type { AppDispatch, RootState } from "../../../store/index";
+import type { RootState } from "../../../store/index";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
-function ResourceCard({ resource }: { resource: any }) {
-  const [expanded, setExpanded] = useState(false);
 
+function ResourceModal({
+  resource,
+  onClose,
+}: {
+  resource: Resource;
+  onClose: () => void;
+}) {
   return (
-    <Card>
-      <div className={styles.accentBar} style={{ background: 'var(--accent)' }} />
-      <div className={styles.cardBody}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resource-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className={styles.modalClose} onClick={onClose}>
+          ×
+        </button>
+
         <span className={styles.categoryBadge}>
-          {resource.type === 'video' ? <VideoIcon /> : <ArticleIcon />}
+          {resource.type === "video" ? <VideoIcon /> : <ArticleIcon />}
           {resource.category}
         </span>
-        <h3 className={styles.cardTitle}>{resource.title}</h3>
-        <p className={styles.excerpt}>{resource.excerpt}</p>
-        <div className={styles.cardFooter}>
-          <span className={styles.readTime}>{resource.readTime || resource.duration}</span>
-          {resource.type !== 'video' && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              aria-expanded={expanded}
-              className={styles.readMoreBtn}
-            >
-              {expanded ? 'Read less' : 'Read more'}
-            </button>
-          )}
-        </div>
-        {expanded && resource.content && (
-          <div className={styles.expandedContent}>{resource.content}</div>
+
+        <h2 id="resource-title" className={styles.modalTitle}>
+          {resource.title}
+        </h2>
+
+        <p className={styles.modalSummary}>{resource.summary}</p>
+
+        {resource.type === "article" && resource.content && (
+          <div className={styles.modalContent}>{resource.content}</div>
         )}
-        {resource.type === 'video' && (
+
+        {resource.type === "video" && (
           <div className={styles.videoWrap}>
             <iframe
               src={resource.videoUrl}
@@ -45,6 +56,69 @@ function ResourceCard({ resource }: { resource: any }) {
             />
           </div>
         )}
+
+        {(resource.type === "document" || resource.type === "link") && (
+          <div className={styles.externalWrap}>
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.externalBtn}
+            >
+              {resource.type === "document" ? "Open document" : "Visit website"}
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ResourceCard({
+  resource,
+  onOpen,
+}: {
+  resource: Resource;
+  onOpen: (resource: Resource) => void;
+}) {
+    const handleClick = () => {
+    if (resource.type === "document" || resource.type === "link") {
+      window.open(resource.url, "_blank");
+    } else {
+      onOpen(resource);
+    }
+  };
+  return (
+    <Card>
+      <div
+        className={styles.accentBar}
+        style={{ background: "var(--accent)" }}
+      />
+
+      <div className={styles.cardBody}>
+        <span className={styles.categoryBadge}>
+          {resource.type === "video" ? <VideoIcon /> : <ArticleIcon />}
+          {resource.category}
+        </span>
+
+        <h3 className={styles.cardTitle}>{resource.title}</h3>
+
+        <p className={styles.excerpt}>{resource.summary}</p>
+
+        <div className={styles.cardFooter}>
+          <button
+            onClick={handleClick}
+            className={styles.readMoreBtn}
+          >
+            {resource.type === "video"
+              ? "Watch"
+              : resource.type === "document"
+                ? "Open document"
+                : resource.type === "link"
+                  ? "Visit site"
+                  : "Read"}
+          </button>
+        </div>
       </div>
     </Card>
   );
@@ -52,20 +126,21 @@ function ResourceCard({ resource }: { resource: any }) {
 
 export default function ResourcesPage() {
   const resources = useSelector(selectPublishedResources);
-  const [filter, setFilter] = useState('all');
-
-
+  const [filter, setFilter] = useState("all");
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(
+    null,
+  );
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
     fetchPublishedResources,
-    "Failed to fetch resources:"
+    "Failed to fetch resources:",
   );
 
   const types = ["all", ...new Set(resources.map((r) => r.type))];
+
   const filtered =
     filter === "all" ? resources : resources.filter((r) => r.type === filter);
-
 
   return (
     <div className={styles.page}>
@@ -75,28 +150,47 @@ export default function ResourcesPage() {
           <p>Curated by your practitioner — take your time with these.</p>
         </div>
 
-        <div role="tablist" aria-label="Filter resources by type" className={styles.filterRow}>
-          {types.map((t: string) => (
+        <div
+          role="tablist"
+          aria-label="Filter resources by type"
+          className={styles.filterRow}
+        >
+          {types.map((type: string) => (
             <button
-              key={t}
+              key={type}
               role="tab"
-              aria-selected={filter === t}
-              onClick={() => setFilter(t)}
-              className={filter === t ? styles.filterBtnActive : styles.filterBtn}
+              aria-selected={filter === type}
+              onClick={() => setFilter(type)}
+              className={
+                filter === type ? styles.filterBtnActive : styles.filterBtn
+              }
             >
-              {t === 'all' ? 'All resources' : t + 's'}
+              {type === "all" ? "All resources" : `${type}s`}
             </button>
           ))}
         </div>
 
         <div className={styles.grid}>
-          {filtered.map((r: any) => <ResourceCard key={r.id} resource={r} />)}
+          {filtered.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              onOpen={setSelectedResource}
+            />
+          ))}
         </div>
 
         {filtered.length === 0 && (
           <p className={styles.empty}>No resources available yet.</p>
         )}
       </div>
+
+      {selectedResource && (
+        <ResourceModal
+          resource={selectedResource}
+          onClose={() => setSelectedResource(null)}
+        />
+      )}
     </div>
   );
 }

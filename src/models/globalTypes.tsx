@@ -106,7 +106,7 @@ export enum ResourceType {
   ARTICLE = "article",
   VIDEO = "video",
   AUDIO = "audio",
-  PDF = "pdf",
+  DOCUMENT = "document",
   LINK = "link",
 }
 
@@ -192,9 +192,11 @@ export type Resource = {
   updated_at: string;
   title: string;
   summary?: string;
+  category: string;
   content?: string;
   type: ResourceType | string;
   url?: string;
+  videoUrl?: string;
   tags?: string; // comma-separated or JSON string
   content_format?: ContentFormat | string;
   is_published: boolean;
@@ -232,9 +234,6 @@ export type UpdateUser = Partial<Omit<UserProfile, "id" | "created_at">> & {
 export type UpdateResource = Partial<Omit<Resource, "id" | "created_at">> & {
   id: string;
 };
-
-
-
 
 /// Chart
 

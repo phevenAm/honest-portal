@@ -8,6 +8,11 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from "recharts";
 import Card from "../Card/Card";
 import type {
@@ -256,6 +261,51 @@ function HeatView({
   );
 }
 
+function RadarView({
+  responses,
+  scaleQuestions,
+}: {
+  responses: Response[];
+  scaleQuestions: Question[];
+}) {
+  const latestResponse = responses[responses.length - 1];
+
+  const data = scaleQuestions.map((question) => ({
+    question:
+      question.text.length > 22
+        ? `${question.text.slice(0, 22)}…`
+        : question.text,
+    score: getScore(latestResponse, question.id),
+    fullMark: 10,
+  }));
+
+  return (
+    <ResponsiveContainer width="100%" height={360}>
+      <RadarChart data={data} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+        <PolarGrid stroke="var(--border)" />
+        <PolarAngleAxis
+          dataKey="question"
+          tick={{ fill: "var(--text-secondary)", fontSize: 12 }}
+        />
+        <PolarRadiusAxis
+          angle={90}
+          domain={[0, 10]}
+          tickCount={6}
+          tick={{ fill: "var(--text-muted)", fontSize: 10 }}
+        />
+        <Radar
+          name="Latest check-in"
+          dataKey="score"
+          stroke="#2d7264"
+          fill="#2d7264"
+          fillOpacity={0.35}
+        />
+        <Tooltip content={<CustomTooltip />} />
+      </RadarChart>
+    </ResponsiveContainer>
+  );
+}
+
 interface ProgressChartProps {
   responses: Response[];
   questionnaire: Questionnaire | null;
@@ -267,15 +317,11 @@ export default function ProgressChart({
   questionnaire,
   title = "Your Progress",
 }: ProgressChartProps) {
-  console.log("ProgressChart mounted");
-
-  const [view, setView] = useState<"line" | "heat">("line");
+  const [view, setView] = useState<"line" | "heat" | "radar">("line");
 
   const scaleQuestions =
     questionnaire?.questions?.filter((question) => question.type === "scale") ??
     [];
-
-    
 
   if (!responses || responses.length === 0) {
     return (
@@ -299,11 +345,6 @@ export default function ProgressChart({
 
   const chartData = buildChartData(responses, scaleQuestions);
 
-  console.log("responses", responses);
-console.log("questionnaire", questionnaire);
-console.log("scaleQuestions", scaleQuestions);
-console.log("chartData", chartData);
-
   return (
     <Card className={styles.card}>
       <div className={styles.chartHeader}>
@@ -316,7 +357,7 @@ console.log("chartData", chartData);
         </div>
 
         <div role="group" aria-label="Chart type" className={styles.toggle}>
-          {(["line", "heat"] as const).map((value) => (
+          {(["line", "heat", "radar"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -326,7 +367,11 @@ console.log("chartData", chartData);
                 view === value ? styles.toggleBtnActive : styles.toggleBtn
               }
             >
-              {value === "line" ? "Line graph" : "Heatmap"}
+              {value === "line"
+                ? "Line graph"
+                : value === "heat"
+                  ? "Heatmap"
+                  : "Radar"}
             </button>
           ))}
         </div>
@@ -334,8 +379,10 @@ console.log("chartData", chartData);
 
       {view === "line" ? (
         <LineView data={chartData} scaleQuestions={scaleQuestions} />
-      ) : (
+      ) : view === "heat" ? (
         <HeatView responses={responses} scaleQuestions={scaleQuestions} />
+      ) : (
+        <RadarView responses={responses} scaleQuestions={scaleQuestions} />
       )}
     </Card>
   );
