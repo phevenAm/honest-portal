@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectAllResources,
@@ -12,42 +12,53 @@ import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminResourcesPage.module.scss";
 import type { AppDispatch, RootState } from "../../../store/index";
-import { Resource } from "../../../models/globalTypes";
+import type { Resource } from "../../../models/globalTypes";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 import { ResourceForm } from "./AdminResourcesPageForm";
 import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
-const CATEGORIES = [
-  "Psychoeducation",
-  "Coping Skills",
-  "Breathwork",
-  "Self-Compassion",
-  "Relationships",
-  "General",
-];
+const RESOURCE_TYPES = ["all", "article", "video", "document", "link"] as const;
 
+const getResourceTypeLabel = (type: string) => {
+  if (type === "all") return "All";
+  if (type === "article") return "Articles";
+  if (type === "video") return "Videos";
+  if (type === "document") return "Documents";
+  if (type === "link") return "Websites";
+
+  return type;
+};
+
+const getResourceIcon = (type: Resource["type"]) => {
+  if (type === "video") return <VideoIcon />;
+  if (type === "document") return <span aria-hidden="true">📄</span>;
+  if (type === "link") return <span aria-hidden="true">🔗</span>;
+
+  return <ArticleIcon />;
+};
 
 export default function AdminResourcesPage() {
+  const dispatch = useDispatch<AppDispatch>();
   const resources: Resource[] = useSelector(selectAllResources);
+
   const [showForm, setShowForm] = useState(false);
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
+  const [typeFilter, setTypeFilter] =
+    useState<(typeof RESOURCE_TYPES)[number]>("all");
 
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [editingResource, setEditingResource] = useState(null);
-
-  const [typeFilter, setTypeFilter] = useState("all");
-
-  const dispatch: AppDispatch = useDispatch();
+  useFetchOnIdle(
+    (state: RootState) => state.resources.status,
+    fetchResources,
+    "Failed to fetch resources:",
+  );
 
   const filtered =
     typeFilter === "all"
       ? resources
-      : resources.filter((r) => r.type === typeFilter);
+      : resources.filter((resource) => resource.type === typeFilter);
 
-  useFetchOnIdle(
-    (state) => state.resources.status,
-    fetchResources,
-    "Failed to fetch resources:",
-  );
+  const publishedCount = resources.filter((resource) => resource.is_published).length;
+  const draftCount = resources.filter((resource) => !resource.is_published).length;
 
   return (
     <div className={styles.page}>
@@ -56,81 +67,84 @@ export default function AdminResourcesPage() {
           <div>
             <h1>Resources</h1>
             <p>
-              {resources.filter((r) => r.is_published).length} published ·{" "}
-              {resources.filter((r) => !r.is_published).length} drafts
+              {publishedCount} published · {draftCount} drafts
             </p>
           </div>
+
           <Button onClick={() => setShowForm(true)}>+ Add resource</Button>
         </div>
 
         <div className={styles.filterRow}>
-          {["all", "article", "video"].map((t) => (
+          {RESOURCE_TYPES.map((type) => (
             <button
-              key={t}
-              onClick={() => setTypeFilter(t)}
+              key={type}
+              type="button"
+              onClick={() => setTypeFilter(type)}
               className={
-                typeFilter === t ? styles.filterBtnActive : styles.filterBtn
+                typeFilter === type ? styles.filterBtnActive : styles.filterBtn
               }
             >
-              {t === "all" ? "All" : t + "s"}
+              {getResourceTypeLabel(type)}
             </button>
           ))}
         </div>
 
         <div className={styles.list}>
-          {filtered.map((r) => (
-            <Card key={r.id}>
+          {filtered.map((resource) => (
+            <Card key={resource.id}>
               <div className={styles.resourceRow}>
                 <div className={styles.resourceIcon}>
-                  {r.type === "video" ? <VideoIcon /> : <ArticleIcon />}
+                  {getResourceIcon(resource.type)}
                 </div>
+
                 <div className={styles.resourceInfo}>
-                  <p className={styles.resourceTitle}>{r.title}</p>
-                  {/*<p className={styles.resourceMeta}>{r.category} · {r.updated_at} · {r.readTime || r.duration || '–'}</p>*/}
+                  <p className={styles.resourceTitle}>{resource.title}</p>
+
                   <p className={styles.resourceMeta}>
-                    {" "}
-                    · Lasted edited:{" "}
-                    {new Date(r.updated_at).toLocaleDateString()} ·
+                    {getResourceTypeLabel(resource.type).replace(/s$/, "")} ·{" "}
+                    {resource.category} · Last edited:{" "}
+                    {resource.updated_at
+                      ? new Date(resource.updated_at).toLocaleDateString()
+                      : "Unknown"}
                   </p>
                 </div>
+
                 <div className={styles.resourceActions}>
                   <span
-                    className={`${styles.badge} ${r.is_published ? styles.published : styles.draft}`}
+                    className={`${styles.badge} ${
+                      resource.is_published ? styles.published : styles.draft
+                    }`}
                   >
-                    {r.is_published ? "Published" : "Draft"}
+                    {resource.is_published ? "Published" : "Draft"}
                   </span>
+
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() =>
                       dispatch(
                         togglePublished({
-                          id: r.id,
-                          is_published: !r.is_published,
+                          id: resource.id,
+                          is_published: !resource.is_published,
                         }),
                       )
                     }
                   >
-                    {r.is_published ? "Unpublish" : "Publish"}
+                    {resource.is_published ? "Unpublish" : "Publish"}
                   </Button>
+
                   <Button
                     variant="primary"
                     size="sm"
-                    onClick={() => {
-                      setEditingResource(r);
-                      setShowEditForm(true);
-                      console.log(
-                        "editing resource, button clicked",
-                        editingResource,
-                      );
-                    }}
+                    onClick={() => setEditingResource(resource)}
                   >
                     Edit
                   </Button>
+
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => dispatch(deleteResource(r.id))}
+                    onClick={() => dispatch(deleteResource(resource.id))}
                   >
                     Delete
                   </Button>
@@ -138,8 +152,11 @@ export default function AdminResourcesPage() {
               </div>
             </Card>
           ))}
+
           {filtered.length === 0 && (
-            <p className={styles.empty}>No resources yet.</p>
+            <p className={styles.empty}>
+              No {getResourceTypeLabel(typeFilter).toLowerCase()} resources yet.
+            </p>
           )}
         </div>
       </div>
@@ -150,13 +167,14 @@ export default function AdminResourcesPage() {
           onClose={() => setShowForm(false)}
         />
       )}
-      {showEditForm && editingResource && (
+
+      {editingResource && (
         <ResourceForm
           resource={editingResource}
           onSave={(data) =>
             dispatch(updateResource({ id: editingResource.id, ...data }))
           }
-          onClose={() => setShowEditForm(false)}
+          onClose={() => setEditingResource(null)}
         />
       )}
     </div>
