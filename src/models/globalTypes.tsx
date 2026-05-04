@@ -192,6 +192,7 @@ export type Resource = {
   updated_at: string;
   title: string;
   summary?: string;
+  category: string;
   content?: string;
   type: ResourceType | string;
   url?: string;

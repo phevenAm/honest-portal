@@ -7,7 +7,7 @@ import styles from './ResourcesPage.module.scss';
 import { useFetchOnIdle } from "../../../Hooks/Hooks";
 import type { AppDispatch, RootState } from "../../../store/index";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
-function ResourceCard({ resource }: { resource: any }) {
+function ResourceCard({ resource }: { resource: Resource }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -19,9 +19,9 @@ function ResourceCard({ resource }: { resource: any }) {
           {resource.category}
         </span>
         <h3 className={styles.cardTitle}>{resource.title}</h3>
-        <p className={styles.excerpt}>{resource.excerpt}</p>
+        <p className={styles.excerpt}>{resource.summary}</p>
         <div className={styles.cardFooter}>
-          <span className={styles.readTime}>{resource.readTime || resource.duration}</span>
+          {/*<span className={styles.readTime}>{resource.readTime || resource.duration}</span>*/}
           {resource.type !== 'video' && (
             <button
               onClick={() => setExpanded(!expanded)}
