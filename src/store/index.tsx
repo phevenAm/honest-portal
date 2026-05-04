@@ -8,22 +8,24 @@
 // ============================================================
 
 import { configureStore } from '@reduxjs/toolkit';
-import userDirectoryReducer from './slices/userDirectorySlice';
+import userDirectoryReducer  from './slices/userDirectorySlice';
 import questionnairesReducer from './slices/questionnairesSlice';
-import responsesReducer from './slices/responsesSlice';
-import resourcesReducer from './slices/resourcesSlice';
-import themeReducer from './slices/themeSlice';
+import assignmentsReducer    from './slices/questionnaireAssignmentsSlice';
+import responsesReducer      from './slices/responsesSlice';
+import resourcesReducer      from './slices/resourcesSlice';
+import themeReducer          from './slices/themeSlice';
 
 export const store = configureStore({
   reducer: {
-    userDirectory: userDirectoryReducer,
+    userDirectory:  userDirectoryReducer,
     questionnaires: questionnairesReducer,
-    responses: responsesReducer,
-    resources: resourcesReducer,
-    theme: themeReducer,
+    assignments:    assignmentsReducer,
+    responses:      responsesReducer,
+    resources:      resourcesReducer,
+    theme:          themeReducer,
   },
 });
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState   = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export default store;

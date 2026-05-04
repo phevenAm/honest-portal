@@ -105,7 +105,7 @@
   color: var(--text-muted);
 }
 
-// ── Builder modal ──────────────────────────────────────────
+// ── Shared overlay ─────────────────────────────────────────
 .overlay {
   position: fixed;
   inset: 0;
@@ -118,6 +118,7 @@
   padding: 40px $sp-6;
 }
 
+// ── Builder modal ──────────────────────────────────────────
 .modal {
   width: 100%;
   max-width: 640px;
@@ -258,4 +259,85 @@
   display: flex;
   gap: $sp-3;
   justify-content: flex-end;
+  margin-top: $sp-6;
+}
+
+// ── Assign modal ───────────────────────────────────────────
+.assignModal {
+  width: 100%;
+  max-width: 480px;
+  padding: $sp-8;
+}
+
+.assignSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 $sp-5;
+  line-height: 1.5;
+
+  strong { color: var(--text-primary); font-weight: 600; }
+}
+
+.clientList {
+  list-style: none;
+  margin: 0 0 $sp-2;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $sp-2;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.clientRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  padding: $sp-3 $sp-4;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--border);
+  background: var(--bg-base);
+  cursor: pointer;
+  transition: border-color var(--transition-base), background var(--transition-base);
+  user-select: none;
+
+  &:hover { border-color: var(--border-focus); background: var(--bg-muted); }
+
+  &.clientRowAssigned {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+}
+
+.clientCheckbox {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.clientName {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.assignedBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: $sp-4 0;
+  text-align: center;
 }

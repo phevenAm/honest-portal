@@ -103,6 +103,7 @@
 
 // ── Resources teaser card ──────────────────────────────────
 .resourcesCard {
+  height: 100%;
   padding: $sp-6;
   background: linear-gradient(135deg, var(--accent-subtle), var(--accent-light));
 }

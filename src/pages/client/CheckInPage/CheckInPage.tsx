@@ -1,27 +1,86 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useAuth } from '../../../context/AuthContext';
-import { selectActiveQuestionnaires } from '../../../store/slices/questionnairesSlice';
-import { submitResponse } from '../../../store/slices/responsesSlice';
-import Card from '../../../components/shared/Card/Card';
-import Button from '../../../components/shared/Button/Button';
-import styles from './CheckInPage.module.scss';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useAuth } from "../../../context/AuthContext";
+import { isWithinCadence } from "../../../Helpers/Helpers";
+import {
+  fetchAssignmentsByUser,
+  selectAllAssignments,
+} from "../../../store/slices/questionnaireAssignmentsSlice";
+import {
+  fetchResponsesByUser,
+  selectUserResponses,
+  submitResponse,
+} from "../../../store/slices/responsesSlice";
+import Card from "../../../components/shared/Card/Card";
+import Button from "../../../components/shared/Button/Button";
+import type { AppDispatch } from "../../../store/index";
+import type { Question, Questionnaire } from "../../../models/globalTypes";
+import styles from "./CheckInPage.module.scss";
 
 const CheckIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-    <polyline points="22 4 12 14.01 9 11.01"/>
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
   </svg>
 );
 
-function ScaleQuestion({ question, value, onChange }: { question: any; value: number | undefined; onChange: (n: number) => void }) {
+type AssignmentWithQuestionnaire = {
+  id: string;
+  questionnaire_id: string;
+  user_id: string;
+  assigned_at: string;
+  questionnaires?: Questionnaire;
+};
+
+const getResponseDate = (response: any) =>
+  response.submitted_at ?? response.created_at ?? "";
+
+const getLatestResponseForQuestionnaire = (
+  responses: any[],
+  questionnaireId: string,
+) =>
+  responses
+    .filter((response) => response.questionnaire_id === questionnaireId)
+    .sort(
+      (a, b) =>
+        new Date(getResponseDate(b)).getTime() -
+        new Date(getResponseDate(a)).getTime(),
+    )[0];
+
+function ScaleQuestion({
+  question,
+  value,
+  onChange,
+}: {
+  question: Question;
+  value: number | undefined;
+  onChange: (n: number) => void;
+}) {
+  const min = question.min_value ?? 1;
+  const max = question.max_value ?? 10;
+
   return (
     <div className={styles.scaleWrap}>
-      <div role="radiogroup" aria-label={question.text} className={styles.scaleButtons}>
-        {Array.from({ length: question.max }, (_, i) => i + 1).map(n => (
+      <div
+        role="radiogroup"
+        aria-label={question.text}
+        className={styles.scaleButtons}
+      >
+        {Array.from({ length: max - min + 1 }, (_, i) => min + i).map((n) => (
           <button
             key={n}
+            type="button"
             role="radio"
             aria-checked={value === n}
             onClick={() => onChange(n)}
@@ -31,66 +90,160 @@ function ScaleQuestion({ question, value, onChange }: { question: any; value: nu
           </button>
         ))}
       </div>
+
       <div className={styles.scaleLabels}>
-        <span>{question.minLabel}</span>
-        <span>{question.maxLabel}</span>
+        <span>{question.min_label}</span>
+        <span>{question.max_label}</span>
       </div>
     </div>
   );
 }
 
 export default function CheckInPage() {
-  const dispatch       = useDispatch();
-  const navigate       = useNavigate();
-  const { user }       = useAuth();
-  const questionnaires = useSelector(selectActiveQuestionnaires);
-  const questionnaire  = questionnaires.find(q => q.assignedTo.includes(user?.id));
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { authUser, userProfile } = useAuth();
 
-  const [answers, setAnswers]         = useState<Record<string, any>>({});
-  const [submitted, setSubmitted]     = useState(false);
+  const assignments = useSelector(
+    selectAllAssignments,
+  ) as AssignmentWithQuestionnaire[];
+
+  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+
+  const [answers, setAnswers] = useState<Record<string, number | string>>({});
+  const [submitted, setSubmitted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  if (!questionnaire) return (
-    <div className={styles.emptyState}>
-      <p>No check-ins are currently assigned to you.</p>
-    </div>
+  useEffect(() => {
+    if (!authUser?.id) return;
+
+    dispatch(fetchAssignmentsByUser(authUser.id))
+      .unwrap()
+      .catch((err) => {
+        console.error("Failed to fetch assigned questionnaires:", err);
+      });
+
+    dispatch(fetchResponsesByUser(authUser.id))
+      .unwrap()
+      .catch((err) => {
+        console.error("Failed to fetch user responses:", err);
+      });
+  }, [dispatch, authUser?.id]);
+
+  const activeAssignments = assignments.filter(
+    (assignment) => assignment.questionnaires?.is_active,
   );
 
-  const questions   = questionnaire.questions;
-  const currentQ    = questions[currentStep];
-  const isLast      = currentStep === questions.length - 1;
-  const canProceed  = currentQ.type === 'text' || answers[currentQ.id] !== undefined;
-  const progress    = ((currentStep + 1) / questions.length) * 100;
+  const availableAssignments = activeAssignments.filter((assignment) => {
+    const questionnaire = assignment.questionnaires;
+    if (!questionnaire) return false;
 
-  const handleAnswer = (value: any) => setAnswers(prev => ({ ...prev, [currentQ.id]: value }));
+    const latestResponse = getLatestResponseForQuestionnaire(
+      allUserResponses,
+      questionnaire.id,
+    );
 
-  const handleNext = () => {
-    if (isLast) {
-      const scores: Record<string, number> = {};
-      const textResponses: Record<string, string> = {};
-      questions.forEach((q: any) => {
-        if (q.type === 'scale') scores[q.id]        = answers[q.id] || 5;
-        if (q.type === 'text')  textResponses[q.id] = answers[q.id] || '';
-      });
-      dispatch(submitResponse({ userId: user!.id, questionnaireId: questionnaire.id, scores, textResponses, week: 999 }));
-      setSubmitted(true);
-    } else {
-      setCurrentStep(s => s + 1);
-    }
+    if (!latestResponse) return true;
+
+    return !isWithinCadence(getResponseDate(latestResponse), questionnaire.frequency);
+  });
+
+  const questionnaire = availableAssignments[0]?.questionnaires;
+
+  if (!questionnaire) {
+    return (
+      <div className={styles.emptyState}>
+        <p>You have no check-ins available right now.</p>
+        <Button onClick={() => navigate("/dashboard")}>Back to dashboard</Button>
+      </div>
+    );
+  }
+
+  const questions = questionnaire.questions ?? [];
+  const currentQ = questions[currentStep];
+
+  if (!currentQ) {
+    return (
+      <div className={styles.emptyState}>
+        <p>This questionnaire has no questions yet.</p>
+        <Button onClick={() => navigate("/dashboard")}>Back to dashboard</Button>
+      </div>
+    );
+  }
+
+  const isLast = currentStep === questions.length - 1;
+  const canProceed =
+    currentQ.type === "text" || answers[currentQ.id] !== undefined;
+  const progress = ((currentStep + 1) / questions.length) * 100;
+
+  const handleAnswer = (value: number | string) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [currentQ.id]: value,
+    }));
   };
 
-  if (submitted) return (
-    <div className={styles.completePage}>
-      <Card className={styles.completeCard}>
-        <div className={styles.completeIconWrap}><CheckIcon /></div>
-        <h2 className={styles.completeTitle}>Thank you, {user?.first_name}</h2>
-        <p className={styles.completeText}>
-          Your check-in has been recorded. Each one is a small act of self-care — well done for showing up today.
-        </p>
-        <Button onClick={() => navigate('/dashboard')} fullWidth>View my progress</Button>
-      </Card>
-    </div>
-  );
+  const handleNext = () => {
+    if (!isLast) {
+      setCurrentStep((step) => step + 1);
+      return;
+    }
+
+    if (!authUser?.id) return;
+
+    const scores: Record<string, number | string> = {};
+
+    questions.forEach((question) => {
+      if (question.type === "scale") {
+        scores[question.id] =
+          (answers[question.id] as number | undefined) ??
+          Math.round((question.max_value ?? 10) / 2);
+      }
+
+      if (question.type === "text") {
+        scores[question.id] = (answers[question.id] as string | undefined) ?? "";
+      }
+    });
+
+    dispatch(
+      submitResponse({
+        user_id: authUser.id,
+        questionnaire_id: questionnaire.id,
+        scores,
+      }),
+    )
+      .unwrap()
+      .then(() => {
+        setSubmitted(true);
+      })
+      .catch((err) => {
+        console.error("Failed to submit check-in:", err);
+      });
+  };
+
+  if (submitted) {
+    return (
+      <div className={styles.completePage}>
+        <Card className={styles.completeCard}>
+          <div className={styles.completeIconWrap}>
+            <CheckIcon />
+          </div>
+
+          <h2 className={styles.completeTitle}>
+            Thank you, {userProfile?.first_name}
+          </h2>
+
+          <p className={styles.completeText}>
+            Your check-in has been recorded.
+          </p>
+
+          <Button onClick={() => navigate("/dashboard")} fullWidth>
+            View my progress
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -101,23 +254,34 @@ export default function CheckInPage() {
         </div>
 
         <div className={styles.progressMeta}>
-          <span>Question {currentStep + 1} of {questions.length}</span>
+          <span>
+            Question {currentStep + 1} of {questions.length}
+          </span>
           <span>{Math.round(progress)}%</span>
         </div>
+
         <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+          <div
+            className={styles.progressFill}
+            style={{ width: `${progress}%` }}
+          />
         </div>
 
         <Card className={styles.questionCard}>
           <p className={styles.questionText}>{currentQ.text}</p>
-          {currentQ.type === 'scale' ? (
-            <ScaleQuestion question={currentQ} value={answers[currentQ.id]} onChange={handleAnswer} />
+
+          {currentQ.type === "scale" ? (
+            <ScaleQuestion
+              question={currentQ}
+              value={answers[currentQ.id] as number | undefined}
+              onChange={handleAnswer}
+            />
           ) : (
             <textarea
               aria-label={currentQ.text}
-              value={answers[currentQ.id] || ''}
-              onChange={e => handleAnswer(e.target.value)}
-              placeholder="Take a moment to reflect… (optional)"
+              value={(answers[currentQ.id] as string) || ""}
+              onChange={(e) => handleAnswer(e.target.value)}
+              placeholder="Take a moment to reflect…"
               rows={4}
               className={styles.textarea}
             />
@@ -125,11 +289,16 @@ export default function CheckInPage() {
         </Card>
 
         <div className={styles.navRow}>
-          <Button variant="ghost" onClick={() => setCurrentStep(s => Math.max(0, s - 1))} disabled={currentStep === 0}>
+          <Button
+            variant="ghost"
+            onClick={() => setCurrentStep((step) => Math.max(0, step - 1))}
+            disabled={currentStep === 0}
+          >
             Back
           </Button>
+
           <Button onClick={handleNext} disabled={!canProceed}>
-            {isLast ? 'Submit check-in' : 'Next'}
+            {isLast ? "Submit check-in" : "Next"}
           </Button>
         </div>
       </div>

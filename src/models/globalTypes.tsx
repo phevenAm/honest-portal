@@ -232,3 +232,14 @@ export type UpdateUser = Partial<Omit<UserProfile, "id" | "created_at">> & {
 export type UpdateResource = Partial<Omit<Resource, "id" | "created_at">> & {
   id: string;
 };
+
+
+
+
+/// Chart
+
+export interface ProgressChartProps {
+  responses: Response[];
+  questionnaire: Questionnaire | null;
+  title?: string;
+}

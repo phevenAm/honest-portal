@@ -113,6 +113,8 @@ export const selectAllUsers = (state) => state.userDirectory.users;
 export const selectUserById = (id) => (state) =>
   state.userDirectory.users.find((u) => u.id === id);
 
+export const selectClientUsers = (state) =>
+  state.userDirectory.users.filter((u) => u.role === "client");
 export const selectUserCount = (state) => state.userDirectory.users.length;
 
 export default userDirectorySlice.reducer;
