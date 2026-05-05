@@ -36,7 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const prevUserIdRef = useRef<string | null>(null);
 
-  const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
+  const fetchProfile = async (
+    authUser: AuthUser,
+  ): Promise<UserProfile | null> => {
     const { data, error } = await supabase
       .from("users")
       .select("*")
@@ -95,7 +97,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       setError(error.message);
       throw error;
@@ -122,18 +127,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from("platform_access_token")
       .select("id, token, is_used")
       .eq("token", cleanedToken)
-      .eq("is_used", false)
       .maybeSingle();
 
     if (tokenError) {
-      setError(tokenError.message);
-      throw tokenError;
+      throw new Error(tokenError.message);
     }
 
     if (!tokenRow) {
-      const message = "Invalid or already used access token";
-      setError(message);
-      throw new Error(message);
+      throw new Error("Invalid access token.");
+    }
+
+    if (tokenRow.is_used) {
+      throw new Error("This access token has already been used.");
     }
 
     const { error: signUpError } = await supabase.auth.signUp({
