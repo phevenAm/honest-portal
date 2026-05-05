@@ -103,3 +103,39 @@ export const PlusIcon = () => (
   </svg>
 );
 
+
+
+export const LogoIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 22V12" />
+    <path d="M12 12C12 7 7 3 2 3c0 5 4 9 10 9z" />
+    <path d="M12 12C12 7 17 3 22 3c0 5-4 9-10 9z" />
+  </svg>
+);
+
+export const MailIcon = () => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
