@@ -11,7 +11,12 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, meta?: any) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    meta?: any,
+    accessToken?: string,
+  ) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -30,8 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const prevUserIdRef = useRef<string | null>(null);
-
-  
 
   const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
     const { data, error } = await supabase
@@ -68,26 +71,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
-useEffect(() => {
-  let initialised = false;
+  useEffect(() => {
+    let initialised = false;
 
-  const init = async () => {
-    const { data } = await supabase.auth.getSession();
-    await handleSession(data.session);
-    initialised = true;
-  };
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      await handleSession(data.session);
+      initialised = true;
+    };
 
-  init();
+    init();
 
-  const { data: { subscription } } =
-    supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("onAuthStateChange event:", event);
-      if (!initialised) return; // ignore all events until getSession finishes
+      if (!initialised) return;
       handleSession(session);
     });
 
-  return () => subscription.unsubscribe();
-}, []);
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     setError(null);
@@ -98,16 +102,59 @@ useEffect(() => {
     }
   };
 
-  const signUp = async (email: string, password: string, meta?: any) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    meta?: any,
+    accessToken?: string,
+  ) => {
     setError(null);
-    const { error } = await supabase.auth.signUp({
+
+    const cleanedToken = accessToken?.trim();
+
+    if (!cleanedToken) {
+      const message = "Access token is required";
+      setError(message);
+      throw new Error(message);
+    }
+
+    const { data: tokenRow, error: tokenError } = await supabase
+      .from("platform_access_token")
+      .select("id, token, is_used")
+      .eq("token", cleanedToken)
+      .eq("is_used", false)
+      .maybeSingle();
+
+    if (tokenError) {
+      setError(tokenError.message);
+      throw tokenError;
+    }
+
+    if (!tokenRow) {
+      const message = "Invalid or already used access token";
+      setError(message);
+      throw new Error(message);
+    }
+
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: { data: meta },
     });
-    if (error) {
-      setError(error.message);
-      throw error;
+
+    if (signUpError) {
+      setError(signUpError.message);
+      throw signUpError;
+    }
+
+    const { error: updateTokenError } = await supabase
+      .from("platform_access_token")
+      .update({ is_used: true })
+      .eq("id", tokenRow.id);
+
+    if (updateTokenError) {
+      setError(updateTokenError.message);
+      throw updateTokenError;
     }
   };
 
