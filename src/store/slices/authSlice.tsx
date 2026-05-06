@@ -25,7 +25,7 @@ export const signIn = createAsyncThunk(
 
       console.log('Fetched profile data:', profileData);
 
-    const { first_name, last_name, dob, disabled } = data.user.user_metadata || 
+    const { first_name, last_name, age, disabled } = data.user.user_metadata || 
       data.user.identities?.[0]?.identity_data || {};
 
     const profile: User = {
@@ -33,7 +33,7 @@ export const signIn = createAsyncThunk(
       email:      data.user.email ?? '',
       first_name: first_name ?? '',
       last_name:  last_name ?? '',
-      dob:        dob ?? '',
+      age:        age ?? '',
       role:       profileData?.role ?? 'user',
       jointedAt:  data.user.created_at,
       avatar:     (first_name?.[0] ?? '') + (last_name?.[0] ?? ''),

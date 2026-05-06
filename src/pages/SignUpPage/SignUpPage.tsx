@@ -17,7 +17,7 @@ const FIELDS = [
   { id: "firstName", label: "First name", type: "text", ph: "" },
   { id: "lastName", label: "Last name", type: "text", ph: "" },
   { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
-  { id: "dob", label: "Date of birth", type: "date", ph: "" },
+  { id: "age", label: "Age", type: "number", ph: "" },
   {
     id: "accessToken",
     label: "Access token",
@@ -41,7 +41,7 @@ export default function SignUpPage() {
     firstName: "",
     lastName: "",
     email: "",
-    dob: "",
+    age: "",
     accessToken: "",
     password: "",
     confirm: "",
@@ -81,7 +81,7 @@ export default function SignUpPage() {
         {
           first_name: form.firstName,
           last_name: form.lastName,
-          dob: form.dob,
+          age: form.age,
         },
         form.accessToken,
       );

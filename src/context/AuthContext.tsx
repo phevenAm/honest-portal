@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { supabase } from "../lib/supabase";
 import type { AuthUser, UserProfile } from "../models/globalTypes";
 import type { Session } from "@supabase/supabase-js";
@@ -23,9 +29,13 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
+  return context;
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -36,7 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const prevUserIdRef = useRef<string | null>(null);
 
-  const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
+  const fetchProfile = async (
+    authUser: AuthUser,
+  ): Promise<UserProfile | null> => {
     const { data, error } = await supabase
       .from("users")
       .select("*")
@@ -52,16 +64,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleSession = async (session: Session | null) => {
-    const authUser = session?.user ?? null;
-    const newUserId = authUser?.id ?? null;
+    const currentAuthUser = session?.user ?? null;
+    const newUserId = currentAuthUser?.id ?? null;
 
-    setAuthUser(authUser);
+    setAuthUser(currentAuthUser);
 
     if (newUserId !== prevUserIdRef.current) {
       prevUserIdRef.current = newUserId;
 
-      if (authUser) {
-        const profileData = await fetchProfile(authUser);
+      if (currentAuthUser) {
+        const profileData = await fetchProfile(currentAuthUser);
         setUserProfile(profileData);
       } else {
         setUserProfile(null);
@@ -84,8 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("onAuthStateChange event:", event);
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!initialised) return;
       handleSession(session);
     });
@@ -95,7 +106,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       setError(error.message);
       throw error;
@@ -113,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const cleanedToken = accessToken?.trim();
 
     if (!cleanedToken) {
-      const message = "Access token is required";
+      const message = "Access token is required.";
       setError(message);
       throw new Error(message);
     }
@@ -122,16 +138,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from("platform_access_token")
       .select("id, token, is_used")
       .eq("token", cleanedToken)
-      .eq("is_used", false)
       .maybeSingle();
 
     if (tokenError) {
       setError(tokenError.message);
-      throw tokenError;
+      throw new Error(tokenError.message);
     }
 
     if (!tokenRow) {
-      const message = "Invalid or already used access token";
+      const message = "Invalid access token.";
+      setError(message);
+      throw new Error(message);
+    }
+
+    if (tokenRow.is_used === true) {
+      const message = "This access token has already been used.";
       setError(message);
       throw new Error(message);
     }
@@ -139,7 +160,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: meta },
+      options: {
+        data: meta,
+      },
     });
 
     if (signUpError) {
@@ -147,20 +170,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw signUpError;
     }
 
-    const { error: updateTokenError } = await supabase
-      .from("platform_access_token")
-      .update({ is_used: true })
-      .eq("id", tokenRow.id);
+    const { data: tokenConsumed, error: consumeTokenError } =
+      await supabase.rpc("consume_platform_access_token", {
+        input_token: cleanedToken,
+      });
 
-    if (updateTokenError) {
-      setError(updateTokenError.message);
-      throw updateTokenError;
+    if (consumeTokenError) {
+      setError(consumeTokenError.message);
+      throw consumeTokenError;
+    }
+
+    if (!tokenConsumed) {
+      const message = "This access token has already been used.";
+      setError(message);
+      throw new Error(message);
     }
   };
 
   const signOut = async () => {
     setError(null);
+
     const { error } = await supabase.auth.signOut();
+
     if (error) {
       console.error("signOut error:", error.message);
     }
