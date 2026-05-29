@@ -16,6 +16,7 @@ import ProgressChart from "../../../components/shared/ProgressChart/ProgressChar
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch, RootState } from "../../../store/index";
+import { useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
 
 const getResponseDate = (response: any) =>
@@ -40,10 +41,22 @@ export default function ClientDashboard() {
   const questionnairesStatus = useSelector(
     (state: RootState) => state.questionnaires.status,
   );
-  const responsesStatus = useSelector((state: RootState) => state.responses.status);
+  const responsesStatus = useSelector(
+    (state: RootState) => state.responses.status,
+  );
 
   const questionnaires = useSelector(selectActiveQuestionnaires);
   const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+
+  const {
+    data: [quoteData] = [],
+    error: quoteError,
+    isLoading: isQuoteLoading,
+  } = useGetRandomQuoteQuery();
+
+  if (!isQuoteLoading) {
+    console.log(quoteData, quoteError);
+  }
 
   const assignedQs = questionnaires.filter((q) =>
     q.assignedTo.includes(authUser?.id ?? ""),
@@ -63,7 +76,10 @@ export default function ClientDashboard() {
   const questionnaire = assignedQs[0] ?? null;
 
   const responses = useSelector(
-    selectUserQuestionnaireResponses(authUser?.id ?? "", questionnaire?.id ?? ""),
+    selectUserQuestionnaireResponses(
+      authUser?.id ?? "",
+      questionnaire?.id ?? "",
+    ),
   );
 
   useEffect(() => {
@@ -89,7 +105,8 @@ export default function ClientDashboard() {
     if (scaleQuestions.length === 0) return null;
 
     const total = scaleQuestions.reduce(
-      (sum, q) => sum + ((response.scores as Record<string, number>)[q.id] ?? 0),
+      (sum, q) =>
+        sum + ((response.scores as Record<string, number>)[q.id] ?? 0),
       0,
     );
 
@@ -143,9 +160,18 @@ export default function ClientDashboard() {
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <h1>{greeting}, {userProfile?.first_name}</h1>
+          <h1>
+            {greeting}, {userProfile?.first_name}
+          </h1>
           <p>Here's a look at how you've been doing</p>
         </div>
+
+        {quoteData && (
+          <section className={`${styles.quotes} ${styles.warm}`}>
+            <h3>{quoteData.content}</h3>
+            <small>{quoteData.author}</small>
+          </section>
+        )}
 
         <div className={styles.statsRow}>
           {stats.map((s) => (

@@ -11,11 +11,6 @@ export type DBUser = {
   disabled: boolean;
 };
 
-export type UserProfile = DBUser & {
-  avatar: string;
-  color: string;
-};
-
 export type AuthUser = DBUser & {
   // id: string;
   email: string | null;
@@ -242,3 +237,24 @@ export interface ProgressChartProps {
   questionnaire: Questionnaire | null;
   title?: string;
 }
+
+//-------- Quotes -------------
+
+export type inspirationalQuote = {
+  author: string;
+  authorSlug: string;
+  content: string;
+  dateAdded: string;
+  dateModified: string;
+  length: number;
+  tags: string[];
+  id: string;
+};
+
+export type inspirationalSearchedQuote = {
+  count: number;
+  totalCount: number;
+  page: number;
+  totalPages: number;
+  results: inspirationalQuote[];
+};

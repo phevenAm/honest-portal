@@ -50,7 +50,7 @@ const userDirectorySlice = createSlice({
 
       if (!exists) {
         state.users.push({
-       id: `user-${Date.now()}`,
+          id: `user-${Date.now()}`,
           firstName: action.payload.first_name,
           lastName: action.payload.last_name,
           role: action.payload.role,
@@ -108,13 +108,17 @@ const userDirectorySlice = createSlice({
 export const { addUser, updateUser } = userDirectorySlice.actions;
 
 // Selectors
-export const selectAllUsers = (state) => state.userDirectory.users;
+export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) =>
+  state.userDirectory.users;
 
-export const selectUserById = (id) => (state) =>
-  state.userDirectory.users.find((u) => u.id === id);
+export const selectUserById =
+  (id: string) => (state: { userDirectory: UserDirectoryState }) =>
+    state.userDirectory.users.find((u) => u.id === id);
 
-export const selectClientUsers = (state) =>
-  state.userDirectory.users.filter((u) => u.role === "client");
-export const selectUserCount = (state) => state.userDirectory.users.length;
+export const selectClientUsers = (state: {
+  userDirectory: UserDirectoryState;
+}) => state.userDirectory.users.filter((u) => u.role === "client");
+export const selectUserCount = (state: { userDirectory: UserDirectoryState }) =>
+  state.userDirectory.users.length;
 
 export default userDirectorySlice.reducer;
