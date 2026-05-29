@@ -123,7 +123,10 @@ function AppRoutes() {
           />
 
           <Route path="/" element={<RootRedirect />} />
-       <Route path="*" element={<div>CAUGHT: {window.location.pathname}</div>} />
+          <Route
+            path="*"
+            element={<div>CAUGHT: {window.location.pathname}</div>}
+          />
         </Routes>
       </BrowserRouter>
     </ThemeWrapper>
