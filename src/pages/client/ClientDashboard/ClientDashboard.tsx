@@ -80,7 +80,7 @@ export default function ClientDashboard() {
 
     if (!latestResponse) return true;
 
-    return !isWithinCadence(getResponseDate(latestResponse), q.frequency);
+    return isWithinCadence(getResponseDate(latestResponse), q.frequency);
   });
 
   const questionnaire = assignedQs[0] ?? null;

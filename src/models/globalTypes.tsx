@@ -42,37 +42,6 @@ export type AuthUser = DBUser & {
 
 //!Questionnare stuff
 
-export enum QuestionnaireFrequency {
-  WEEKLY = "weekly",
-  DAILY = "daily",
-  FORTNIGHTLY = "fortnightly",
-}
-
-export type Questionnaire = {
-  id: string;
-  title: string;
-  description?: string;
-  frequency: QuestionnaireFrequency;
-  is_active: boolean;
-  created_at: string;
-
-  questions: Question[];
-
-  assignedTo: string[]; // derived from assignments table
-};
-
-export type Question = {
-  id: string;
-  text: string;
-  type: "scale" | "text";
-  min_value?: number;
-  max_value?: number;
-  min_label?: string;
-  max_label?: string;
-  order_index: number;
-  is_required: boolean;
-};
-
 //Claude below
 
 // ============================================================

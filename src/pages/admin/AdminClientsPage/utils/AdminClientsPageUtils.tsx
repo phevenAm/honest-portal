@@ -1,4 +1,4 @@
-import { Questionnaire } from "../../../../models/globalTypes";
+import { Questionnaire, Response } from "../../../../models/globalTypes";
 
 export const generateAccessToken = () => {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -44,5 +44,3 @@ export const getQuestionnaireForResponse = (
     (questionnaire) => questionnaire.id === response.questionnaire_id,
   );
 };
-
-//!TODO: THESE ARE NOT HOOKS - PURE FUNCTIONS AND SHOULD BE HELPERS

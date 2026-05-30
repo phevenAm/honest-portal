@@ -12,7 +12,6 @@ import {
   fetchQuestionnaires,
   selectAllQuestionnaires,
 } from "../../../store/slices/questionnairesSlice";
-import { supabase } from "../../../lib/supabase";
 import Card from "../../../components/shared/Card/Card";
 import Avatar from "../../../components/shared/Avatar/Avatar";
 import Button from "../../../components/shared/Button/Button";
@@ -24,48 +23,15 @@ import type {
   RootState,
 } from "../../../store/index";
 import type {
-  Question,
   Questionnaire,
   Response,
   UserProfile,
 } from "../../../models/globalTypes";
 
 import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal"
+import { getScoreAverage } from "./utils/AdminClientsPageUtils";
 
-const generateAccessToken = () => {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const groups = Array.from({ length: 3 }, () =>
-    Array.from({ length: 4 }, () =>
-      alphabet[Math.floor(Math.random() * alphabet.length)],
-    ).join(""),
-  );
 
-  return groups.join("-");
-};
-
-const getResponseDate = (response: Response) =>
-  response.submitted_at ?? response.created_at ?? "";
-
-const getScoreAverage = (
-  response: Response | undefined,
-  questionnaire: Questionnaire | undefined,
-) => {
-  if (!response || !questionnaire) return null;
-
-  const scaleQuestions = questionnaire.questions?.filter(
-    (question) => question.type === "scale",
-  );
-
-  if (!scaleQuestions?.length) return null;
-
-  const total = scaleQuestions.reduce((sum, question) => {
-    const raw = (response.scores as Record<string, number | string>)[question.id];
-    const score = Number(raw ?? 0);
-    return sum + (Number.isFinite(score) ? score : 0);
-  }, 0);
-
-  return (total / scaleQuestions.length).toFixed(1);
-};
 
 const getQuestionnaireForResponse = (
   response: Response | undefined,
