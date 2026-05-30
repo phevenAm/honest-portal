@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Card from "../../../../../components/shared/Card/Card";
 
-import {generateAccessToken} from "../../hooks/UseAdminClientsPage";
+import {generateAccessToken} from "../../utils/AdminClientsPageUtils";
 import Button from "../../../../../components/shared/Button/Button";
 import { supabase } from "../../../../../lib/supabase";
 import styles from "../../AdminClientsPage.module.scss";
