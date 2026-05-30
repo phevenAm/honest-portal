@@ -16,8 +16,10 @@ import ProgressChart from "../../../components/shared/ProgressChart/ProgressChar
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch, RootState } from "../../../store/index";
-import { useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
+import { useGetQuoteByKeywordQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
+import { inspirationalQuote } from "../../../models/globalTypes";
+import Spinner from "../../../ui-components/Spinner/Spinner";
 
 const getResponseDate = (response: any) =>
   response.submitted_at ?? response.created_at ?? "";
@@ -49,14 +51,22 @@ export default function ClientDashboard() {
   const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
 
   const {
-    data: [quoteData] = [],
+    data,
     error: quoteError,
     isLoading: isQuoteLoading,
-  } = useGetRandomQuoteQuery();
+  } = useGetQuoteByKeywordQuery("hope");
 
-  if (!isQuoteLoading) {
-    console.log(quoteData, quoteError);
-  }
+  const quotes: inspirationalQuote[] = data?.results ?? [];
+
+  const filtered = quotes.filter((q) => q.length <= 70);
+
+  //console.log(quotes.map((q) => q.length));
+  console.log(filtered);
+
+  const randomQuote =
+    filtered.length > 0
+      ? filtered[Math.floor(Math.random() * filtered.length)]
+      : undefined;
 
   const assignedQs = questionnaires.filter((q) =>
     q.assignedTo.includes(authUser?.id ?? ""),
@@ -156,6 +166,13 @@ export default function ClientDashboard() {
     },
   ];
 
+  if (questionnairesStatus !== "succeeded" || responsesStatus !== "succeeded") {
+    return (
+      <div className={styles.page}>
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
@@ -166,12 +183,12 @@ export default function ClientDashboard() {
           <p>Here's a look at how you've been doing</p>
         </div>
 
-        {quoteData && (
+        {randomQuote ? (
           <section className={`${styles.quotes} ${styles.warm}`}>
-            <h3>{quoteData.content}</h3>
-            <small>{quoteData.author}</small>
+            <h3>{randomQuote?.content}</h3>
+            <small>{randomQuote?.author}</small>
           </section>
-        )}
+        ) : null}
 
         <div className={styles.statsRow}>
           {stats.map((s) => (

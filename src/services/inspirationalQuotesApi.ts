@@ -7,14 +7,14 @@ import {
 export const inspirationalQuotesApi = createApi({
   reducerPath: "inspirationalQuotesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://api.quotable.io/quotes/",
+    baseUrl: "https://api.quotable.io",
   }),
   endpoints: (builder) => ({
     getRandomQuote: builder.query<inspirationalQuote[], void>({
-      query: () => "random",
+      query: () => "/quotes/random",
     }),
     getQuoteByKeyword: builder.query<inspirationalSearchedQuote[], string>({
-      query: (keyword) => `search?keyword=${keyword}`,
+      query: (keyword) => `/search/quotes?query=${keyword}`,
     }),
   }),
 });
