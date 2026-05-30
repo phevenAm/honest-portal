@@ -44,3 +44,5 @@ export const getQuestionnaireForResponse = (
     (questionnaire) => questionnaire.id === response.questionnaire_id,
   );
 };
+
+//!TODO: THESE ARE NOT HOOKS - PURE FUNCTIONS AND SHOULD BE HELPERS
