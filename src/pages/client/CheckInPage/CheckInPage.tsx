@@ -145,7 +145,7 @@ export default function CheckInPage() {
 
     if (!latestResponse) return true;
 
-    return !isWithinCadence(getResponseDate(latestResponse), questionnaire.frequency);
+    return isWithinCadence(getResponseDate(latestResponse), questionnaire.frequency);
   });
 
   const questionnaire = availableAssignments[0]?.questionnaires;

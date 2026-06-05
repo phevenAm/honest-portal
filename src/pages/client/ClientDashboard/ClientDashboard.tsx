@@ -16,7 +16,10 @@ import ProgressChart from "../../../components/shared/ProgressChart/ProgressChar
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch, RootState } from "../../../store/index";
+import { useGetQuoteByKeywordQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
+import { inspirationalQuote } from "../../../models/globalTypes";
+import Spinner from "../../../ui-components/Spinner/Spinner";
 
 const getResponseDate = (response: any) =>
   response.submitted_at ?? response.created_at ?? "";
@@ -40,10 +43,30 @@ export default function ClientDashboard() {
   const questionnairesStatus = useSelector(
     (state: RootState) => state.questionnaires.status,
   );
-  const responsesStatus = useSelector((state: RootState) => state.responses.status);
+  const responsesStatus = useSelector(
+    (state: RootState) => state.responses.status,
+  );
 
   const questionnaires = useSelector(selectActiveQuestionnaires);
   const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+
+  const {
+    data,
+    error: quoteError,
+    isLoading: isQuoteLoading,
+  } = useGetQuoteByKeywordQuery("hope");
+
+  const quotes: inspirationalQuote[] = data?.results ?? [];
+
+  const filtered = quotes.filter((q) => q.length <= 70);
+
+  //console.log(quotes.map((q) => q.length));
+  console.log(filtered);
+
+  const randomQuote =
+    filtered.length > 0
+      ? filtered[Math.floor(Math.random() * filtered.length)]
+      : undefined;
 
   const assignedQs = questionnaires.filter((q) =>
     q.assignedTo.includes(authUser?.id ?? ""),
@@ -57,13 +80,16 @@ export default function ClientDashboard() {
 
     if (!latestResponse) return true;
 
-    return !isWithinCadence(getResponseDate(latestResponse), q.frequency);
+    return isWithinCadence(getResponseDate(latestResponse), q.frequency);
   });
 
   const questionnaire = assignedQs[0] ?? null;
 
   const responses = useSelector(
-    selectUserQuestionnaireResponses(authUser?.id ?? "", questionnaire?.id ?? ""),
+    selectUserQuestionnaireResponses(
+      authUser?.id ?? "",
+      questionnaire?.id ?? "",
+    ),
   );
 
   useEffect(() => {
@@ -89,7 +115,8 @@ export default function ClientDashboard() {
     if (scaleQuestions.length === 0) return null;
 
     const total = scaleQuestions.reduce(
-      (sum, q) => sum + ((response.scores as Record<string, number>)[q.id] ?? 0),
+      (sum, q) =>
+        sum + ((response.scores as Record<string, number>)[q.id] ?? 0),
       0,
     );
 
@@ -139,13 +166,29 @@ export default function ClientDashboard() {
     },
   ];
 
+  if (questionnairesStatus !== "succeeded" || responsesStatus !== "succeeded") {
+    return (
+      <div className={styles.page}>
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <h1>{greeting}, {userProfile?.first_name}</h1>
+          <h1>
+            {greeting}, {userProfile?.first_name}
+          </h1>
           <p>Here's a look at how you've been doing</p>
         </div>
+
+        {randomQuote ? (
+          <section className={`${styles.quotes} ${styles.warm}`}>
+            <h3>{randomQuote?.content}</h3>
+            <small>{randomQuote?.author}</small>
+          </section>
+        ) : null}
 
         <div className={styles.statsRow}>
           {stats.map((s) => (

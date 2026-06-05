@@ -7,25 +7,31 @@
 //   - Uses the provided slices as reducers
 // ============================================================
 
-import { configureStore } from '@reduxjs/toolkit';
-import userDirectoryReducer  from './slices/userDirectorySlice';
-import questionnairesReducer from './slices/questionnairesSlice';
-import assignmentsReducer    from './slices/questionnaireAssignmentsSlice';
-import responsesReducer      from './slices/responsesSlice';
-import resourcesReducer      from './slices/resourcesSlice';
-import themeReducer          from './slices/themeSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import { setupListeners } from "@reduxjs/toolkit/query";
+import userDirectoryReducer from "./slices/userDirectorySlice";
+import questionnairesReducer from "./slices/questionnairesSlice";
+import assignmentsReducer from "./slices/questionnaireAssignmentsSlice";
+import responsesReducer from "./slices/responsesSlice";
+import resourcesReducer from "./slices/resourcesSlice";
+import themeReducer from "./slices/themeSlice";
+import { inspirationalQuotesApi } from "../services/inspirationalQuotesApi";
 
 export const store = configureStore({
   reducer: {
-    userDirectory:  userDirectoryReducer,
+    userDirectory: userDirectoryReducer,
     questionnaires: questionnairesReducer,
-    assignments:    assignmentsReducer,
-    responses:      responsesReducer,
-    resources:      resourcesReducer,
-    theme:          themeReducer,
+    assignments: assignmentsReducer,
+    responses: responsesReducer,
+    resources: resourcesReducer,
+    theme: themeReducer,
+    [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },
+  middleware: (getDefaultMiddleWare): any =>
+    getDefaultMiddleWare().concat(inspirationalQuotesApi.middleware),
 });
 
-export type RootState   = ReturnType<typeof store.getState>;
+setupListeners(store.dispatch);
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export default store;
