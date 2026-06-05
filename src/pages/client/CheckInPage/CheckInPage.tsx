@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuth } from "../../../context/AuthContext";
-import { isWithinCadence } from "../../../Helpers/Helpers";
+import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import {
   fetchAssignmentsByUser,
   selectAllAssignments,
@@ -17,6 +17,7 @@ import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch } from "../../../store/index";
 import type { Question, Questionnaire } from "../../../models/globalTypes";
 import styles from "./CheckInPage.module.scss";
+
 
 const CheckIcon = () => (
   <svg
@@ -43,8 +44,6 @@ type AssignmentWithQuestionnaire = {
   questionnaires?: Questionnaire;
 };
 
-const getResponseDate = (response: any) =>
-  response.submitted_at ?? response.created_at ?? "";
 
 const getLatestResponseForQuestionnaire = (
   responses: any[],
@@ -145,7 +144,7 @@ export default function CheckInPage() {
 
     if (!latestResponse) return true;
 
-    return isWithinCadence(getResponseDate(latestResponse), questionnaire.frequency);
+    return isQuestionnaireCheckInDue(getResponseDate(latestResponse), questionnaire.frequency);
   });
 
   const questionnaire = availableAssignments[0]?.questionnaires;
