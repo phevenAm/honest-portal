@@ -1,5 +1,5 @@
-import {describe, it, expect} from 'vitest';
-import {getScoreAverage} from './AdminClientsPageUtils'
+import {describe, it, expect, test} from 'vitest';
+import {getScoreAverage, generateAccessToken} from './AdminClientsPageUtils'
 import { QuestionnaireFrequency, Questionnaire, Response } from "../../../../models/globalTypes";
 
 describe("ageScoreAverage", () => {
@@ -94,6 +94,29 @@ describe("ageScoreAverage", () => {
     }
 
     expect(getScoreAverage(response, mockQuestionnaire)).toBe("5.0")
+  })
+
+})
+
+describe("generateAccessToken", () => {
+
+  const regExPattern = /^[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$/i;
+
+  it('creates a token in the correct format', () => {
+    const accessToken = generateAccessToken()
+
+    expect(accessToken).toMatch(regExPattern)
+  })
+
+  //!bad tokens
+  const badTokens: string[] = [
+    'asd-2-', '234-sdf-2333333', '3', '234234234-dfsdfsdfsdf-$$$$$', '----'
+  ]
+
+  
+
+  test.each(badTokens)(' %s does not match the regex', (dodgyToken) => {
+    expect(dodgyToken).not.toMatch(regExPattern)
   })
 
 })
