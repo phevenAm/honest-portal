@@ -1,4 +1,3 @@
-// Button.scss
 @use '../../../styles/spacing' as *;
 
 .btn {
@@ -44,15 +43,11 @@
     background: var(--accent-dark);
     border-color: var(--accent-dark);
   }
-
-:global(.dark) & {
-  color: var(--text-black);
-}
 }
 
 .secondary {
   background: var(--accent-light);
-  color: var(--text-secondary);
+  color: var(--accent-dark);
   border-color: var(--accent-light);
 
   &:hover:not(:disabled) {
