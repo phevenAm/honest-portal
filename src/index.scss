@@ -1,9 +1,7 @@
 // ============================================================
-// index.scss  —  Global entry point
-// Imports all partials and maps SCSS variables to CSS custom
-// properties so components can use var(--...) in their own
-// SCSS files. Only edit _colors, _typography, _spacing to
-// retheme the entire app.
+// index.scss — Global entry point
+// Single source of truth for all design tokens.
+// Edit _colors, _spacing, _typography to retheme the app.
 // ============================================================
 
 @use 'styles/colors'     as *;
@@ -12,52 +10,59 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
-// ── CSS custom properties — light mode ────────────────────
+// ── Light mode tokens ──────────────────────────────────────
 :root {
-  // Colours
-  --accent:           #{$color-accent};
-  --accent-dark:      #{$color-accent-dark};
-  --accent-light:     #{$color-accent-light};
-  --accent-subtle:    #{$color-accent-subtle};
+  // Accent
+  --accent:             #{$color-accent};
+  --accent-dark:        #{$color-accent-dark};
+  --accent-hover:       #{$color-accent-dark};
+  --accent-light:       #{$color-accent-light};
+  --accent-subtle:      #{$color-accent-subtle};
 
-  --text-primary:     #{$color-text-primary};
-  --text-secondary:   #{$color-text-secondary};
-  --text-muted:       #{$color-text-muted};
-  --text-inverse:     #{$color-text-inverse};
+  // Text
+  --text-primary:       #{$color-text-primary};
+  --text-secondary:     #{$color-text-secondary};
+  --text-muted:         #{$color-text-muted};
+  --text-disabled:      #{$color-text-disabled};
+  --text-inverse:       #{$color-text-inverse};
 
-  --bg-base:          #{$color-bg-base};
-  --bg-card:          #{$color-bg-card};
-  --bg-muted:         #{$color-bg-muted};
-  --bg-overlay:       #{$color-bg-overlay};
+  // Backgrounds
+  --bg-base:            #{$color-bg-base};
+  --bg-card:            #{$color-bg-card};
+  --bg-muted:           #{$color-bg-muted};
+  --bg-overlay:         #{$color-bg-overlay};
 
-  --border:           #{$color-border};
-  --border-focus:     #{$color-border-focus};
+  // Borders
+  --border:             #{$color-border};
+  --border-strong:      #{$color-border};
+  --border-focus:       #{$color-border-focus};
 
-  --danger:           #{$color-danger};
-  --danger-light:     #{$color-danger-light};
-  --danger-border:    #{$color-danger-border};
-  --success:          #{$color-success};
-  --warning:          #{$color-warning};
-  --warning-light:    #{$color-warning-light};
+  // Feedback
+  --danger:             #{$color-danger};
+  --danger-light:       #{$color-danger-light};
+  --danger-border:      #{$color-danger-border};
+  --success:            #{$color-success};
+  --warning:            #{$color-warning};
+  --warning-light:      #{$color-warning-light};
 
   // Shadows
-  --shadow-xs:        #{$shadow-xs};
-  --shadow-sm:        #{$shadow-sm};
-  --shadow-md:        #{$shadow-md};
-  --shadow-lg:        #{$shadow-lg};
-  --shadow-xl:        #{$shadow-xl};
+  --shadow-xs:          #{$shadow-xs};
+  --shadow-sm:          #{$shadow-sm};
+  --shadow-md:          #{$shadow-md};
+  --shadow-lg:          #{$shadow-lg};
+  --shadow-xl:          #{$shadow-xl};
 
   // Radius
-  --r-sm:             #{$r-sm};
-  --r-md:             #{$r-md};
-  --r-lg:             #{$r-lg};
-  --r-xl:             #{$r-xl};
-  --r-2xl:            #{$r-2xl};
-  --r-full:           #{$r-full};
+  --r-sm:               #{$r-sm};
+  --r-md:               #{$r-md};
+  --r-lg:               #{$r-lg};
+  --r-xl:               #{$r-xl};
+  --r-2xl:              #{$r-2xl};
+  --r-full:             #{$r-full};
 
   // Typography
-  --font-serif:       #{$font-serif};
-  --font-sans:        #{$font-sans};
+  --font-serif:         #{$font-serif};
+  --font-sans:          #{$font-sans};
 
   // Spacing
   --sp-1: #{$sp-1}; --sp-2: #{$sp-2}; --sp-3: #{$sp-3}; --sp-4: #{$sp-4};
@@ -65,35 +70,55 @@
   --sp-10: #{$sp-10}; --sp-12: #{$sp-12}; --sp-16: #{$sp-16};
 
   // Transitions
-  --transition-fast:  #{$transition-fast};
-  --transition-base:  #{$transition-base};
-  --transition-slow:  #{$transition-slow};
+  --transition-fast:    #{$transition-fast};
+  --transition-base:    #{$transition-base};
+  --transition-slow:    #{$transition-slow};
 
   // Layout
-  --navbar-height:    #{$navbar-height};
-  --max-width:        #{$max-width-xl};
+  --navbar-height:      #{$navbar-height};
+  --max-width:          #{$max-width-xl};
 }
 
-// ── CSS custom properties — dark mode ─────────────────────
+// ── Dark mode tokens ───────────────────────────────────────
 .dark {
-  --accent:           #{$dark-accent};
-  --accent-light:     #{$dark-accent-light};
-  --accent-subtle:    #{$dark-accent-light};
+  // Accent — lighter for dark backgrounds
+  --accent:             #{$dark-accent};
+  --accent-dark:        #{$teal-400};
+  --accent-hover:       #{$teal-400};
+  --accent-light:       #{$dark-accent-light};
+  --accent-subtle:      #{$dark-accent-light};
 
-  --text-primary:     #{$dark-text-primary};
-  --text-secondary:   #{$dark-text-secondary};
-  --text-muted:       #{$dark-text-muted};
+  // Text
+  --text-primary:       #{$dark-text-primary};
+  --text-secondary:     #{$dark-text-secondary};
+  --text-muted:         #{$dark-text-muted};
+  --text-disabled:      #{$teal-900};
+  --text-inverse:       #0f1f1c;
 
-  --bg-base:          #{$dark-bg-base};
-  --bg-card:          #{$dark-bg-card};
-  --bg-muted:         #{$dark-bg-muted};
-  --bg-overlay:       rgba(15, 31, 28, 0.92);
+  // Backgrounds
+  --bg-base:            #{$dark-bg-base};
+  --bg-card:            #{$dark-bg-card};
+  --bg-muted:           #{$dark-bg-muted};
+  --bg-overlay:         rgba(15, 31, 28, 0.92);
 
-  --border:           #{$dark-border};
+  // Borders
+  --border:             #{$dark-border};
+  --border-strong:      #{$teal-700};
+  --border-focus:       #{$teal-300};
 
-  --shadow-sm:        0 1px 4px rgba(0,0,0,0.25);
-  --shadow-md:        0 4px 12px rgba(0,0,0,0.35);
-  --shadow-lg:        0 8px 28px rgba(0,0,0,0.45);
+  // Feedback — adjusted for dark bg contrast
+  --danger:             #fca5a5;
+  --danger-light:       rgba(185, 28, 28, 0.2);
+  --danger-border:      rgba(185, 28, 28, 0.4);
+  --success:            #{$teal-300};
+  --warning:            #fcd34d;
+  --warning-light:      rgba(146, 64, 14, 0.2);
+
+  // Shadows — stronger on dark
+  --shadow-sm:          0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-md:          0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg:          0 8px 28px rgba(0, 0, 0, 0.55);
+  --shadow-xl:          0 16px 48px rgba(0, 0, 0, 0.65);
 }
 
 // ── Reset ──────────────────────────────────────────────────

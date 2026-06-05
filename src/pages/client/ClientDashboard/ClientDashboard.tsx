@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "../../../context/AuthContext";
-import { isWithinCadence } from "../../../Helpers/Helpers";
+import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import {
   selectActiveQuestionnaires,
   fetchQuestionnaires,
@@ -20,9 +20,6 @@ import { useGetQuoteByKeywordQuery } from "../../../services/inspirationalQuotes
 import styles from "./ClientDashboard.module.scss";
 import { inspirationalQuote } from "../../../models/globalTypes";
 import Spinner from "../../../ui-components/Spinner/Spinner";
-
-const getResponseDate = (response: any) =>
-  response.submitted_at ?? response.created_at ?? "";
 
 const getLatestResponseForQuestionnaire = (
   responses: any[],
@@ -80,7 +77,7 @@ export default function ClientDashboard() {
 
     if (!latestResponse) return true;
 
-    return isWithinCadence(getResponseDate(latestResponse), q.frequency);
+    return isQuestionnaireCheckInDue(getResponseDate(latestResponse), q.frequency);
   });
 
   const questionnaire = assignedQs[0] ?? null;

@@ -11,9 +11,6 @@ export const generateAccessToken = () => {
   return groups.join("-");
 };
 
-export const getResponseDate = (response: Response) =>
-  response.submitted_at ?? response.created_at ?? "";
-
 export const getScoreAverage = (
   response: Response | undefined,
   questionnaire: Questionnaire | undefined,

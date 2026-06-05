@@ -36,6 +36,7 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "sync-tokens": "node sync-tokens.js"
   }
 }

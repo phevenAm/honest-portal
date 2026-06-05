@@ -68,37 +68,29 @@
   margin: 0;
 }
 
-// colour variants
+// colour variants — use tokens so dark mode works
 .teal {
   background: var(--accent-light);
 
-  .statLabel {
-    color: var(--accent-dark);
-  }
+  .statLabel { color: var(--accent-dark); }
 }
 
 .stone {
-  background: #ede8e3;
+  background: var(--bg-muted);
 
-  .statLabel {
-    color: #5c4f48;
-  }
+  .statLabel { color: var(--text-secondary); }
 }
 
 .warm {
-  background: #fce8d4;
+  background: var(--warning-light);
 
-  .statLabel {
-    color: #92400e;
-  }
+  .statLabel { color: var(--warning); }
 }
 
 .danger {
   background: var(--danger-light);
 
-  .statLabel {
-    color: var(--danger);
-  }
+  .statLabel { color: var(--danger); }
 }
 
 // ── Chart ──────────────────────────────────────────────────
@@ -185,14 +177,13 @@
   line-height: 1.6;
 }
 
-
-//--- quotes section
-
+// ── Quotes section ─────────────────────────────────────────
 .quotes {
   padding: $sp-6;
   background: var(--bg-muted);
   border-radius: var(--r-md);
   position: relative;
+  margin-bottom: $sp-5;
 
   &::after {
     content: '"';
@@ -205,19 +196,17 @@
     font-family: "Revalia", sans-serif;
     font-weight: 400;
     font-style: normal;
-    color: rgba(205, 92, 92, 0.61);
+    color: var(--danger-border);
   }
 
   h3 {
-    color: black;
+    color: var(--text-primary);
     font-size: 1.35rem;
     font-weight: 100;
   }
 
   small {
-    color: indianred;
+    color: var(--danger);
     font-size: .8rem;
   }
-
-  margin-bottom: $sp-5;
 }

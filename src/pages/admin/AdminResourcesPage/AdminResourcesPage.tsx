@@ -13,9 +13,10 @@ import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminResourcesPage.module.scss";
 import type { AppDispatch, RootState } from "../../../store/index";
 import type { Resource } from "../../../models/globalTypes";
-import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
+import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 import { ResourceForm } from "./AdminResourcesPageForm";
 import { useFetchOnIdle } from "../../../Hooks/Hooks";
+
 
 const RESOURCE_TYPES = ["all", "article", "video", "document", "link"] as const;
 
@@ -31,8 +32,8 @@ const getResourceTypeLabel = (type: string) => {
 
 const getResourceIcon = (type: Resource["type"]) => {
   if (type === "video") return <VideoIcon />;
-  if (type === "document") return <span aria-hidden="true">📄</span>;
-  if (type === "link") return <span aria-hidden="true">🔗</span>;
+  if (type === "document") return <span aria-hidden="true"><DocumentIcon/></span>;
+  if (type === "link") return <span aria-hidden="true"><LinkIcon/></span>;
 
   return <ArticleIcon />;
 };

@@ -1,4 +1,8 @@
-export const isWithinCadence = (date: string, frequency: string) => {
+import type {
+  Response,
+} from "../models/globalTypes";
+
+export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
   const now = new Date();
   const d = new Date(date);
 
@@ -10,3 +14,6 @@ export const isWithinCadence = (date: string, frequency: string) => {
 
   return false;
 };
+
+export const getResponseDate = (response: Response) =>
+  response.submitted_at ?? response.created_at ?? "";

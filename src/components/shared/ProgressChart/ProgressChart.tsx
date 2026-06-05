@@ -62,7 +62,7 @@ const formatDate = (iso?: string) => {
   return `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
-const getResponseDate = (response: Response) =>
+export const getResponseDate = (response: Response) =>
   response.submitted_at ?? response.created_at ?? "";
 
 const getScore = (response: Response, questionId: string) => {
