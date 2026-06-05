@@ -78,6 +78,10 @@
 
   &.active   { background: var(--accent-light); color: var(--accent-dark); }
   &.inactive { background: var(--bg-muted);     color: var(--text-muted); }
+
+:global(.dark) & {
+  color: var(--text-muted);
+}
 }
 
 .qDesc {

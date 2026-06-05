@@ -44,11 +44,15 @@
     background: var(--accent-dark);
     border-color: var(--accent-dark);
   }
+
+:global(.dark) & {
+  color: var(--text-black);
+}
 }
 
 .secondary {
   background: var(--accent-light);
-  color: var(--accent-dark);
+  color: var(--text-secondary);
   border-color: var(--accent-light);
 
   &:hover:not(:disabled) {
