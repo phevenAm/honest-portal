@@ -86,10 +86,8 @@ export const deleteResource = createAsyncThunk<string, string>(
 
 export const togglePublished = createAsyncThunk<{ id: string; is_published: boolean }, { id: string; is_published: boolean }>(
   "resources/togglePublished",
-  async ({ id, is_published }, { getState, rejectWithValue }) => {
-    const state = getState() as { resources: ResourcesState };
-    const resource = state.resources.resources.find((r) => r.id === id);
-    const newValue = !resource?.is_published;
+  async ({ id, is_published }, { rejectWithValue }) => {
+    const newValue = is_published;
     const { error } = await supabase
       .from("resources")
       .update({ is_published: newValue, updated_at: new Date().toISOString() })
