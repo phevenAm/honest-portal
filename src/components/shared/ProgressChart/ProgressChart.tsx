@@ -317,7 +317,7 @@ export default function ProgressChart({
   questionnaire,
   title = "Your Progress",
 }: ProgressChartProps) {
-  const [view, setView] = useState<"line" | "heat" | "radar">("line");
+  const [view, setView] = useState<"line" | "radar">("line");
 
   const scaleQuestions =
     questionnaire?.questions?.filter((question) => question.type === "scale") ??
@@ -357,7 +357,7 @@ export default function ProgressChart({
         </div>
 
         <div role="group" aria-label="Chart type" className={styles.toggle}>
-          {(["line", "heat", "radar"] as const).map((value) => (
+          {(["line", "radar"] as const).map((value) => (
             <button
               key={value}
               type="button"
@@ -369,8 +369,6 @@ export default function ProgressChart({
             >
               {value === "line"
                 ? "Line graph"
-                : value === "heat"
-                  ? "Heatmap"
                   : "Radar"}
             </button>
           ))}
@@ -379,8 +377,6 @@ export default function ProgressChart({
 
       {view === "line" ? (
         <LineView data={chartData} scaleQuestions={scaleQuestions} />
-      ) : view === "heat" ? (
-        <HeatView responses={responses} scaleQuestions={scaleQuestions} />
       ) : (
         <RadarView responses={responses} scaleQuestions={scaleQuestions} />
       )}
