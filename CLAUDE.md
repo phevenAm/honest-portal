@@ -26,7 +26,7 @@ There are two auth mechanisms that co-exist:
 
 1. **`AuthContext`** (`src/context/AuthContext.tsx`) — the live source of truth for the UI. Holds `authUser` (Supabase auth object), `userProfile` (row from the `users` table), `isAdmin`, and session methods (`signIn`, `signUp`, `signOut`). Components should consume this via `useAuth()`.
 
-2. **`authSlice`** (`src/store/slices/authSlice.tsx`) — a Redux slice with its own thunks. Appears to be a legacy or parallel implementation. The main routing and `ProtectedRoute` rely on `AuthContext`, not this slice.
+2. **`authSlice`** (`src/store/slices/authSlice.tsx`) — a Redux slice with its own thunks. Appears to be a legacy or parallel implementation. The main routing and `ProtectedRoute` rely on `AuthContext`, not this slice. <-- this has been deleted now>
 
 `ProtectedRoute` (`src/components/shared/ProtectedRoute/ProtectedRoute.tsx`) accepts `requiredRole: "admin" | "client"` and redirects accordingly. Admins are always redirected away from client routes and vice versa.
 
