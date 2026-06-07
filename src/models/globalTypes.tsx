@@ -91,6 +91,10 @@ export type UserProfile = {
   role: UserRole | string;
   dob: string; // date stored as ISO string
   disabled: boolean;
+  onboarding_completed: boolean;
+  display_name: string | null;
+  avatar_url: string | null;
+  focus_keywords: string[] | null;
 };
 
 // questionnaires table

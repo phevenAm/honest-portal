@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "../../../context/AuthContext";
@@ -16,7 +16,7 @@ import ProgressChart from "../../../components/shared/ProgressChart/ProgressChar
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch, RootState } from "../../../store/index";
-import { useGetQuoteByKeywordQuery } from "../../../services/inspirationalQuotesApi";
+import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
 import { inspirationalQuote } from "../../../models/globalTypes";
 import Spinner from "../../../ui-components/Spinner/Spinner";
@@ -47,19 +47,26 @@ export default function ClientDashboard() {
   const questionnaires = useSelector(selectActiveQuestionnaires); // all available questionnares (backend should only return assigned; frontend checks anyway)
   const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? "")); // all submissions ever
 
-  const {
-    data,
-    error: quoteError,
-    isLoading: isQuoteLoading,
-  } = useGetQuoteByKeywordQuery("hope");
+  const quoteKeyword = useMemo(() => {
+    const kws = userProfile?.focus_keywords;
+    if (!kws || kws.length === 0) return null;
+    return kws[Math.floor(Math.random() * kws.length)];
+  }, [userProfile?.id]);
 
-  const quotes: inspirationalQuote[] = data?.results ?? [];
+  const { data: keywordData } = useGetQuoteByKeywordQuery(quoteKeyword!, {
+    skip: !quoteKeyword,
+  });
+  const { data: randomData } = useGetRandomQuoteQuery(undefined, {
+    skip: !!quoteKeyword,
+  });
+
+  const quotes: inspirationalQuote[] = keywordData?.results ?? randomData ?? [];
 
   const filtered = quotes.filter((q) => q.length <= 70);
 
   const randomQuote =
     filtered.length > 0
-      ? filtered[Math.floor(Math.random() * filtered.length - 1)]
+      ? filtered[Math.floor(Math.random() * filtered.length)]
       : undefined;
 
   const assignedQs = questionnaires.filter((q) =>
