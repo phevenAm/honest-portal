@@ -17,6 +17,8 @@ export function useFetchOnIdle<T>(
         .catch((err: unknown) => {
           console.error(errorMessage, err);
         });
+
+        //!implement retry if status === error
     }
   }, [status, dispatch, thunk, errorMessage]);
 }

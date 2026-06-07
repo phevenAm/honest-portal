@@ -283,26 +283,26 @@ export default function AdminQuestionnairesPage() {
 
   const [showBuilder,    setShowBuilder]    = useState(false);
   const [editingQ,       setEditingQ]       = useState<Questionnaire | null>(null);
-  const [assigningQ,     setAssigningQ]     = useState<Questionnaire | null>(null);
+  const [isAssigningQ,     setIsAssigningQ]     = useState<Questionnaire | null>(null);
 
   useFetchOnIdle(
     (state: RootState) => state.questionnaires.status,
-    fetchQuestionnaires,
+    () => fetchQuestionnaires(),
     "Failed to fetch questionnaires:",
   );
 
   useFetchOnIdle(
     (state: RootState) => state.userDirectory.status,
-    fetchAllUsers,
+    () => fetchAllUsers(),
     "Failed to fetch users:",
   );
 
   // When assign modal opens, fetch latest assignments for that questionnaire
   useEffect(() => {
-    if (assigningQ) {
-      dispatch(fetchAssignmentsByQuestionnaire(assigningQ.id));
+    if (isAssigningQ) {
+      dispatch(fetchAssignmentsByQuestionnaire(isAssigningQ.id));
     }
-  }, [assigningQ, dispatch]);
+  }, [isAssigningQ, dispatch]);
 
   const handleCreate = (data: any) => dispatch(createQuestionnaire(data));
 
@@ -344,7 +344,7 @@ export default function AdminQuestionnairesPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => setAssigningQ(q)}
+                      onClick={() => setIsAssigningQ(q)}
                     >
                       Assign
                     </Button>
@@ -395,11 +395,11 @@ export default function AdminQuestionnairesPage() {
         />
       )}
 
-      {assigningQ && (
+      {isAssigningQ && (
         <AssignModal
-          questionnaire={assigningQ}
+          questionnaire={isAssigningQ}
           clients={clients}
-          onClose={() => setAssigningQ(null)}
+          onClose={() => setIsAssigningQ(null)}
         />
       )}
     </div>

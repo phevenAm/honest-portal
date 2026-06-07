@@ -49,7 +49,7 @@ export default function AdminResourcesPage() {
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
-    fetchResources,
+    () => fetchResources(),
     "Failed to fetch resources:",
   );
 
