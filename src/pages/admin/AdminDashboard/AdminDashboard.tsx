@@ -14,48 +14,34 @@ import Card from "../../../components/shared/Card/Card";
 import Avatar from "../../../components/shared/Avatar/Avatar";
 import Button from "../../../components/shared/Button/Button";
 import { useAuth } from "../../../context/AuthContext";
-import type { AppDispatch, RootState } from "../../../store/index";
-  import { useFetchOnIdle } from "../../../Hooks/Hooks";
+import type { RootState } from "../../../store/index";
+import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 import styles from "./AdminDashboard.module.scss";
-import {UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon} from '../../../components/shared/Icons/Icons';
+import { UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon } from '../../../components/shared/Icons/Icons';
 
-const COLORS = ["teal", "sky", "teal", "peach"] as const;
 
 export default function AdminDashboard() {
   const { userProfile } = useAuth();
-  const dispatch = useDispatch<AppDispatch>();
   const allClients = useSelector(selectAllUsers);
   const questionnaires = useSelector(selectAllQuestionnaires);
   const resources = useSelector(selectAllResources);
 
-  const questionnaireStatus = useSelector(
+  useFetchOnIdle(
+    (state: RootState) => state.userDirectory.status,
+    () => fetchAllUsers(),
+    "Failed to fetch users:"
+  )
+
+  useFetchOnIdle(
     (state: RootState) => state.questionnaires.status,
-  );
-
-  //const resourcesStateStatus = useSelector((state: RootState) => state.resources.status);
-
-  useEffect(() => {
-    dispatch(fetchAllUsers())
-      .unwrap()
-      .catch((err) => {
-        console.error("Failed to fetch users:", err);
-      });
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (questionnaireStatus === "idle") {
-      dispatch(fetchQuestionnaires())
-        .unwrap()
-        .catch((err) => {
-          console.error("Failed to fetch questionnaires:", err);
-        });
-    }
-  }, [dispatch, questionnaireStatus]);
+    () => fetchQuestionnaires(),
+    'Failed to fetch questionnaires'
+  )
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
-    fetchResources,
+    () => fetchResources(),
     "Failed to fetch resources:"
   );
 

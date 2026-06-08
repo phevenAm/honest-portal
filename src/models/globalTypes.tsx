@@ -88,9 +88,13 @@ export type UserProfile = {
   created_at: string;
   first_name: string;
   last_name: string;
+  dob: string | null;
   role: UserRole | string;
-  dob: string; // date stored as ISO string
   disabled: boolean;
+  onboarding_completed: boolean;
+  display_name: string | null;
+  avatar_url: string | null;
+  focus_keywords: string[] | null;
 };
 
 // questionnaires table
@@ -164,6 +168,7 @@ export type Resource = {
   tags?: string; // comma-separated or JSON string
   content_format?: ContentFormat | string;
   is_published: boolean;
+  is_sensitive: boolean;
 };
 
 // ─── App-level types (not in DB) ───────────────────────────

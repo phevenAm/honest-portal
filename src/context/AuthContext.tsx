@@ -9,6 +9,8 @@ import { supabase } from "../lib/supabase";
 import type { AuthUser, UserProfile } from "../models/globalTypes";
 import type { Session } from "@supabase/supabase-js";
 
+type ProfileUpdates = Partial<Pick<UserProfile, 'display_name' | 'avatar_url' | 'focus_keywords' | 'onboarding_completed'>>;
+
 type AuthContextType = {
   authUser: AuthUser | null;
   userProfile: UserProfile | null;
@@ -24,6 +26,7 @@ type AuthContextType = {
     accessToken?: string,
   ) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (updates: ProfileUpdates) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -187,6 +190,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateProfile = async (updates: ProfileUpdates) => {
+    if (!authUser) return;
+
+    const { error } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("id", authUser.id);
+
+    if (error) throw new Error(error.message);
+
+    setUserProfile((prev) => (prev ? { ...prev, ...updates } : prev));
+  };
+
   const signOut = async () => {
     setError(null);
 
@@ -209,6 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signOut,
+        updateProfile,
       }}
     >
       {children}

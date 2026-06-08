@@ -133,7 +133,7 @@ export default function ResourcesPage() {
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
-    fetchPublishedResources,
+    () => fetchPublishedResources(),
     "Failed to fetch resources:",
   );
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "../../../context/AuthContext";
@@ -16,13 +16,14 @@ import ProgressChart from "../../../components/shared/ProgressChart/ProgressChar
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import type { AppDispatch, RootState } from "../../../store/index";
-import { useGetQuoteByKeywordQuery } from "../../../services/inspirationalQuotesApi";
+import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
 import { inspirationalQuote } from "../../../models/globalTypes";
 import Spinner from "../../../ui-components/Spinner/Spinner";
+import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 const getLatestResponseForQuestionnaire = (
-  responses: any[],
+  responses: any[], //all submitted check-in answers ever
   questionnaireId: string,
 ) =>
   responses
@@ -34,7 +35,6 @@ const getLatestResponseForQuestionnaire = (
     )[0];
 
 export default function ClientDashboard() {
-  const dispatch = useDispatch<AppDispatch>();
   const { authUser, userProfile } = useAuth();
 
   const questionnairesStatus = useSelector(
@@ -44,21 +44,25 @@ export default function ClientDashboard() {
     (state: RootState) => state.responses.status,
   );
 
-  const questionnaires = useSelector(selectActiveQuestionnaires);
-  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+  const questionnaires = useSelector(selectActiveQuestionnaires); // all available questionnares (backend should only return assigned; frontend checks anyway)
+  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? "")); // all submissions ever
 
-  const {
-    data,
-    error: quoteError,
-    isLoading: isQuoteLoading,
-  } = useGetQuoteByKeywordQuery("hope");
+  const quoteKeyword = useMemo(() => {
+    const kws = userProfile?.focus_keywords;
+    if (!kws || kws.length === 0) return null;
+    return kws[Math.floor(Math.random() * kws.length)];
+  }, [userProfile?.id]);
 
-  const quotes: inspirationalQuote[] = data?.results ?? [];
+  const { data: keywordData } = useGetQuoteByKeywordQuery(quoteKeyword!, {
+    skip: !quoteKeyword,
+  });
+  const { data: randomData } = useGetRandomQuoteQuery(undefined, {
+    skip: !!quoteKeyword,
+  });
+
+  const quotes: inspirationalQuote[] = keywordData?.results ?? randomData ?? [];
 
   const filtered = quotes.filter((q) => q.length <= 70);
-
-  //console.log(quotes.map((q) => q.length));
-  console.log(filtered);
 
   const randomQuote =
     filtered.length > 0
@@ -89,17 +93,18 @@ export default function ClientDashboard() {
     ),
   );
 
-  useEffect(() => {
-    if (questionnairesStatus === "idle") {
-      dispatch(fetchQuestionnaires());
-    }
-  }, [dispatch, questionnairesStatus]);
+  useFetchOnIdle(
+    (state: RootState) => state.questionnaires.status,
+    () => fetchQuestionnaires(),
+    'Error fetch questionnares'
+  )
 
-  useEffect(() => {
-    if (authUser?.id && responsesStatus === "idle") {
-      dispatch(fetchResponsesByUser(authUser.id));
-    }
-  }, [dispatch, authUser?.id, responsesStatus]);
+  useFetchOnIdle(
+    (state: RootState) => state.responses.status,
+    () => fetchResponsesByUser(authUser?.id ?? ''),
+    'Failed to fetch user responses'
+  )
+
 
   const latestResponse = responses[responses.length - 1] ?? null;
 
@@ -147,13 +152,13 @@ export default function ClientDashboard() {
     },
     ...(improvement !== null
       ? [
-          {
-            label: "Overall change",
-            value: `${parseFloat(improvement) >= 0 ? "+" : ""}${improvement}`,
-            sub: "Since you started",
-            color: parseFloat(improvement) >= 0 ? "teal" : "danger",
-          },
-        ]
+        {
+          label: "Overall change",
+          value: `${parseFloat(improvement) >= 0 ? "+" : ""}${improvement}`,
+          sub: "Since you started",
+          color: parseFloat(improvement) >= 0 ? "teal" : "danger",
+        },
+      ]
       : []),
     {
       label: "Available check-ins",
@@ -191,9 +196,8 @@ export default function ClientDashboard() {
           {stats.map((s) => (
             <div
               key={s.label}
-              className={`${styles.statCard} ${
-                styles[s.color as keyof typeof styles]
-              }`}
+              className={`${styles.statCard} ${styles[s.color as keyof typeof styles]
+                }`}
             >
               <p className={styles.statLabel}>{s.label}</p>
               <p className={styles.statValue}>{s.value}</p>

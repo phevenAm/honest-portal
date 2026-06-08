@@ -155,6 +155,25 @@
   }
 }
 
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: $sp-5;
+  font-family: var(--font-sans);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 .footer {
   text-align: center;
   margin-top: $sp-5;

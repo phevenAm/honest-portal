@@ -49,7 +49,7 @@ export default function AdminResourcesPage() {
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
-    fetchResources,
+    () => fetchResources(),
     "Failed to fetch resources:",
   );
 
@@ -111,6 +111,11 @@ export default function AdminResourcesPage() {
                 </div>
 
                 <div className={styles.resourceActions}>
+                  {resource.is_sensitive && (
+                    <span className={`${styles.badge} ${styles.sensitive}`}>
+                      Sensitive
+                    </span>
+                  )}
                   <span
                     className={`${styles.badge} ${
                       resource.is_published ? styles.published : styles.draft

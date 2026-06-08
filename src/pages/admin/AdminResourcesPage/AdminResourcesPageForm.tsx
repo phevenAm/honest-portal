@@ -27,6 +27,7 @@ export function ResourceForm({
     videoUrl: "",
     url: "",
     category: "General",
+    is_sensitive: false,
   });
 
   const set = (key: string, value: string) =>
@@ -38,11 +39,12 @@ export function ResourceForm({
     setForm({
       type: resource.type,
       title: resource.title,
-      summary: resource.summary,
+      summary: resource.summary ?? "",
       content: resource.content || "",
       videoUrl: resource.videoUrl || "",
       url: resource.url || "",
       category: resource.category,
+      is_sensitive: resource.is_sensitive ?? false,
     });
   }, [resource]);
 
@@ -167,6 +169,19 @@ export function ResourceForm({
             </div>
           )}
         </div>
+
+        <label className={styles.sensitiveRow}>
+          <input
+            type="checkbox"
+            checked={form.is_sensitive}
+            onChange={(e) =>
+              setForm((current) => ({ ...current, is_sensitive: e.target.checked }))
+            }
+          />
+          <span>
+            <strong>Sensitive content</strong> — restrict to adult clients only
+          </span>
+        </label>
 
         <div className={styles.modalActions}>
           <Button variant="ghost" onClick={onClose}>

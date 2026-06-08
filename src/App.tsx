@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
 import { store } from "./store/index";
 import { selectThemeMode } from "./store/slices/themeSlice";
 import { useAuth } from "./context/AuthContext";
+import OnboardingModal from "./components/Onboarding/OnboardingModal";
 
 import LoginPage from "./pages/client/LoginPage/LoginPage";
 import SignUpPage from "./pages/SignUpPage/SignUpPage";
@@ -33,6 +34,20 @@ function RootRedirect() {
   return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
 }
 
+function OnboardingGate() {
+  const { userProfile, isAdmin, isAuthenticated, loading } = useAuth();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (!loading && isAuthenticated && !isAdmin && userProfile !== null && !userProfile.onboarding_completed) {
+      setShow(true);
+    }
+  }, [loading, isAuthenticated, isAdmin, userProfile]);
+
+  if (!show) return null;
+  return <OnboardingModal onComplete={() => setShow(false)} />;
+}
+
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -46,6 +61,7 @@ function AppRoutes() {
   return (
     <ThemeWrapper>
       <BrowserRouter>
+        <OnboardingGate />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />

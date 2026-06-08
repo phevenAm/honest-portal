@@ -17,3 +17,13 @@ export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
 
 export const getResponseDate = (response: Response) =>
   response.submitted_at ?? response.created_at ?? "";
+
+export const isAdultFromDob = (dob: string | null | undefined): boolean => {
+  if (!dob) return false;
+  const birth = new Date(dob);
+  const now = new Date();
+  const age = now.getFullYear() - birth.getFullYear();
+  const hadBirthday =
+    now >= new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+  return age > 18 || (age === 18 && hadBirthday);
+};

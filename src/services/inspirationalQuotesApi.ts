@@ -13,7 +13,7 @@ export const inspirationalQuotesApi = createApi({
     getRandomQuote: builder.query<inspirationalQuote[], void>({
       query: () => "/quotes/random",
     }),
-    getQuoteByKeyword: builder.query<inspirationalSearchedQuote[], string>({
+    getQuoteByKeyword: builder.query<inspirationalSearchedQuote, string>({
       query: (keyword) => `/search/quotes?query=${keyword}`,
     }),
   }),
