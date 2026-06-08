@@ -4,20 +4,11 @@ import { useAuth } from "../../context/AuthContext";
 import styles from "./SignUpPage.module.scss";
 import {LogoIcon, MailIcon} from "../../components/shared/Icons/Icons";
 
-function getMinAgeDate(age = 11) {
-  const today = new Date();
-  return new Date(today.getFullYear() - age, today.getMonth(), today.getDate())
-    .toISOString()
-    .split("T")[0];
-}
-
-
-
 const FIELDS = [
   { id: "firstName", label: "First name", type: "text", ph: "" },
   { id: "lastName", label: "Last name", type: "text", ph: "" },
   { id: "email", label: "Email address", type: "email", ph: "you@example.com" },
-  { id: "age", label: "Age", type: "number", ph: "" },
+  { id: "dob", label: "Date of birth", type: "date", ph: "" },
   {
     id: "accessToken",
     label: "Access token",
@@ -41,7 +32,7 @@ export default function SignUpPage() {
     firstName: "",
     lastName: "",
     email: "",
-    age: "",
+    dob: "",
     accessToken: "",
     password: "",
     confirm: "",
@@ -59,6 +50,11 @@ export default function SignUpPage() {
 
     if (!form.accessToken.trim()) {
       setError("Access token is required");
+      return;
+    }
+
+    if (!form.dob) {
+      setError("Date of birth is required");
       return;
     }
 
@@ -81,7 +77,7 @@ export default function SignUpPage() {
         {
           first_name: form.firstName,
           last_name: form.lastName,
-          age: form.age,
+          dob: form.dob,
         },
         form.accessToken,
       );
@@ -158,7 +154,9 @@ export default function SignUpPage() {
                           ? "new-password"
                           : undefined
                   }
-                  {...(field.type === "date" && { max: getMinAgeDate(11) })}
+                  {...(field.type === "date" && {
+                    max: new Date().toISOString().split("T")[0],
+                  })}
                   className={styles.input}
                 />
               </div>
@@ -169,6 +167,7 @@ export default function SignUpPage() {
               disabled={
                 loading ||
                 !form.email ||
+                !form.dob ||
                 !form.password ||
                 !form.confirm ||
                 !form.accessToken

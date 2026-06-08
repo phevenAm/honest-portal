@@ -111,6 +111,11 @@ export default function AdminResourcesPage() {
                 </div>
 
                 <div className={styles.resourceActions}>
+                  {resource.is_sensitive && (
+                    <span className={`${styles.badge} ${styles.sensitive}`}>
+                      Sensitive
+                    </span>
+                  )}
                   <span
                     className={`${styles.badge} ${
                       resource.is_published ? styles.published : styles.draft

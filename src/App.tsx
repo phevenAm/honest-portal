@@ -39,13 +39,6 @@ function OnboardingGate() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    console.warn('ONBOARDING GATE:', {
-      loading,
-      isAuthenticated,
-      isAdmin,
-      userProfile,
-      onboarding_completed: userProfile?.onboarding_completed,
-    });
     if (!loading && isAuthenticated && !isAdmin && userProfile !== null && !userProfile.onboarding_completed) {
       setShow(true);
     }
