@@ -180,7 +180,7 @@ export default function ClientDashboard() {
       <div className={styles.inner}>
         <div className={styles.header}>
           <h1>
-            {greeting}, {userProfile?.first_name}
+            {greeting}, {userProfile?.display_name ?? userProfile?.first_name ?? 'friend'}
           </h1>
           <p>Here's a look at how you've been doing</p>
         </div>

@@ -113,7 +113,7 @@ export default function CheckInPage() {
   const [submitted, setSubmitted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect(() => {
+  useEffect(() => { //!TODO: use idle hook
     if (!authUser?.id) return;
 
     dispatch(fetchAssignmentsByUser(authUser.id))

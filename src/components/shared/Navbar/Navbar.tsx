@@ -15,7 +15,7 @@ export default function Navbar() {
   const location = useLocation();
   const themeMode = useSelector(selectThemeMode);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAdmin, signOut, profile } = useAuth();
+  const { isAdmin, signOut, userProfile } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -86,9 +86,9 @@ export default function Navbar() {
           </button>
 
           <div className={styles.userSection}>
-            {profile && (
+            {userProfile && (
               <Avatar
-                initials={`${profile.first_name?.[0] ?? ''}${profile.last_name?.[0] ?? ''}`}
+                initials={`${userProfile.first_name?.[0] ?? ''}${userProfile.last_name?.[0] ?? ''}`}
                 color="teal"
                 size={34}
               />
