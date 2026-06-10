@@ -98,15 +98,15 @@ function ScaleQuestion({
 }
 
 export default function CheckInPage() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { authUser, userProfile } = useAuth();
 
-  const assignments = useSelector(
+  const assignments = useAppSelector(
     selectAllAssignments,
   ) as AssignmentWithQuestionnaire[];
 
-  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+  const allUserResponses = useAppSelector(selectUserResponses(authUser?.id ?? ""));
 
   const [answers, setAnswers] = useState<Record<string, number | string>>({});
   const [submitted, setSubmitted] = useState(false);

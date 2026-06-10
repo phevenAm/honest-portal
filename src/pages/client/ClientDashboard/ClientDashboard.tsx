@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import { useAuth } from "../../../context/AuthContext";
@@ -36,15 +36,15 @@ const getLatestResponseForQuestionnaire = (
 export default function ClientDashboard() {
   const { authUser, userProfile } = useAuth();
 
-  const questionnairesStatus = useSelector(
+  const questionnairesStatus = useAppSelector(
     (state: RootState) => state.questionnaires.status,
   );
-  const responsesStatus = useSelector(
+  const responsesStatus = useAppSelector(
     (state: RootState) => state.responses.status,
   );
 
-  const questionnaires = useSelector(selectActiveQuestionnaires); // all available questionnares (backend should only return assigned; frontend checks anyway)
-  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? "")); // all submissions ever
+  const questionnaires = useAppSelector(selectActiveQuestionnaires); // all available questionnares (backend should only return assigned; frontend checks anyway)
+  const allUserResponses = useAppSelector(selectUserResponses(authUser?.id ?? "")); // all submissions ever
 
   const quoteKeyword = useMemo(() => {
     const kws = userProfile?.focus_keywords;
@@ -85,7 +85,7 @@ export default function ClientDashboard() {
 
   const questionnaire = assignedQs[0] ?? null;
 
-  const responses = useSelector(
+  const responses = useAppSelector(
     selectUserQuestionnaireResponses(
       authUser?.id ?? "",
       questionnaire?.id ?? "",
