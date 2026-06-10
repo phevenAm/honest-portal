@@ -80,7 +80,7 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { to: "/admin/questionnaires", label: "New questionnaire", color: "teal" },
-    { to: "/admin/resources", label: "Write an article", color: "stone" },
+    { to: "/admin/resources", label: "Create a new resource", color: "stone" },
     { to: "/admin/clients", label: "Add a client", color: "warm" },
   ];
 
