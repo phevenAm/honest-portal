@@ -7,7 +7,7 @@
 //   - Uses the provided slices as reducers
 // ============================================================
 
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, Middleware } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import userDirectoryReducer from "./slices/userDirectorySlice";
 import questionnairesReducer from "./slices/questionnairesSlice";
@@ -27,8 +27,8 @@ export const store = configureStore({
     theme: themeReducer,
     [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },
-  middleware: (getDefaultMiddleWare): any =>
-    getDefaultMiddleWare().concat(inspirationalQuotesApi.middleware),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(inspirationalQuotesApi.middleware as Middleware),
 });
 
 setupListeners(store.dispatch);

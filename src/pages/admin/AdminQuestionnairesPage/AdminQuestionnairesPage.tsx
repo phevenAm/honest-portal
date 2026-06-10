@@ -21,7 +21,8 @@ import {
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminQuestionnairesPage.module.scss";
-import type { AppDispatch, RootState } from "../../../store/index";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import type { RootState } from "../../../store/index";
 import type { Questionnaire, UserProfile } from "../../../models/globalTypes";
 
 
@@ -208,8 +209,8 @@ function AssignModal({
   clients: UserProfile[];
   onClose: () => void;
 }) {
-  const dispatch    = useDispatch<AppDispatch>();
-  const assignments = useSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
+  const dispatch    = useAppDispatch();
+  const assignments = useAppSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
   const assignedIds = new Set(assignments.map((a) => a.user_id));
   console.log('assignments:', assignments, 'assignedIds:', assignedIds);
 
@@ -277,9 +278,9 @@ function AssignModal({
 // ─── Page ───────────────────────────────────────────────────
 
 export default function AdminQuestionnairesPage() {
-  const dispatch       = useDispatch<AppDispatch>();
-  const questionnaires = useSelector(selectAllQuestionnaires);
-  const clients        = useSelector(selectClientUsers);
+  const dispatch       = useAppDispatch();
+  const questionnaires = useAppSelector(selectAllQuestionnaires);
+  const clients        = useAppSelector(selectClientUsers);
 
   const [showBuilder,    setShowBuilder]    = useState(false);
   const [editingQ,       setEditingQ]       = useState<Questionnaire | null>(null);

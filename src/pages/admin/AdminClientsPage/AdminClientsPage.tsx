@@ -42,8 +42,8 @@ const getQuestionnaireForResponse = (
 
 
 function ClientRow({ user }: { user: UserProfile }) {
-  const allResponses = useSelector(selectResponsesByUser(user.id));
-  const questionnaires = useSelector(selectAllQuestionnaires);
+  const allResponses = useAppSelector(selectResponsesByUser(user.id));
+  const questionnaires = useAppSelector(selectAllQuestionnaires);
 
   const questionnaireOptions = useMemo(
     () =>
@@ -210,18 +210,18 @@ function ClientRow({ user }: { user: UserProfile }) {
 }
 
 export default function AdminClientsPage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const allUsers = useSelector(selectAllUsers) as UserProfile[];
+  const dispatch = useAppDispatch();
+  const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [search, setSearch] = useState("");
 
-  const userDirectoryStatus = useSelector(
+  const userDirectoryStatus = useAppSelector(
     (state: RootState) => state.userDirectory.status,
   );
-  const questionnairesStatus = useSelector(
+  const questionnairesStatus = useAppSelector(
     (state: RootState) => state.questionnaires.status,
   );
-  const responsesStatus = useSelector((state: RootState) => state.responses.status);
+  const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
 
   useEffect(() => {
     if (userDirectoryStatus === "idle") {
