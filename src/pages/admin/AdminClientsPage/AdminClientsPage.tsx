@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   fetchAllUsers,
   selectAllUsers,
@@ -18,10 +18,7 @@ import Button from "../../../components/shared/Button/Button";
 import ProgressChart from "../../../components/shared/ProgressChart/ProgressChart";
 import styles from "./AdminClientsPage.module.scss";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
-import type {
-  AppDispatch,
-  RootState,
-} from "../../../store/index";
+import type { RootState } from "../../../store/index";
 import type {
   Questionnaire,
   Response,

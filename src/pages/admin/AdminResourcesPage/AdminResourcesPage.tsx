@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import {
   selectAllResources,
   createResource,
@@ -11,11 +12,10 @@ import {
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
 import styles from "./AdminResourcesPage.module.scss";
-import type { AppDispatch, RootState } from "../../../store/index";
+import type { RootState } from "../../../store/index";
 import type { Resource } from "../../../models/globalTypes";
 import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 import { ResourceForm } from "./AdminResourcesPageForm";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 
 const RESOURCE_TYPES = ["all", "article", "video", "document", "link"] as const;
@@ -39,8 +39,8 @@ const getResourceIcon = (type: Resource["type"]) => {
 };
 
 export default function AdminResourcesPage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const resources: Resource[] = useSelector(selectAllResources);
+  const dispatch = useAppDispatch();
+  const resources: Resource[] = useAppSelector(selectAllResources);
 
   const [showForm, setShowForm] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);

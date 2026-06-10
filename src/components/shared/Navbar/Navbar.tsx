@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme, selectThemeMode } from '../../../store/slices/themeSlice';
 import { LogoIcon, MoonIcon, SunIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
 import Avatar from '../Avatar/Avatar';
@@ -11,11 +11,11 @@ import styles from './Navbar.module.scss';
 
 
 export default function Navbar() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
-  const themeMode = useSelector(selectThemeMode);
+  const themeMode = useAppSelector(selectThemeMode);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAdmin, signOut, userProfile } = useAuth();
+  const { isAdmin, signOut, userProfile, displayName } = useAuth();
 
   const handleLogout = async () => {
     try {

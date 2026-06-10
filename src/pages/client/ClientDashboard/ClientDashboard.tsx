@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import { useAuth } from "../../../context/AuthContext";
 import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import {
@@ -15,12 +15,11 @@ import {
 import ProgressChart from "../../../components/shared/ProgressChart/ProgressChart";
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
-import type { AppDispatch, RootState } from "../../../store/index";
+import type { RootState } from "../../../store/index";
 import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
 import { inspirationalQuote } from "../../../models/globalTypes";
 import Spinner from "../../../ui-components/Spinner/Spinner";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 const getLatestResponseForQuestionnaire = (
   responses: any[], //all submitted check-in answers ever

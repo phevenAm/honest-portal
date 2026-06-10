@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import {
   selectAllUsers,
   fetchAllUsers,
@@ -15,7 +15,6 @@ import Avatar from "../../../components/shared/Avatar/Avatar";
 import Button from "../../../components/shared/Button/Button";
 import { useAuth } from "../../../context/AuthContext";
 import type { RootState } from "../../../store/index";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 import styles from "./AdminDashboard.module.scss";
 import { UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon } from '../../../components/shared/Icons/Icons';
@@ -23,9 +22,9 @@ import { UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon } from '../../.
 
 export default function AdminDashboard() {
   const { userProfile } = useAuth();
-  const allClients = useSelector(selectAllUsers);
-  const questionnaires = useSelector(selectAllQuestionnaires);
-  const resources = useSelector(selectAllResources);
+  const allClients = useAppSelector(selectAllUsers);
+  const questionnaires = useAppSelector(selectAllQuestionnaires);
+  const resources = useAppSelector(selectAllResources);
 
   useFetchOnIdle(
     (state: RootState) => state.userDirectory.status,

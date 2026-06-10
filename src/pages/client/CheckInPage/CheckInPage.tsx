@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { useAuth } from "../../../context/AuthContext";
 import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import {
@@ -14,7 +14,6 @@ import {
 } from "../../../store/slices/responsesSlice";
 import Card from "../../../components/shared/Card/Card";
 import Button from "../../../components/shared/Button/Button";
-import type { AppDispatch } from "../../../store/index";
 import type { Question, Questionnaire } from "../../../models/globalTypes";
 import styles from "./CheckInPage.module.scss";
 

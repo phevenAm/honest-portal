@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import {
   selectPublishedResources,
   fetchPublishedResources,
@@ -7,7 +7,6 @@ import {
 import Card from "../../../components/shared/Card/Card";
 import styles from "./ResourcesPage.module.scss";
 import type { Resource } from "../../../models/globalTypes";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
 import type { RootState } from "../../../store/index";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 
@@ -125,7 +124,7 @@ function ResourceCard({
 }
 
 export default function ResourcesPage() {
-  const resources = useSelector(selectPublishedResources);
+  const resources = useAppSelector(selectPublishedResources);
   const [filter, setFilter] = useState("all");
   const [selectedResource, setSelectedResource] = useState<Resource | null>(
     null,

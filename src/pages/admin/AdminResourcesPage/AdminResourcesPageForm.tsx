@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { selectAllResources, createResource, deleteResource, togglePublished,fetchResources, updateResource } from '../../../store/slices/resourcesSlice';
 import Card from '../../../components/shared/Card/Card';
 import Button from '../../../components/shared/Button/Button';
 import styles from './AdminResourcesPage.module.scss';
-import type { AppDispatch, RootState } from '../../../store/index';
 import { Resource } from '../../../models/globalTypes';
 import { ArticleIcon, VideoIcon } from '../../../components/shared/Icons/Icons';
 

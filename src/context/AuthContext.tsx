@@ -14,6 +14,7 @@ type ProfileUpdates = Partial<Pick<UserProfile, 'display_name' | 'avatar_url' | 
 type AuthContextType = {
   authUser: AuthUser | null;
   userProfile: UserProfile | null;
+  displayName: string | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -213,11 +214,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const displayName = userProfile?.display_name ?? userProfile?.first_name ?? null;
+
   return (
     <AuthContext.Provider
       value={{
         authUser,
         userProfile,
+        displayName,
         error,
         loading,
         isAuthenticated: !!authUser,
