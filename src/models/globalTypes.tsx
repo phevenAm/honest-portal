@@ -137,10 +137,7 @@ export type QuestionnaireAssignment = {
   assigned_at: string;
 
   // joined optionally
-  questionnaires?: Pick<
-    Questionnaire,
-    "id" | "title" | "frequency" | "is_active"
-  >;
+  questionnaires?: Pick<Questionnaire, "id" | "title" | "frequency" | "is_active">;
   users?: Pick<UserProfile, "id" | "first_name" | "last_name">;
 };
 
@@ -174,7 +171,6 @@ export type Resource = {
 
 // ─── App-level types (not in DB) ───────────────────────────
 
-
 // ─── Utility types ─────────────────────────────────────────
 
 // Scores payload shape for a submitted response
@@ -182,9 +178,9 @@ export type Resource = {
 export type ResponseScores = Record<string, number | string>;
 
 // Partial update helpers
-export type UpdateQuestionnaire = Partial<
-  Omit<Questionnaire, "id" | "created_at" | "questions" | "assignedTo">
-> & { id: string };
+export type UpdateQuestionnaire = Partial<Omit<Questionnaire, "id" | "created_at" | "questions" | "assignedTo">> & {
+  id: string;
+};
 export type UpdateUser = Partial<Omit<UserProfile, "id" | "created_at">> & {
   id: string;
 };

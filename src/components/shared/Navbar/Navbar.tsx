@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { toggleTheme, selectThemeMode } from '../../../store/slices/themeSlice';
-import { LogoIcon, MoonIcon, SunIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
-import Avatar from '../Avatar/Avatar';
-import SkipToMain from '../SkipToMain/SkipToMain';
-import { useAuth } from '../../../context/AuthContext';
-import { getInitials } from '@Helpers/Helpers';
-import styles from './Navbar.module.scss';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
+import { getInitials } from "@Helpers/Helpers";
 
+import { useAuth } from "../../../context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
+import Avatar from "../Avatar/Avatar";
+import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, SunIcon } from "../Icons/Icons";
+import SkipToMain from "../SkipToMain/SkipToMain";
 
+import styles from "./Navbar.module.scss";
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
@@ -23,39 +23,38 @@ export default function Navbar() {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
   const adminLinks = [
-    { to: '/admin', label: 'Dashboard' },
-    { to: '/admin/clients', label: 'Clients' },
-    { to: '/admin/questionnaires', label: 'Questionnaires' },
-    { to: '/admin/resources', label: 'Resources' },
+    { to: "/admin", label: "Dashboard" },
+    { to: "/admin/clients", label: "Clients" },
+    { to: "/admin/questionnaires", label: "Questionnaires" },
+    { to: "/admin/resources", label: "Resources" },
   ];
 
   const clientLinks = [
-    { to: '/dashboard', label: 'My Progress' },
-    { to: '/check-in', label: 'Check-in' },
-    { to: '/resources', label: 'Resources' },
+    { to: "/dashboard", label: "My Progress" },
+    { to: "/check-in", label: "Check-in" },
+    { to: "/resources", label: "Resources" },
   ];
 
   const links = isAdmin ? adminLinks : clientLinks;
 
   const createLinkRoleTestId = (link: { to: string; label: string }) => {
-    return link.to.split('/').filter(Boolean).join('-')
-  }
+    return link.to.split("/").filter(Boolean).join("-");
+  };
 
-  console.log(userProfile.avatar_url)
+  console.log(userProfile.avatar_url);
 
   return (
     <header role="banner" className={styles.header}>
       <SkipToMain />
       <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
-
         {/* Logo */}
         <Link
-          to={isAdmin ? '/admin' : '/dashboard'}
+          to={isAdmin ? "/admin" : "/dashboard"}
           aria-label="WithMe — home"
           className={styles.logo}
           data-testid="logo-link"
@@ -69,14 +68,14 @@ export default function Navbar() {
 
         {/* Desktop nav links */}
         <ul className={styles.desktopNav} role="list">
-          {links.map(link => {
+          {links.map((link) => {
             const active = location.pathname === link.to;
             return (
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  aria-current={active ? 'page' : undefined}
-                  className={`${styles.navLink} ${active ? styles.active : ''}`}
+                  aria-current={active ? "page" : undefined}
+                  className={`${styles.navLink} ${active ? styles.active : ""}`}
                   data-testid={`navbar-link-${createLinkRoleTestId(link)}`}
                 >
                   {link.label}
@@ -90,10 +89,10 @@ export default function Navbar() {
         <div className={styles.actions}>
           <button
             onClick={() => dispatch(toggleTheme())}
-            aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={`Switch to ${themeMode === "light" ? "dark" : "light"} mode`}
             className={styles.iconBtn}
           >
-            {themeMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            {themeMode === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
 
           <div className={styles.userSection}>
@@ -102,7 +101,7 @@ export default function Navbar() {
                 initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
                 color="teal"
                 size={34}
-                imageSrc={userProfile.avatar_url || ''}
+                imageSrc={userProfile.avatar_url || ""}
               />
             )}
             <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn}>
@@ -112,7 +111,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             className={styles.menuBtn}
@@ -126,14 +125,14 @@ export default function Navbar() {
       {menuOpen && (
         <div id="mobile-menu" className={styles.mobileMenu}>
           <ul role="list" className={styles.mobileMenuList}>
-            {links.map(link => {
+            {links.map((link) => {
               const active = location.pathname === link.to;
               return (
                 <li key={link.to}>
                   <Link
                     to={link.to}
                     onClick={() => setMenuOpen(false)}
-                    className={`${styles.mobileNavLink} ${active ? styles.active : ''}`}
+                    className={`${styles.mobileNavLink} ${active ? styles.active : ""}`}
                   >
                     {link.label}
                   </Link>

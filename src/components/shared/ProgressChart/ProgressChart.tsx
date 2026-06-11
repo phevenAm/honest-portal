@@ -1,35 +1,27 @@
 import React, { useState } from "react";
+
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
-  ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
+  Line,
+  LineChart,
   PolarAngleAxis,
+  PolarGrid,
   PolarRadiusAxis,
   Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
+
+import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
 import Card from "../Card/Card";
-import type {
-  Questionnaire,
-  Question,
-  Response,
-} from "../../../models/globalTypes";
+
 import styles from "./ProgressChart.module.scss";
 
-const LINE_COLORS = [
-  "#2d7264",
-  "#5a8a6a",
-  "#3a7fa8",
-  "#8a6a2d",
-  "#a8633a",
-  "#6a2d8a",
-];
+const LINE_COLORS = ["#2d7264", "#5a8a6a", "#3a7fa8", "#8a6a2d", "#a8633a", "#6a2d8a"];
 
 const scoreToHeatColor = (score: number) => {
   if (!score) return "var(--bg-muted)";
@@ -62,8 +54,7 @@ const formatDate = (iso?: string) => {
   return `${date.getDate()}/${date.getMonth() + 1}`;
 };
 
-export const getResponseDate = (response: Response) =>
-  response.submitted_at ?? response.created_at ?? "";
+export const getResponseDate = (response: Response) => response.submitted_at ?? response.created_at ?? "";
 
 const getScore = (response: Response, questionId: string) => {
   const scores = response.scores as Record<string, number | string>;
@@ -128,31 +119,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-function LineView({
-  data,
-  scaleQuestions,
-}: {
-  data: Record<string, string | number>[];
-  scaleQuestions: Question[];
-}) {
+function LineView({ data, scaleQuestions }: { data: Record<string, string | number>[]; scaleQuestions: Question[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart
-        data={data}
-        margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-      >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="var(--border)"
-          vertical={false}
-        />
+      <LineChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
 
-        <XAxis
-          dataKey="label"
-          tick={{ fill: "var(--text-muted)", fontSize: 11 }}
-          axisLine={false}
-          tickLine={false}
-        />
+        <XAxis dataKey="label" tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
 
         <YAxis
           domain={[0, 10]}
@@ -193,21 +166,12 @@ function LineView({
   );
 }
 
-function HeatView({
-  responses,
-  scaleQuestions,
-}: {
-  responses: Response[];
-  scaleQuestions: Question[];
-}) {
+function HeatView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
   const cols = responses.length;
 
   return (
     <div className={styles.heatmapWrap}>
-      <div
-        className={styles.heatmapGrid}
-        style={{ gridTemplateColumns: `120px repeat(${cols}, 1fr)` }}
-      >
+      <div className={styles.heatmapGrid} style={{ gridTemplateColumns: `120px repeat(${cols}, 1fr)` }}>
         <div />
 
         {responses.map((response) => (
@@ -219,9 +183,7 @@ function HeatView({
         {scaleQuestions.map((question) => (
           <React.Fragment key={question.id}>
             <div className={styles.heatmapRowLabel} title={question.text}>
-              {question.text.length > 18
-                ? `${question.text.slice(0, 18)}…`
-                : question.text}
+              {question.text.length > 18 ? `${question.text.slice(0, 18)}…` : question.text}
             </div>
 
             {responses.map((response) => {
@@ -231,12 +193,8 @@ function HeatView({
                 <div
                   key={`${response.id}-${question.id}`}
                   role="img"
-                  aria-label={`${question.text} on ${formatDate(
-                    getResponseDate(response),
-                  )}: ${score}/10`}
-                  title={`${question.text} — ${formatDate(
-                    getResponseDate(response),
-                  )}: ${score}/10`}
+                  aria-label={`${question.text} on ${formatDate(getResponseDate(response))}: ${score}/10`}
+                  title={`${question.text} — ${formatDate(getResponseDate(response))}: ${score}/10`}
                   className={styles.heatCell}
                   style={{ background: scoreToHeatColor(score) }}
                 />
@@ -249,11 +207,7 @@ function HeatView({
       <div className={styles.heatLegend}>
         <span>Low</span>
         {[1, 3, 5, 7, 9].map((score) => (
-          <div
-            key={score}
-            className={styles.heatLegendSwatch}
-            style={{ background: scoreToHeatColor(score) }}
-          />
+          <div key={score} className={styles.heatLegendSwatch} style={{ background: scoreToHeatColor(score) }} />
         ))}
         <span>High</span>
       </div>
@@ -261,20 +215,11 @@ function HeatView({
   );
 }
 
-function RadarView({
-  responses,
-  scaleQuestions,
-}: {
-  responses: Response[];
-  scaleQuestions: Question[];
-}) {
+function RadarView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
   const latestResponse = responses[responses.length - 1];
 
   const data = scaleQuestions.map((question) => ({
-    question:
-      question.text.length > 22
-        ? `${question.text.slice(0, 22)}…`
-        : question.text,
+    question: question.text.length > 22 ? `${question.text.slice(0, 22)}…` : question.text,
     score: getScore(latestResponse, question.id),
     fullMark: 10,
   }));
@@ -283,23 +228,9 @@ function RadarView({
     <ResponsiveContainer width="100%" height={360}>
       <RadarChart data={data} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
         <PolarGrid stroke="var(--border)" />
-        <PolarAngleAxis
-          dataKey="question"
-          tick={{ fill: "var(--text-secondary)", fontSize: 12 }}
-        />
-        <PolarRadiusAxis
-          angle={90}
-          domain={[0, 10]}
-          tickCount={6}
-          tick={{ fill: "var(--text-muted)", fontSize: 10 }}
-        />
-        <Radar
-          name="Latest check-in"
-          dataKey="score"
-          stroke="#2d7264"
-          fill="#2d7264"
-          fillOpacity={0.35}
-        />
+        <PolarAngleAxis dataKey="question" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+        <PolarRadiusAxis angle={90} domain={[0, 10]} tickCount={6} tick={{ fill: "var(--text-muted)", fontSize: 10 }} />
+        <Radar name="Latest check-in" dataKey="score" stroke="#2d7264" fill="#2d7264" fillOpacity={0.35} />
         <Tooltip content={<CustomTooltip />} />
       </RadarChart>
     </ResponsiveContainer>
@@ -312,23 +243,15 @@ interface ProgressChartProps {
   title?: string;
 }
 
-export default function ProgressChart({
-  responses,
-  questionnaire,
-  title = "Your Progress",
-}: ProgressChartProps) {
+export default function ProgressChart({ responses, questionnaire, title = "Your Progress" }: ProgressChartProps) {
   const [view, setView] = useState<"line" | "radar">("line");
 
-  const scaleQuestions =
-    questionnaire?.questions?.filter((question) => question.type === "scale") ??
-    [];
+  const scaleQuestions = questionnaire?.questions?.filter((question) => question.type === "scale") ?? [];
 
   if (!responses || responses.length === 0) {
     return (
       <Card>
-        <p className={styles.empty}>
-          No responses yet. Complete your first check-in to see your progress.
-        </p>
+        <p className={styles.empty}>No responses yet. Complete your first check-in to see your progress.</p>
       </Card>
     );
   }
@@ -336,9 +259,7 @@ export default function ProgressChart({
   if (scaleQuestions.length === 0) {
     return (
       <Card>
-        <p className={styles.empty}>
-          No scale questions found, so there is nothing to plot yet.
-        </p>
+        <p className={styles.empty}>No scale questions found, so there is nothing to plot yet.</p>
       </Card>
     );
   }
@@ -351,8 +272,7 @@ export default function ProgressChart({
         <div className={styles.chartMeta}>
           <h3>{title}</h3>
           <p>
-            {responses.length} check-in{responses.length !== 1 ? "s" : ""}{" "}
-            tracked
+            {responses.length} check-in{responses.length !== 1 ? "s" : ""} tracked
           </p>
         </div>
 
@@ -363,13 +283,9 @@ export default function ProgressChart({
               type="button"
               onClick={() => setView(value)}
               aria-pressed={view === value}
-              className={
-                view === value ? styles.toggleBtnActive : styles.toggleBtn
-              }
+              className={view === value ? styles.toggleBtnActive : styles.toggleBtn}
             >
-              {value === "line"
-                ? "Line graph"
-                  : "Radar"}
+              {value === "line" ? "Line graph" : "Radar"}
             </button>
           ))}
         </div>

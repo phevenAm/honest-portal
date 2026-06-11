@@ -1,8 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  inspirationalQuote,
-  inspirationalSearchedQuote,
-} from "../models/globalTypes";
+
+import { inspirationalQuote, inspirationalSearchedQuote } from "../models/globalTypes";
 
 export const inspirationalQuotesApi = createApi({
   reducerPath: "inspirationalQuotesApi",
@@ -19,5 +17,4 @@ export const inspirationalQuotesApi = createApi({
   }),
 });
 
-export const { useGetRandomQuoteQuery, useGetQuoteByKeywordQuery } =
-  inspirationalQuotesApi;
+export const { useGetRandomQuoteQuery, useGetQuoteByKeywordQuery } = inspirationalQuotesApi;

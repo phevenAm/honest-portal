@@ -9,13 +9,14 @@
 
 import { configureStore, Middleware } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import userDirectoryReducer from "./slices/userDirectorySlice";
-import questionnairesReducer from "./slices/questionnairesSlice";
-import assignmentsReducer from "./slices/questionnaireAssignmentsSlice";
-import responsesReducer from "./slices/responsesSlice";
-import resourcesReducer from "./slices/resourcesSlice";
-import themeReducer from "./slices/themeSlice";
+
 import { inspirationalQuotesApi } from "../services/inspirationalQuotesApi";
+import assignmentsReducer from "./slices/questionnaireAssignmentsSlice";
+import questionnairesReducer from "./slices/questionnairesSlice";
+import resourcesReducer from "./slices/resourcesSlice";
+import responsesReducer from "./slices/responsesSlice";
+import themeReducer from "./slices/themeSlice";
+import userDirectoryReducer from "./slices/userDirectorySlice";
 
 export const store = configureStore({
   reducer: {
@@ -27,8 +28,7 @@ export const store = configureStore({
     theme: themeReducer,
     [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(inspirationalQuotesApi.middleware as Middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(inspirationalQuotesApi.middleware as Middleware),
 });
 
 setupListeners(store.dispatch);

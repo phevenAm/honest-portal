@@ -1,45 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@store/hooks";
-import {
-  fetchAllUsers,
-  selectAllUsers,
-} from "@store/slices/userDirectorySlice";
-import {
-  fetchAllResponses,
-  selectResponsesByUser,
-} from "@store/slices/responsesSlice";
-import {
-  fetchQuestionnaires,
-  selectAllQuestionnaires,
-} from "@store/slices/questionnairesSlice";
-import Card from "@components/shared/Card/Card";
+
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
+import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
-import styles from "./AdminClientsPage.module.scss";
-import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
+import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
+import { useAppDispatch, useAppSelector } from "@store/hooks";
 import type { RootState } from "@store/index";
-import type {
-  Questionnaire,
-  Response,
-  UserProfile,
-} from "@models/globalTypes";
+import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
+import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
+import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal"
-import { getScoreAverage, exportClientPDF } from "./utils/AdminClientsPageUtils";
+import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal";
+import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
+import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
+import styles from "./AdminClientsPage.module.scss";
 
-
-const getQuestionnaireForResponse = (
-  response: Response | undefined,
-  questionnaires: Questionnaire[],
-) => {
+const getQuestionnaireForResponse = (response: Response | undefined, questionnaires: Questionnaire[]) => {
   if (!response) return undefined;
-  return questionnaires.find(
-    (questionnaire) => questionnaire.id === response.questionnaire_id,
-  );
+  return questionnaires.find((questionnaire) => questionnaire.id === response.questionnaire_id);
 };
-
 
 function ClientRow({ user }: { user: UserProfile }) {
   const allResponses = useAppSelector(selectResponsesByUser(user.id));
@@ -48,18 +29,13 @@ function ClientRow({ user }: { user: UserProfile }) {
   const questionnaireOptions = useMemo(
     () =>
       questionnaires.filter((questionnaire) =>
-        allResponses.some(
-          (response) => response.questionnaire_id === questionnaire.id,
-        ),
+        allResponses.some((response) => response.questionnaire_id === questionnaire.id),
       ),
     [questionnaires, allResponses],
   );
 
   const latestResponse = allResponses[allResponses.length - 1];
-  const latestQuestionnaire = getQuestionnaireForResponse(
-    latestResponse,
-    questionnaires,
-  );
+  const latestQuestionnaire = getQuestionnaireForResponse(latestResponse, questionnaires);
 
   const [expanded, setExpanded] = useState(false);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
@@ -73,14 +49,11 @@ function ClientRow({ user }: { user: UserProfile }) {
   }, [questionnaireOptions, selectedQuestionnaireId]);
 
   const selectedQuestionnaire =
-    questionnaireOptions.find(
-      (questionnaire) => questionnaire.id === selectedQuestionnaireId,
-    ) ?? questionnaireOptions[0];
+    questionnaireOptions.find((questionnaire) => questionnaire.id === selectedQuestionnaireId) ??
+    questionnaireOptions[0];
 
   const selectedResponses = selectedQuestionnaire
-    ? allResponses.filter(
-        (response) => response.questionnaire_id === selectedQuestionnaire.id,
-      )
+    ? allResponses.filter((response) => response.questionnaire_id === selectedQuestionnaire.id)
     : [];
 
   const avgScore = getScoreAverage(latestResponse, latestQuestionnaire);
@@ -98,11 +71,7 @@ function ClientRow({ user }: { user: UserProfile }) {
   return (
     <>
       <div className={styles.clientRow}>
-        <Avatar
-          initials={`${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`}
-          color="teal"
-          size={40}
-        />
+        <Avatar initials={`${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`} color="teal" size={40} />
 
         <div className={styles.clientMeta}>
           <p className={styles.clientName}>
@@ -158,15 +127,11 @@ function ClientRow({ user }: { user: UserProfile }) {
         <div className={styles.expandedChart}>
           {questionnaireOptions.length > 1 && (
             <div className={styles.progressControls}>
-              <label htmlFor={`questionnaire-${user.id}`}>
-                Questionnaire
-              </label>
+              <label htmlFor={`questionnaire-${user.id}`}>Questionnaire</label>
               <select
                 id={`questionnaire-${user.id}`}
                 value={selectedQuestionnaire?.id ?? ""}
-                onChange={(event) =>
-                  setSelectedQuestionnaireId(event.target.value)
-                }
+                onChange={(event) => setSelectedQuestionnaireId(event.target.value)}
               >
                 {questionnaireOptions.map((questionnaire) => (
                   <option key={questionnaire.id} value={questionnaire.id}>
@@ -215,12 +180,8 @@ export default function AdminClientsPage() {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [search, setSearch] = useState("");
 
-  const userDirectoryStatus = useAppSelector(
-    (state: RootState) => state.userDirectory.status,
-  );
-  const questionnairesStatus = useAppSelector(
-    (state: RootState) => state.questionnaires.status,
-  );
+  const userDirectoryStatus = useAppSelector((state: RootState) => state.userDirectory.status);
+  const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
   const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
 
   useEffect(() => {
@@ -245,9 +206,7 @@ export default function AdminClientsPage() {
 
   const filtered = allClients.filter(
     (user) =>
-      `${user.first_name} ${user.last_name}`
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
+      `${user.first_name} ${user.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
       user.email?.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -259,14 +218,11 @@ export default function AdminClientsPage() {
             <div>
               <h1>Clients</h1>
               <p>
-                {allClients.length} active{" "}
-                {allClients.length === 1 ? "client" : "clients"}
+                {allClients.length} active {allClients.length === 1 ? "client" : "clients"}
               </p>
             </div>
 
-            <Button onClick={() => setShowTokenModal(true)}>
-              Create access token
-            </Button>
+            <Button onClick={() => setShowTokenModal(true)}>Create access token</Button>
           </div>
 
           <div className={styles.searchWrap}>
@@ -293,9 +249,7 @@ export default function AdminClientsPage() {
           </Card>
         </div>
 
-        {showTokenModal && (
-          <AccessTokenModal onClose={() => setShowTokenModal(false)} />
-        )}
+        {showTokenModal && <AccessTokenModal onClose={() => setShowTokenModal(false)} />}
       </div>
     </>
   );

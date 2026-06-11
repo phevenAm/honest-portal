@@ -1,6 +1,4 @@
-import type {
-  Response,
-} from "../models/globalTypes";
+import type { Response } from "../models/globalTypes";
 
 export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
   const now = new Date();
@@ -15,14 +13,9 @@ export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
   return false;
 };
 
-export const getResponseDate = (response: Response) =>
-  response.submitted_at ?? response.created_at ?? "";
+export const getResponseDate = (response: Response) => response.submitted_at ?? response.created_at ?? "";
 
-export const getInitials = (
-  displayName: string | null,
-  firstName: string,
-  lastName: string
-): string => {
+export const getInitials = (displayName: string | null, firstName: string, lastName: string): string => {
   const name = displayName?.trim() || `${firstName} ${lastName}`;
   return name
     .split(" ")
@@ -37,7 +30,6 @@ export const isAdultFromDob = (dob: string | null | undefined): boolean => {
   const birth = new Date(dob);
   const now = new Date();
   const age = now.getFullYear() - birth.getFullYear();
-  const hadBirthday =
-    now >= new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+  const hadBirthday = now >= new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
   return age > 18 || (age === 18 && hadBirthday);
 };

@@ -1,1 +1,1 @@
-export { default } from './AdminResourcesPage';
+export { default } from "./AdminResourcesPage";

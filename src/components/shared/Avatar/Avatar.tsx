@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import styles from "./Avatar.module.scss";
 
 type AvatarColor = "teal" | "sage" | "stone" | "sky" | "clay";
@@ -10,12 +11,7 @@ interface AvatarProps {
   imageSrc?: string;
 }
 
-export default function Avatar({
-  initials,
-  color = "teal",
-  size = 40,
-  imageSrc = "",
-}: AvatarProps) {
+export default function Avatar({ initials, color = "teal", size = 40, imageSrc = "" }: AvatarProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = !!imageSrc && !imgFailed;
 
@@ -26,12 +22,7 @@ export default function Avatar({
       style={{ width: size, height: size, fontSize: size * 0.34 }}
     >
       {showImage ? (
-        <img
-          src={imageSrc}
-          alt={'User Avatar'}
-          className={styles.avatarImg}
-          onError={() => setImgFailed(true)}
-        />
+        <img src={imageSrc} alt={"User Avatar"} className={styles.avatarImg} onError={() => setImgFailed(true)} />
       ) : (
         initials
       )}

@@ -1,9 +1,9 @@
 import React from "react";
 
-import Modal from "../../../../../components/shared/Modal/Modal";
 import Button from "../../../../../components/shared/Button/Button";
-import { deleteUser } from "../../../../../store/slices/userDirectorySlice";
+import Modal from "../../../../../components/shared/Modal/Modal";
 import { useAppDispatch } from "../../../../../store/hooks";
+import { deleteUser } from "../../../../../store/slices/userDirectorySlice";
 
 type DeleteClientModalProps = {
   onClose: () => void;
@@ -20,12 +20,12 @@ export default function DeleteClientModal({
 }: DeleteClientModalProps) {
   const dispatch = useAppDispatch();
 
-  console.log('id from modal is: ', id);
+  console.log("id from modal is: ", id);
 
-const handleConfirm = async () => {
-  await dispatch(deleteUser(id)).unwrap();
-  onClose();
-};
+  const handleConfirm = async () => {
+    await dispatch(deleteUser(id)).unwrap();
+    onClose();
+  };
 
   return (
     <Modal
@@ -33,19 +33,11 @@ const handleConfirm = async () => {
       onClose={onClose}
       actions={
         <>
-          <Button
-            variant="primary"
-            onClick={onClose}
-            aria-label="cancel user deletion"
-          >
+          <Button variant="primary" onClick={onClose} aria-label="cancel user deletion">
             Cancel
           </Button>
 
-          <Button
-            variant="danger"
-            onClick={handleConfirm}
-            aria-label="confirm user deletion"
-          >
+          <Button variant="danger" onClick={handleConfirm} aria-label="confirm user deletion">
             Delete
           </Button>
         </>

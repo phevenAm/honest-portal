@@ -19,7 +19,7 @@
       "quoteProperties": "asNeeded",
       "semicolons": "always",
       "trailingCommas": "all",
-      "quoteStyle": "single"
+      "quoteStyle": "double"
     },
     "jsxRuntime": "transparent"
   },

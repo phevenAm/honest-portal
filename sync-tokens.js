@@ -6,11 +6,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const SCSS_FILES = [
-  "src/styles/_colors.scss",
-  "src/styles/_spacing.scss",
-  "src/styles/_typography.scss",
-];
+const SCSS_FILES = ["src/styles/_colors.scss", "src/styles/_spacing.scss", "src/styles/_typography.scss"];
 
 const INDEX_SCSS = "src/index.scss";
 
@@ -48,10 +44,7 @@ function buildVarLines(vars, indent = "  ") {
 function replaceBlock(content, selector, newVars) {
   // Match :root { ... } or .dark { ... }
   const escapedSelector = selector.replace(".", "\\.");
-  const blockRegex = new RegExp(
-    `(${escapedSelector}\\s*\\{)([^}]*)(\\})`,
-    "s"
-  );
+  const blockRegex = new RegExp(`(${escapedSelector}\\s*\\{)([^}]*)(\\})`, "s");
 
   const newLines = buildVarLines(newVars);
 

@@ -1,25 +1,25 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { isQuestionnaireCheckInDue } from "./Helpers";
 
 describe("isQuestionnaireCheckInDue", () => {
-
-  it("returns true when 1 day has passed", () =>{
+  it("returns true when 1 day has passed", () => {
     const date = new Date();
     date.setDate(date.getDate() - 1);
 
-    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(true)
-  })
+    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(true);
+  });
 
   it("returns true if it's been more than one 1", () => {
     const date = new Date();
     date.setDate(date.getDate() - 5);
-    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(true)
-  })
+    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(true);
+  });
 
   it("returns false if it's been leess than one 1 day", () => {
     const date = new Date();
-    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(false)
-  })
+    expect(isQuestionnaireCheckInDue(date.toISOString(), "daily")).toBe(false);
+  });
 
   it("returns true on 7th day", () => {
     const date = new Date();
@@ -48,4 +48,4 @@ describe("isQuestionnaireCheckInDue", () => {
 
     expect(isQuestionnaireCheckInDue(date.toISOString(), "fortnightly")).toBe(true);
   });
-  });
+});

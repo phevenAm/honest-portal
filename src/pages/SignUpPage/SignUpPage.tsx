@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+import { LogoIcon, MailIcon } from "../../components/shared/Icons/Icons";
 import { useAuth } from "../../context/AuthContext";
+
 import styles from "./SignUpPage.module.scss";
-import {LogoIcon, MailIcon} from "../../components/shared/Icons/Icons";
 
 const FIELDS = [
   { id: "firstName", label: "First name", type: "text", ph: "" },
@@ -41,8 +43,7 @@ export default function SignUpPage() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const set = (id: FieldId, value: string) =>
-    setForm((current) => ({ ...current, [id]: value }));
+  const set = (id: FieldId, value: string) => setForm((current) => ({ ...current, [id]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,9 +99,8 @@ export default function SignUpPage() {
           </div>
           <h2 className={styles.confirmTitle}>Check your email</h2>
           <p className={styles.confirmText}>
-            We've sent a confirmation link to <strong>{form.email}</strong>.
-            Click it to activate your account, then come back to sign in. Check
-            your spam folder if you don't see it within a few minutes.
+            We've sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your account, then
+            come back to sign in. Check your spam folder if you don't see it within a few minutes.
           </p>
           <Link to="/login" className={styles.backLink}>
             ← Back to sign in
@@ -164,14 +164,7 @@ export default function SignUpPage() {
 
             <button
               type="submit"
-              disabled={
-                loading ||
-                !form.email ||
-                !form.dob ||
-                !form.password ||
-                !form.confirm ||
-                !form.accessToken
-              }
+              disabled={loading || !form.email || !form.dob || !form.password || !form.confirm || !form.accessToken}
               className={styles.submitBtn}
             >
               {loading ? "Creating account…" : "Create account"}
@@ -179,7 +172,7 @@ export default function SignUpPage() {
           </form>
 
           <p className={styles.footer}>
-            Already have an account? {" "}
+            Already have an account?{" "}
             <Link to="/login" className={styles.link}>
               Sign in
             </Link>

@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+
 import { getInitials } from "@Helpers/Helpers";
+
+import { useAuth } from "../../context/AuthContext";
 import Avatar from "../shared/Avatar/Avatar";
 import Button from "../shared/Button/Button";
+
 import styles from "./OnboardingModal.module.scss";
 
 const KEYWORDS = [
@@ -28,7 +31,6 @@ type AvatarColor = (typeof AVATAR_COLORS)[number];
 function pickColor(userId: string): AvatarColor {
   return AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
 }
-
 
 interface Props {
   onComplete: () => void;
@@ -79,18 +81,11 @@ export default function OnboardingModal({ onComplete }: Props) {
           <>
             <div className={styles.textCenter}>
               <h2 className={styles.title}>Welcome, {userProfile?.first_name}!</h2>
-              <p className={styles.subtitle}>
-                Let's personalize your space. You can always update this later.
-              </p>
+              <p className={styles.subtitle}>Let's personalize your space. You can always update this later.</p>
             </div>
 
             <div className={styles.avatarPreview}>
-              <Avatar
-                initials={initials}
-                color={color}
-                size={80}
-                src={avatarUrl.trim() || undefined}
-              />
+              <Avatar initials={initials} color={color} size={80} src={avatarUrl.trim() || undefined} />
             </div>
 
             <div className={styles.fields}>
@@ -107,8 +102,7 @@ export default function OnboardingModal({ onComplete }: Props) {
               </label>
 
               <label className={styles.label}>
-                Profile picture URL{" "}
-                <span className={styles.optional}>(optional)</span>
+                Profile picture URL <span className={styles.optional}>(optional)</span>
                 <input
                   className={styles.input}
                   type="url"
@@ -130,8 +124,7 @@ export default function OnboardingModal({ onComplete }: Props) {
             <div className={styles.textCenter}>
               <h2 className={styles.title}>What would you like to focus on?</h2>
               <p className={styles.subtitle}>
-                Pick topics that resonate — they shape the quotes you'll see.
-                Skip to get the full range.
+                Pick topics that resonate — they shape the quotes you'll see. Skip to get the full range.
               </p>
             </div>
 
@@ -154,11 +147,7 @@ export default function OnboardingModal({ onComplete }: Props) {
               <Button variant="ghost" onClick={() => save([])} disabled={saving}>
                 Skip — show me everything
               </Button>
-              <Button
-                variant="primary"
-                onClick={() => save(selected)}
-                disabled={saving || selected.length === 0}
-              >
+              <Button variant="primary" onClick={() => save(selected)} disabled={saving || selected.length === 0}>
                 {saving ? "Saving…" : "Let's go"}
               </Button>
             </div>

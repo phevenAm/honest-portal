@@ -1,8 +1,10 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@context/AuthContext';
-import {Role} from "@models/globalTypes"
-import Spinner from '../Spinner/Spinner';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+
+import { useAuth } from "@context/AuthContext";
+import { Role } from "@models/globalTypes";
+
+import Spinner from "../Spinner/Spinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -26,10 +28,10 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   if (!userProfile) return <Spinner />;
 
   // Wrong role redirects
-  if (requiredRole === 'admin' && !isAdmin) {
+  if (requiredRole === "admin" && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
-  if (requiredRole === 'client' && isAdmin) {
+  if (requiredRole === "client" && isAdmin) {
     return <Navigate to="/admin" replace />;
   }
 

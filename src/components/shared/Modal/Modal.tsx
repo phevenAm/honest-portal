@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import styles from "./Modal.module.scss";
+
 import CloseIcon from "@mui/icons-material/Close";
+
+import styles from "./Modal.module.scss";
 
 type ModalProps = {
   title: string;
@@ -9,12 +11,7 @@ type ModalProps = {
   actions?: React.ReactNode;
 };
 
-export default function Modal({
-  title,
-  onClose,
-  children,
-  actions,
-}: ModalProps) {
+export default function Modal({ title, onClose, children, actions }: ModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -30,10 +27,7 @@ export default function Modal({
   }, []);
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
-      <div
-        className={styles.modalContainer}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.modalContainer} onClick={(e) => e.stopPropagation()}>
         <header className={styles.modalHeader}>
           <h2>{title}</h2>
           <a onClick={onClose}>

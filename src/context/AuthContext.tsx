@@ -1,15 +1,13 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { supabase } from "../lib/supabase";
-import type { AuthUser, UserProfile } from "../models/globalTypes";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+
 import type { Session } from "@supabase/supabase-js";
 
-type ProfileUpdates = Partial<Pick<UserProfile, 'display_name' | 'avatar_url' | 'focus_keywords' | 'onboarding_completed'>>;
+import { supabase } from "../lib/supabase";
+import type { AuthUser, UserProfile } from "../models/globalTypes";
+
+type ProfileUpdates = Partial<
+  Pick<UserProfile, "display_name" | "avatar_url" | "focus_keywords" | "onboarding_completed">
+>;
 
 type AuthContextType = {
   authUser: AuthUser | null;
@@ -20,12 +18,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (
-    email: string,
-    password: string,
-    meta?: any,
-    accessToken?: string,
-  ) => Promise<void>;
+  signUp: (email: string, password: string, meta?: any, accessToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: ProfileUpdates) => Promise<void>;
 };
@@ -50,14 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const prevUserIdRef = useRef<string | null>(null);
 
-  const fetchProfile = async (
-    authUser: AuthUser,
-  ): Promise<UserProfile | null> => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", authUser.id)
-      .single();
+  const fetchProfile = async (authUser: AuthUser): Promise<UserProfile | null> => {
+    const { data, error } = await supabase.from("users").select("*").eq("id", authUser.id).single();
 
     if (error) {
       console.error("fetchProfile error:", error.message);
@@ -122,12 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    meta?: any,
-    accessToken?: string,
-  ) => {
+  const signUp = async (email: string, password: string, meta?: any, accessToken?: string) => {
     setError(null);
 
     const cleanedToken = accessToken?.trim();
@@ -174,10 +156,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw signUpError;
     }
 
-    const { data: tokenConsumed, error: consumeTokenError } =
-      await supabase.rpc("consume_platform_access_token", {
-        input_token: cleanedToken,
-      });
+    const { data: tokenConsumed, error: consumeTokenError } = await supabase.rpc("consume_platform_access_token", {
+      input_token: cleanedToken,
+    });
 
     if (consumeTokenError) {
       setError(consumeTokenError.message);
@@ -194,10 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: ProfileUpdates) => {
     if (!authUser) return;
 
-    const { error } = await supabase
-      .from("users")
-      .update(updates)
-      .eq("id", authUser.id);
+    const { error } = await supabase.from("users").update(updates).eq("id", authUser.id);
 
     if (error) throw new Error(error.message);
 

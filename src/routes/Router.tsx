@@ -1,29 +1,22 @@
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-  useLocation,
-} from "react-router-dom";
-import LoginPage from "../pages/client/LoginPage/LoginPage";
-import SignUpPage from "../pages/SignUpPage/SignUpPage";
-import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
-import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
-import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
-import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+
+import OnboardingModal from "../components/Onboarding/OnboardingModal";
+import Footer from "../components/shared/Footer/Footer";
+import Navbar from "../components/shared/Navbar/Navbar";
+import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
+import { useAuth } from "../context/AuthContext";
 import AdminClientsPage from "../pages/admin/AdminClientsPage/AdminClientsPage";
+import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
 import AdminQuestionnairesPage from "../pages/admin/AdminQuestionnairesPage/AdminQuestionnairesPage";
 import AdminResourcesPage from "../pages/admin/AdminResourcesPage/AdminResourcesPage";
-import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
-import Navbar from "../components/shared/Navbar/Navbar";
-import Footer from "../components/shared/Footer/Footer";
-import { selectThemeMode } from "../store/slices/themeSlice";
-import { useAuth } from "../context/AuthContext";
-import OnboardingModal from "../components/Onboarding/OnboardingModal";
-import React, { useEffect, useRef, useState } from "react";
-
+import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
+import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
+import LoginPage from "../pages/client/LoginPage/LoginPage";
+import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
+import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import { useAppSelector } from "../store/hooks";
+import { selectThemeMode } from "../store/slices/themeSlice";
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
   const mode = useAppSelector(selectThemeMode);
@@ -67,13 +60,7 @@ function OnboardingGate() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (
-      !loading &&
-      isAuthenticated &&
-      !isAdmin &&
-      userProfile !== null &&
-      !userProfile.onboarding_completed
-    ) {
+    if (!loading && isAuthenticated && !isAdmin && userProfile !== null && !userProfile.onboarding_completed) {
       setShow(true);
     }
   }, [loading, isAuthenticated, isAdmin, userProfile]);
@@ -112,18 +99,12 @@ export default function AppRoutes() {
           >
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/clients" element={<AdminClientsPage />} />
-            <Route
-              path="/admin/questionnaires"
-              element={<AdminQuestionnairesPage />}
-            />
+            <Route path="/admin/questionnaires" element={<AdminQuestionnairesPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
           </Route>
 
           <Route path="/" element={<RootRedirect />} />
-          <Route
-            path="*"
-            element={<div>CAUGHT: {window.location.pathname}</div>}
-          />
+          <Route path="*" element={<div>CAUGHT: {window.location.pathname}</div>} />
           {/* // ! create action page not do page. todo} */}
         </Routes>
       </BrowserRouter>

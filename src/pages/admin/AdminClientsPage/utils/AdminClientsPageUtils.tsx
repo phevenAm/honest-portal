@@ -3,23 +3,16 @@ import { Questionnaire, Response, UserProfile } from "../../../../models/globalT
 export const generateAccessToken = () => {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const groups = Array.from({ length: 3 }, () =>
-    Array.from({ length: 4 }, () =>
-      alphabet[Math.floor(Math.random() * alphabet.length)],
-    ).join(""),
+    Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join(""),
   );
 
   return groups.join("-");
 };
 
-export const getScoreAverage = (
-  response: Response | undefined,
-  questionnaire: Questionnaire | undefined,
-) => {
+export const getScoreAverage = (response: Response | undefined, questionnaire: Questionnaire | undefined) => {
   if (!response || !questionnaire) return null;
 
-  const scaleQuestions = questionnaire.questions?.filter(
-    (question) => question.type === "scale",
-  );
+  const scaleQuestions = questionnaire.questions?.filter((question) => question.type === "scale");
 
   if (!scaleQuestions?.length) return null;
 
@@ -32,14 +25,9 @@ export const getScoreAverage = (
   return (total / scaleQuestions.length).toFixed(1);
 };
 
-export const getQuestionnaireForResponse = (
-  response: Response | undefined,
-  questionnaires: Questionnaire[],
-) => {
+export const getQuestionnaireForResponse = (response: Response | undefined, questionnaires: Questionnaire[]) => {
   if (!response) return undefined;
-  return questionnaires.find(
-    (questionnaire) => questionnaire.id === response.questionnaire_id,
-  );
+  return questionnaires.find((questionnaire) => questionnaire.id === response.questionnaire_id);
 };
 
 // ── PDF Export ─────────────────────────────────────────────
@@ -86,9 +74,7 @@ export const exportClientPDF = async ({
       .filter((score) => Number.isFinite(score));
 
     if (averages.length) {
-      const overall = (
-        averages.reduce((total, score) => total + score, 0) / averages.length
-      ).toFixed(1);
+      const overall = (averages.reduce((total, score) => total + score, 0) / averages.length).toFixed(1);
       const latest = averages[averages.length - 1];
       const change = (latest - averages[0]).toFixed(1);
       const colW = (pageW - margin * 2 - 8) / 3;

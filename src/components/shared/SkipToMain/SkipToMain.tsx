@@ -1,4 +1,5 @@
 import type { MouseEvent } from "react";
+
 import styles from "../Navbar/Navbar.module.scss";
 
 const FOCUSABLE_SELECTOR =

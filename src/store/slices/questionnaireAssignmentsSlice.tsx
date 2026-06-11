@@ -3,7 +3,8 @@
 // Manages which questionnaires are assigned to which clients
 // ============================================================
 
-import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
+
 import { supabase } from "../../lib/supabase.js";
 
 type Assignment = {
@@ -83,10 +84,7 @@ export const fetchAssignmentsByQuestionnaire = createAsyncThunk<Assignment[], st
 );
 
 // Assign a questionnaire to a client
-export const assignQuestionnaire = createAsyncThunk<
-  Assignment,
-  { questionnaire_id: string; user_id: string }
->(
+export const assignQuestionnaire = createAsyncThunk<Assignment, { questionnaire_id: string; user_id: string }>(
   "assignments/assignQuestionnaire",
   async (payload, { rejectWithValue }) => {
     const { data, error } = await supabase
@@ -104,10 +102,7 @@ export const assignQuestionnaire = createAsyncThunk<
 export const unassignQuestionnaire = createAsyncThunk<string, string>(
   "assignments/unassignQuestionnaire",
   async (id, { rejectWithValue }) => {
-    const { error } = await supabase
-      .from("questionnaire_assignments")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("questionnaire_assignments").delete().eq("id", id);
 
     if (error) return rejectWithValue(error.message);
     return id;
@@ -118,21 +113,16 @@ export const unassignQuestionnaire = createAsyncThunk<string, string>(
 export const unassignQuestionnaireByIds = createAsyncThunk<
   { questionnaire_id: string; user_id: string },
   { questionnaire_id: string; user_id: string }
->(
-  "assignments/unassignQuestionnaireByIds",
-  async ({ questionnaire_id, user_id }, { rejectWithValue }) => {
-    const { error } = await supabase
-      .from("questionnaire_assignments")
-      .delete()
-      .eq("questionnaire_id", questionnaire_id)
-      .eq("user_id", user_id);
+>("assignments/unassignQuestionnaireByIds", async ({ questionnaire_id, user_id }, { rejectWithValue }) => {
+  const { error } = await supabase
+    .from("questionnaire_assignments")
+    .delete()
+    .eq("questionnaire_id", questionnaire_id)
+    .eq("user_id", user_id);
 
-    if (error) return rejectWithValue(error.message);
-    return { questionnaire_id, user_id };
-  },
-);
-
-
+  if (error) return rejectWithValue(error.message);
+  return { questionnaire_id, user_id };
+});
 
 // ─── Slice ─────────────────────────────────────────────────
 
@@ -194,11 +184,7 @@ const assignmentsSlice = createSlice({
 
       .addCase(unassignQuestionnaireByIds.fulfilled, (state, action) => {
         state.assignments = state.assignments.filter(
-          (a) =>
-            !(
-              a.questionnaire_id === action.payload.questionnaire_id &&
-              a.user_id === action.payload.user_id
-            ),
+          (a) => !(a.questionnaire_id === action.payload.questionnaire_id && a.user_id === action.payload.user_id),
         );
       })
       .addCase(unassignQuestionnaireByIds.rejected, (state, action) => {
@@ -218,9 +204,7 @@ export const selectAssignmentsStatus = (state: RootState) => state.assignments.s
 
 // Get all assignments for a specific user
 export const selectAssignmentsByUser = (userId: string) =>
-  createSelector(selectAllAssignments, (assignments) =>
-    assignments.filter((a) => a.user_id === userId),
-  );
+  createSelector(selectAllAssignments, (assignments) => assignments.filter((a) => a.user_id === userId));
 
 // Get all users assigned to a specific questionnaire
 export const selectAssignmentsByQuestionnaire = (questionnaireId: string) =>
@@ -231,9 +215,7 @@ export const selectAssignmentsByQuestionnaire = (questionnaireId: string) =>
 // Check if a specific questionnaire is assigned to a specific user
 export const selectIsAssigned = (userId: string, questionnaireId: string) =>
   createSelector(selectAllAssignments, (assignments) =>
-    assignments.some(
-      (a) => a.user_id === userId && a.questionnaire_id === questionnaireId,
-    ),
+    assignments.some((a) => a.user_id === userId && a.questionnaire_id === questionnaireId),
   );
 
 export default assignmentsSlice.reducer;
