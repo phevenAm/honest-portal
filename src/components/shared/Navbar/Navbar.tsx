@@ -46,12 +46,10 @@ export default function Navbar() {
     return link.to.split("/").filter(Boolean).join("-");
   };
 
-  console.log(userProfile.avatar_url);
-
   return (
-    <header role="banner" className={styles.header}>
+    <header className={styles.header}>
       <SkipToMain />
-      <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
+      <nav aria-label="Main navigation" className={styles.nav}>
         {/* Logo */}
         <Link
           to={isAdmin ? "/admin" : "/dashboard"}
@@ -67,7 +65,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <ul className={styles.desktopNav} role="list">
+        <ul className={styles.desktopNav}>
           {links.map((link) => {
             const active = location.pathname === link.to;
             return (
@@ -88,6 +86,7 @@ export default function Navbar() {
         {/* Right actions */}
         <div className={styles.actions}>
           <button
+            type="button"
             onClick={() => dispatch(toggleTheme())}
             aria-label={`Switch to ${themeMode === "light" ? "dark" : "light"} mode`}
             className={styles.iconBtn}
@@ -104,7 +103,7 @@ export default function Navbar() {
                 imageSrc={userProfile.avatar_url || ""}
               />
             )}
-            <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn}>
+            <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn} type="button">
               Sign out
             </button>
           </div>
@@ -115,6 +114,7 @@ export default function Navbar() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             className={styles.menuBtn}
+            type="button"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -124,7 +124,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div id="mobile-menu" className={styles.mobileMenu}>
-          <ul role="list" className={styles.mobileMenuList}>
+          <ul className={styles.mobileMenuList}>
             {links.map((link) => {
               const active = location.pathname === link.to;
               return (

@@ -44,12 +44,11 @@ export default function ClientDashboard() {
     return kws[Math.floor(Math.random() * kws.length)];
   }, [userProfile?.id]);
 
-  const { data: keywordData } = useGetQuoteByKeywordQuery(quoteKeyword!, {
-    skip: !quoteKeyword,
-  });
-  const { data: randomData } = useGetRandomQuoteQuery(undefined, {
-    skip: !!quoteKeyword,
-  });
+  console.log(quoteKeyword);
+
+  const { data: keywordData } = useGetQuoteByKeywordQuery("love");
+  const { data: randomData, error } = useGetRandomQuoteQuery();
+  console.log(error);
 
   console.log(randomData);
 
