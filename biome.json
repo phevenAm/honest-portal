@@ -1,0 +1,150 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": ["**/*.ts", "**/*.tsx", "**/*.js"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "semicolons": "always",
+      "trailingCommas": "all",
+      "quoteStyle": "single"
+    },
+    "jsxRuntime": "transparent"
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              "react*",
+              ":BLANK_LINE:",
+              [
+                ":PACKAGE:",
+                "!@/*",
+                "!@components/**",
+                "!@pages/**",
+                "!@context/**",
+                "!@store/**",
+                "!@models/**",
+                "!@styles/**",
+                "!@lib/**",
+                "!@Helpers/**",
+                "!@Hooks/**",
+                "!@services/**"
+              ],
+              ":BLANK_LINE:",
+              [
+                "@/*",
+                "@components/**",
+                "@pages/**",
+                "@context/**",
+                "@store/**",
+                "@models/**",
+                "@styles/**",
+                "@lib/**",
+                "@Helpers/**",
+                "@Hooks/**",
+                "@services/**"
+              ],
+              ":BLANK_LINE:",
+              ["*", "*/**", "!./*.css", "!./*.scss", "!./*.less"],
+              ":BLANK_LINE:",
+              ["./*.css", "./*.scss", "./*.less"]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    },
+    "linter": {
+      "enabled": false
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noLabelWithoutControl": "off",
+        "useValidAnchor": "error",
+        "useKeyWithClickEvents": "error",
+        "useSemanticElements": "off",
+        "noNoninteractiveTabindex": "error",
+        "useAriaPropsSupportedByRole": "off",
+        "noStaticElementInteractions": "warn"
+      },
+      "complexity": {
+        "noBannedTypes": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
+        "noForEach": "off",
+        "useOptionalChain": "info",
+        "useLiteralKeys": "off",
+        "noUselessFragments": "error",
+        "noThisInStatic": "off",
+        "noCommaOperator": "off"
+      },
+      "correctness": {
+        "noPrecisionLoss": "error",
+        "useExhaustiveDependencies": "error",
+        "noConstantCondition": "error",
+        "noInvalidUseBeforeDeclaration": "error",
+        "useHookAtTopLevel": "off"
+      },
+      "style": {
+        "noInferrableTypes": "error",
+        "noNamespace": "error",
+        "noNonNullAssertion": "warn",
+        "useAsConstAssertion": "error",
+        "noParameterAssign": "error",
+        "useImportType": "off",
+        "useDefaultSwitchClause": "error",
+        "useThrowOnlyError": "error",
+        "useEnumInitializers": "off",
+        "useArrayLiterals": "off",
+        "noNestedTernary": "error",
+        "noRestrictedImports": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": { "allow": ["error", "warn"] }
+        },
+        "noEmptyInterface": "error",
+        "noExplicitAny": "warn",
+        "noImplicitAnyLet": "warn",
+        "noExtraNonNullAssertion": "error",
+        "noMisleadingInstantiator": "error",
+        "useAwait": "error",
+        "useNamespaceKeyword": "error",
+        "noDuplicateFontNames": "off",
+        "noConstEnum": "off",
+        "noShadowRestrictedNames": "off",
+        "useIterableCallbackReturn": "off"
+      },
+      "nursery": {}
+    },
+    "includes": ["**", "!**/*test.spec.*", "!**/mocks", "!**/node_modules", "!**/dist/**"]
+  }
+}
