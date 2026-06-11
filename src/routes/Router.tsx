@@ -1,4 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
@@ -14,10 +21,9 @@ import Footer from "../components/shared/Footer/Footer";
 import { selectThemeMode } from "../store/slices/themeSlice";
 import { useAuth } from "../context/AuthContext";
 import OnboardingModal from "../components/Onboarding/OnboardingModal";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useAppSelector } from "../store/hooks";
-
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
   const mode = useAppSelector(selectThemeMode);
@@ -27,7 +33,6 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-
 function RootRedirect() {
   const { isAuthenticated, isAdmin, loading } = useAuth();
   if (loading) return null;
@@ -35,29 +40,40 @@ function RootRedirect() {
   return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
 }
 
-function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayout() {
+  const location = useLocation();
+  const topRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    console.log('hello, loaded, need to add skip to main link')
-    // add event listener for tab press then perform clean up? but its always mounted sooo?
-  },[])
+    topRef.current?.focus({ preventScroll: true });
+  }, [location.pathname]);
+
   return (
     <>
+      <div ref={topRef} tabIndex={-1} aria-hidden="true" />
       <Navbar />
-      <main id="main-content">
-        <div className="page-content">{children}</div>
-        <Footer />
+      <main id="main-content" tabIndex={-1}>
+        <div className="page-content">
+          <Outlet />
+        </div>
       </main>
+      <Footer />
     </>
   );
 }
-
 
 function OnboardingGate() {
   const { userProfile, isAdmin, isAuthenticated, loading } = useAuth();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!loading && isAuthenticated && !isAdmin && userProfile !== null && !userProfile.onboarding_completed) {
+    if (
+      !loading &&
+      isAuthenticated &&
+      !isAdmin &&
+      userProfile !== null &&
+      !userProfile.onboarding_completed
+    ) {
       setShow(true);
     }
   }, [loading, isAuthenticated, isAdmin, userProfile]);
@@ -76,83 +92,39 @@ export default function AppRoutes() {
           <Route path="/signup" element={<SignUpPage />} />
 
           <Route
-            path="/dashboard"
             element={
               <ProtectedRoute requiredRole="client">
-                <AppLayout>
-                  <ClientDashboard />
-                </AppLayout>
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/check-in"
-            element={
-              <ProtectedRoute requiredRole="client">
-                <AppLayout>
-                  <CheckInPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/resources"
-            element={
-              <ProtectedRoute requiredRole="client">
-                <AppLayout>
-                  <ResourcesPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/check-in" element={<CheckInPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+          </Route>
 
           <Route
-            path="/admin"
             element={
               <ProtectedRoute requiredRole="admin">
-                <AppLayout>
-                  <AdminDashboard />
-                </AppLayout>
+                <AppLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/admin/clients"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AppLayout>
-                  <AdminClientsPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/questionnaires"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AppLayout>
-                  <AdminQuestionnairesPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/resources"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AppLayout>
-                  <AdminResourcesPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/clients" element={<AdminClientsPage />} />
+            <Route
+              path="/admin/questionnaires"
+              element={<AdminQuestionnairesPage />}
+            />
+            <Route path="/admin/resources" element={<AdminResourcesPage />} />
+          </Route>
 
           <Route path="/" element={<RootRedirect />} />
           <Route
             path="*"
             element={<div>CAUGHT: {window.location.pathname}</div>}
-            />
-            {/* // ! create action page not do page. todo} */}
+          />
+          {/* // ! create action page not do page. todo} */}
         </Routes>
       </BrowserRouter>
     </ThemeWrapper>
