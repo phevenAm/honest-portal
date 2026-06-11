@@ -4,7 +4,9 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { toggleTheme, selectThemeMode } from '../../../store/slices/themeSlice';
 import { LogoIcon, MoonIcon, SunIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
 import Avatar from '../Avatar/Avatar';
+import SkipToMain from '../SkipToMain/SkipToMain';
 import { useAuth } from '../../../context/AuthContext';
+import { getInitials } from '@Helpers/Helpers';
 import styles from './Navbar.module.scss';
 
 
@@ -44,8 +46,11 @@ export default function Navbar() {
     return link.to.split('/').filter(Boolean).join('-')
   }
 
+  console.log(userProfile.avatar_url)
+
   return (
     <header role="banner" className={styles.header}>
+      <SkipToMain />
       <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
 
         {/* Logo */}
@@ -94,9 +99,10 @@ export default function Navbar() {
           <div className={styles.userSection}>
             {userProfile && (
               <Avatar
-                initials={`${userProfile.first_name?.[0] ?? ''}${userProfile.last_name?.[0] ?? ''}`}
+                initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
                 color="teal"
                 size={34}
+                imageSrc={userProfile.avatar_url || ''}
               />
             )}
             <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn}>

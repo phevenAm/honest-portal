@@ -18,6 +18,20 @@ export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
 export const getResponseDate = (response: Response) =>
   response.submitted_at ?? response.created_at ?? "";
 
+export const getInitials = (
+  displayName: string | null,
+  firstName: string,
+  lastName: string
+): string => {
+  const name = displayName?.trim() || `${firstName} ${lastName}`;
+  return name
+    .split(" ")
+    .map((w) => w[0] ?? "")
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export const isAdultFromDob = (dob: string | null | undefined): boolean => {
   if (!dob) return false;
   const birth = new Date(dob);

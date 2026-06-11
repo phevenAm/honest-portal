@@ -19,7 +19,7 @@ import type { RootState } from "@store/index";
 import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "@services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
 import { inspirationalQuote } from "@models/globalTypes";
-import Spinner from "../../../ui-components/Spinner/Spinner";   
+import Spinner from "../../../components/shared/Spinner/Spinner";   
 
 const getLatestResponseForQuestionnaire = (
   responses: any[], //all submitted check-in answers ever
@@ -34,7 +34,7 @@ const getLatestResponseForQuestionnaire = (
     )[0];
 
 export default function ClientDashboard() {
-  const { authUser, userProfile } = useAuth();
+  const { authUser, userProfile, displayName } = useAuth();
 
   const questionnairesStatus = useAppSelector(
     (state: RootState) => state.questionnaires.status,
@@ -58,6 +58,8 @@ export default function ClientDashboard() {
   const { data: randomData } = useGetRandomQuoteQuery(undefined, {
     skip: !!quoteKeyword,
   });
+
+  console.log(randomData)
 
   const quotes: inspirationalQuote[] = keywordData?.results ?? randomData ?? [];
 
@@ -179,7 +181,7 @@ export default function ClientDashboard() {
       <div className={styles.inner}>
         <div className={styles.header}>
           <h1>
-            {greeting}, {userProfile?.display_name ?? userProfile?.first_name ?? 'friend'}
+            {greeting}, {displayName ?? 'friend'}
           </h1>
           <p>Here's a look at how you've been doing</p>
         </div>
