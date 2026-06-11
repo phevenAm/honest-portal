@@ -1,29 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "@store/hooks";
 import {
   fetchAllUsers,
   selectAllUsers,
-} from "../../../store/slices/userDirectorySlice";
+} from "@store/slices/userDirectorySlice";
 import {
   fetchAllResponses,
   selectResponsesByUser,
-} from "../../../store/slices/responsesSlice";
+} from "@store/slices/responsesSlice";
 import {
   fetchQuestionnaires,
   selectAllQuestionnaires,
-} from "../../../store/slices/questionnairesSlice";
-import Card from "../../../components/shared/Card/Card";
-import Avatar from "../../../components/shared/Avatar/Avatar";
-import Button from "../../../components/shared/Button/Button";
-import ProgressChart from "../../../components/shared/ProgressChart/ProgressChart";
+} from "@store/slices/questionnairesSlice";
+import Card from "@components/shared/Card/Card";
+import Avatar from "@components/shared/Avatar/Avatar";
+import Button from "@components/shared/Button/Button";
+import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import styles from "./AdminClientsPage.module.scss";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
-import type { RootState } from "../../../store/index";
+import type { RootState } from "@store/index";
 import type {
   Questionnaire,
   Response,
   UserProfile,
-} from "../../../models/globalTypes";
+} from "@models/globalTypes";
 
 import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal"
 import { getScoreAverage, exportClientPDF } from "./utils/AdminClientsPageUtils";

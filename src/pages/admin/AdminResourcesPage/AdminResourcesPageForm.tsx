@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { selectAllResources, createResource, deleteResource, togglePublished,fetchResources, updateResource } from '../../../store/slices/resourcesSlice';
-import Card from '../../../components/shared/Card/Card';
-import Button from '../../../components/shared/Button/Button';
+import { selectAllResources, createResource, deleteResource, togglePublished,fetchResources, updateResource } from '@store/slices/resourcesSlice';
+import Card from '@components/shared/Card/Card';
+import Button from '@components/shared/Button/Button';
 import styles from './AdminResourcesPage.module.scss';
-import { Resource } from '../../../models/globalTypes';
-import { ArticleIcon, VideoIcon } from '../../../components/shared/Icons/Icons';
+import { Resource } from '@models/globalTypes';
+import { ArticleIcon, VideoIcon } from '@components/shared/Icons/Icons';
 
 const CATEGORIES = ['Psychoeducation', 'Coping Skills', 'Breathwork', 'Self-Compassion', 'Relationships', 'General'];
 

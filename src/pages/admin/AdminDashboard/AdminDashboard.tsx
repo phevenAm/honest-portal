@@ -1,23 +1,22 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
+import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import {
   selectAllUsers,
   fetchAllUsers,
-} from "../../../store/slices/userDirectorySlice";
+} from "@store/slices/userDirectorySlice";
 import {
   fetchQuestionnaires,
   selectAllQuestionnaires,
-} from "../../../store/slices/questionnairesSlice";
-import { fetchResources, selectAllResources } from "../../../store/slices/resourcesSlice";
-import Card from "../../../components/shared/Card/Card";
-import Avatar from "../../../components/shared/Avatar/Avatar";
-import Button from "../../../components/shared/Button/Button";
-import { useAuth } from "../../../context/AuthContext";
-import type { RootState } from "../../../store/index";
+} from "@store/slices/questionnairesSlice";
+import { fetchResources, selectAllResources } from "@store/slices/resourcesSlice";
+import Card from "@components/shared/Card/Card";
+import Avatar from "@components/shared/Avatar/Avatar";
+import Button from "@components/shared/Button/Button";
+import { useAuth } from "@context/AuthContext";
+import type { RootState } from "@store/index";
 
 import styles from "./AdminDashboard.module.scss";
-import { UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon } from '../../../components/shared/Icons/Icons';
+import { UsersIcon, ClipboardIcon, CheckIcon, BookIcon, PlusIcon } from '@components/shared/Icons/Icons';
 
 
 export default function AdminDashboard() {

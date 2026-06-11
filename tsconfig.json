@@ -26,7 +26,10 @@
       "@store/*": ["src/store/*"],
       "@models/*": ["src/models/*"],
       "@styles/*": ["src/styles/*"],
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@Helpers/*": ["src/Helpers/*"],
+      "@Hooks/*": ["src/Hooks/*"],
+      "@services/*": ["src/services/*"],
     }
   },
   "include": ["src"]

@@ -1,25 +1,25 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
-import { useAuth } from "../../../context/AuthContext";
-import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
+import { useAppSelector, useFetchOnIdle } from "@store/hooks";
+import { useAuth } from "@context/AuthContext";
+import { getResponseDate, isQuestionnaireCheckInDue } from "@Helpers/Helpers";
 import {
   selectActiveQuestionnaires,
   fetchQuestionnaires,
-} from "../../../store/slices/questionnairesSlice";
+} from "@store/slices/questionnairesSlice";
 import {
   selectUserResponses,
   selectUserQuestionnaireResponses,
   fetchResponsesByUser,
-} from "../../../store/slices/responsesSlice";
-import ProgressChart from "../../../components/shared/ProgressChart/ProgressChart";
-import Card from "../../../components/shared/Card/Card";
-import Button from "../../../components/shared/Button/Button";
-import type { RootState } from "../../../store/index";
-import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "../../../services/inspirationalQuotesApi";
+} from "@store/slices/responsesSlice";
+import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import Card from "@components/shared/Card/Card";
+import Button from "@components/shared/Button/Button";
+import type { RootState } from "@store/index";
+import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "@services/inspirationalQuotesApi";
 import styles from "./ClientDashboard.module.scss";
-import { inspirationalQuote } from "../../../models/globalTypes";
-import Spinner from "../../../ui-components/Spinner/Spinner";
+import { inspirationalQuote } from "@models/globalTypes";
+import Spinner from "../../../ui-components/Spinner/Spinner";   
 
 const getLatestResponseForQuestionnaire = (
   responses: any[], //all submitted check-in answers ever

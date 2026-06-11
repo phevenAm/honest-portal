@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useAppDispatch, useAppSelector, useFetchOnIdle } from "../../../store/hooks";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import {
   selectAllResources,
   createResource,
@@ -8,13 +8,13 @@ import {
   togglePublished,
   fetchResources,
   updateResource,
-} from "../../../store/slices/resourcesSlice";
-import Card from "../../../components/shared/Card/Card";
-import Button from "../../../components/shared/Button/Button";
+} from "@store/slices/resourcesSlice";
+import Card from "@components/shared/Card/Card";
+import Button from "@components/shared/Button/Button";
 import styles from "./AdminResourcesPage.module.scss";
-import type { RootState } from "../../../store/index";
-import type { Resource } from "../../../models/globalTypes";
-import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
+import type { RootState } from "@store/index";
+import type { Resource } from "@models/globalTypes";
+import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "@components/shared/Icons/Icons";
 import { ResourceForm } from "./AdminResourcesPageForm";
 
 

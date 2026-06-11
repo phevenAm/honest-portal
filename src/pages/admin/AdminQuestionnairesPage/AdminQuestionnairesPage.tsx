@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useFetchOnIdle } from "../../../store/hooks";
+import { useEffect, useState } from "react";
+import { useFetchOnIdle } from "@store/hooks";
 import {
   createQuestionnaire,
   updateQuestionnaire,
@@ -7,23 +7,23 @@ import {
   deleteQuestionnaire,
   selectAllQuestionnaires,
   fetchQuestionnaires,
-} from "../../../store/slices/questionnairesSlice";
+} from "@store/slices/questionnairesSlice";
 import {
   assignQuestionnaire,
   unassignQuestionnaireByIds,
   fetchAssignmentsByQuestionnaire,
   selectAssignmentsByQuestionnaire,
-} from "../../../store/slices/questionnaireAssignmentsSlice";
+} from "@store/slices/questionnaireAssignmentsSlice";
 import {
   fetchAllUsers,
   selectClientUsers,
-} from "../../../store/slices/userDirectorySlice";
-import Card from "../../../components/shared/Card/Card";
-import Button from "../../../components/shared/Button/Button";
+} from "@store/slices/userDirectorySlice";
+import Card from "@components/shared/Card/Card";
+import Button from "@components/shared/Button/Button";
 import styles from "./AdminQuestionnairesPage.module.scss";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import type { RootState } from "../../../store/index";
-import type { Questionnaire, UserProfile } from "../../../models/globalTypes";
+import { useAppDispatch, useAppSelector } from "@store/hooks";
+import type { RootState } from "@store/index";
+import type { Questionnaire, UserProfile } from "@/models/globalTypes";
 
 
 const QUESTION_TYPES = ["scale", "text"];
