@@ -1,4 +1,4 @@
-export type Role = "admin" | "user";
+export type Role = "admin" | "client";
 
 export type DBUser = {
   id: string;
@@ -174,19 +174,6 @@ export type Resource = {
 
 // ─── App-level types (not in DB) ───────────────────────────
 
-// Used in authSlice — enriched user object for the session
-export type User = {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  dob: string;
-  role: UserRole | string;
-  jointedAt: string;
-  avatar: string; // initials e.g. "JD"
-  color: string; // UI color token e.g. "sage"
-  disabled: boolean;
-};
 
 // ─── Utility types ─────────────────────────────────────────
 
