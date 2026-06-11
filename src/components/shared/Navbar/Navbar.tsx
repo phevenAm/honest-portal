@@ -40,6 +40,10 @@ export default function Navbar() {
 
   const links = isAdmin ? adminLinks : clientLinks;
 
+  const createLinkRoleTestId = (link: { to: string; label: string }) => {
+    return link.to.split('/').filter(Boolean).join('-')
+  }
+
   return (
     <header role="banner" className={styles.header}>
       <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
@@ -49,6 +53,7 @@ export default function Navbar() {
           to={isAdmin ? '/admin' : '/dashboard'}
           aria-label="WithMe — home"
           className={styles.logo}
+          data-testid="logo-link"
         >
           <div className={styles.logoMark}>
             <LogoIcon />
@@ -67,6 +72,7 @@ export default function Navbar() {
                   to={link.to}
                   aria-current={active ? 'page' : undefined}
                   className={`${styles.navLink} ${active ? styles.active : ''}`}
+                  data-testid={`navbar-link-${createLinkRoleTestId(link)}`}
                 >
                   {link.label}
                 </Link>
