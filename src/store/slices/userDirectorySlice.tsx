@@ -24,7 +24,6 @@ export const fetchAllUsers = createAsyncThunk("userDirectory/fetchAllUsers", asy
 });
 
 export const deleteUser = createAsyncThunk("userDirectory/deleteUser", async (id: string, { rejectWithValue }) => {
-  console.log("deleting id;::deleteUser: ", id);
   const { error } = await supabase.from("users").delete().eq("id", id).select();
 
   if (error) return rejectWithValue(error.message);
@@ -82,8 +81,6 @@ const userDirectorySlice = createSlice({
         state.error = action.payload;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
-        console.log("fulfilled delete payload", action.payload);
-
         state.status = "succeeded";
         state.users = state.users.filter((u) => u.id !== action.payload);
       })

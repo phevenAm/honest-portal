@@ -53,7 +53,6 @@ export const createResource = createAsyncThunk<Resource, Omit<Resource, "id" | "
       .insert({ ...payload })
       .select()
       .single();
-    console.log("createResource response:", { data, error });
     if (error) return rejectWithValue(error.message);
     return data;
   },

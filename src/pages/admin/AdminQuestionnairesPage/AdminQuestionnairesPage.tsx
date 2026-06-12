@@ -211,7 +211,6 @@ function AssignModal({
   const dispatch = useAppDispatch();
   const assignments = useAppSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
   const assignedIds = new Set(assignments.map((a) => a.user_id));
-  console.log("assignments:", assignments, "assignedIds:", assignedIds);
 
   const toggle = (userId: string) => {
     if (assignedIds.has(userId)) {

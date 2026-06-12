@@ -20,8 +20,6 @@ export default function DeleteClientModal({
 }: DeleteClientModalProps) {
   const dispatch = useAppDispatch();
 
-  console.log("id from modal is: ", id);
-
   const handleConfirm = async () => {
     await dispatch(deleteUser(id)).unwrap();
     onClose();
