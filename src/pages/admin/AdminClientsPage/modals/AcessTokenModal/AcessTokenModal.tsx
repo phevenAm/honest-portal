@@ -54,7 +54,11 @@ export default function AccessTokenModal({ onClose }: { onClose: () => void }) {
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — close button provides keyboard path
-    <div className={styles.overlay} onClick={(event) => event.target === event.currentTarget && onClose()} role="presentation">
+    <div
+      className={styles.overlay}
+      onClick={(event) => event.target === event.currentTarget && onClose()}
+      role="presentation"
+    >
       <Card className={styles.modal}>
         <h3 className={styles.modalTitle}>Create client access token</h3>
         <p className={styles.modalText}>

@@ -17,15 +17,11 @@ import {
 } from "@store/slices/responsesSlice";
 
 import Spinner from "../../../components/shared/Spinner/Spinner";
+import type { Response } from "../../../models/globalTypes";
 
 import styles from "./ClientDashboard.module.scss";
 
-import type { Response } from "../../../models/globalTypes";
-
-const getLatestResponseForQuestionnaire = (
-  responses: Response[],
-  questionnaireId: string,
-) =>
+const getLatestResponseForQuestionnaire = (responses: Response[], questionnaireId: string) =>
   responses
     .filter((response) => response.questionnaire_id === questionnaireId)
     .sort((a, b) => new Date(getResponseDate(b)).getTime() - new Date(getResponseDate(a)).getTime())[0];
