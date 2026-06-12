@@ -196,23 +196,3 @@ export interface ProgressChartProps {
   title?: string;
 }
 
-//-------- Quotes -------------
-
-export type inspirationalQuote = {
-  author: string;
-  authorSlug: string;
-  content: string;
-  dateAdded: string;
-  dateModified: string;
-  length: number;
-  tags: string[];
-  id: string;
-};
-
-export type inspirationalSearchedQuote = {
-  count: number;
-  totalCount: number;
-  page: number;
-  totalPages: number;
-  results: inspirationalQuote[];
-};

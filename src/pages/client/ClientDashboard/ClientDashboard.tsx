@@ -6,8 +6,7 @@ import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import { useAuth } from "@context/AuthContext";
-import { inspirationalQuote } from "@models/globalTypes";
-import { useGetQuoteByKeywordQuery, useGetRandomQuoteQuery } from "@services/inspirationalQuotesApi";
+import { useGetQuotesByTagQuery } from "@services/inspirationalQuotesApi";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectActiveQuestionnaires } from "@store/slices/questionnairesSlice";
@@ -44,19 +43,12 @@ export default function ClientDashboard() {
     return kws[Math.floor(Math.random() * kws.length)];
   }, [userProfile?.id]);
 
-  console.log(quoteKeyword);
+  const { data: taggedQuotes = [] } = useGetQuotesByTagQuery(quoteKeyword);
 
-  const { data: keywordData } = useGetQuoteByKeywordQuery("love");
-  const { data: randomData, error } = useGetRandomQuoteQuery();
-  console.log(error);
-
-  console.log(randomData);
-
-  const quotes: inspirationalQuote[] = keywordData?.results ?? randomData ?? [];
-
-  const filtered = quotes.filter((q) => q.length <= 70);
-
-  const randomQuote = filtered.length > 0 ? filtered[Math.floor(Math.random() * filtered.length)] : undefined;
+  const randomQuote = useMemo(
+    () => (taggedQuotes.length > 0 ? taggedQuotes[Math.floor(Math.random() * taggedQuotes.length)] : undefined),
+    [taggedQuotes],
+  );
 
   const assignedQs = questionnaires.filter((q) => q.assignedTo.includes(authUser?.id ?? ""));
 
