@@ -1,10 +1,10 @@
-#!/usr/bin/env node
+/** biome-ignore-all lint/suspicious/noConsole: intentional console output for CLI tool */
 // sync-tokens.js
 // Reads $variables from SCSS token files and syncs them as CSS custom
 // properties into the :root and .dark blocks in src/index.scss
 
-const fs = require("fs");
-const path = require("path");
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const SCSS_FILES = ["src/styles/_colors.scss", "src/styles/_spacing.scss", "src/styles/_typography.scss"];
 
@@ -12,10 +12,11 @@ const INDEX_SCSS = "src/index.scss";
 
 // ── 1. Parse all $variable: value pairs from SCSS files ───
 function parseScssVars(filePath) {
-  const content = fs.readFileSync(filePath, "utf8");
+  const content = readFileSync(filePath, "utf8");
   const vars = {};
   const regex = /^\$([a-zA-Z0-9_-]+)\s*:\s*([^;]+);/gm;
   let match;
+  // biome-ignore lint/suspicious/noAssignInExpressions: standard regex exec loop pattern
   while ((match = regex.exec(content)) !== null) {
     const name = match[1].trim();
     const value = match[2].trim();
@@ -53,10 +54,9 @@ function replaceBlock(content, selector, newVars) {
     return content.replace(blockRegex, (_, open, _existing, close) => {
       return `${open}\n${newLines}\n${close}`;
     });
-  } else {
-    // Append new block at end
-    return content + `\n\n${selector} {\n${newLines}\n}\n`;
   }
+  // Append new block at end
+  return `${content}\n\n${selector} {\n${newLines}\n}\n`;
 }
 
 // ── 5. Main ───────────────────────────────────────────────
@@ -64,8 +64,8 @@ function main() {
   // Collect all vars
   const allVars = {};
   for (const file of SCSS_FILES) {
-    const fullPath = path.join(process.cwd(), file);
-    if (!fs.existsSync(fullPath)) {
+    const fullPath = join(process.cwd(), file);
+    if (!existsSync(fullPath)) {
       console.warn(`⚠️  Not found, skipping: ${file}`);
       continue;
     }
@@ -87,13 +87,13 @@ function main() {
   }
 
   // Read index.scss
-  const indexPath = path.join(process.cwd(), INDEX_SCSS);
-  if (!fs.existsSync(indexPath)) {
+  const indexPath = join(process.cwd(), INDEX_SCSS);
+  if (!existsSync(indexPath)) {
     console.error(`❌ Could not find ${INDEX_SCSS}`);
     process.exit(1);
   }
 
-  let content = fs.readFileSync(indexPath, "utf8");
+  let content = readFileSync(indexPath, "utf8");
 
   // Sync :root
   content = replaceBlock(content, ":root", rootVars);
@@ -104,7 +104,7 @@ function main() {
   console.log(`✓ Synced ${Object.keys(darkVars).length} variables to .dark`);
 
   // Write back
-  fs.writeFileSync(indexPath, content, "utf8");
+  writeFileSync(indexPath, content, "utf8");
   console.log(`✅ Done — ${INDEX_SCSS} updated`);
 }
 

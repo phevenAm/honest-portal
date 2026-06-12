@@ -20,8 +20,10 @@ import Spinner from "../../../components/shared/Spinner/Spinner";
 
 import styles from "./ClientDashboard.module.scss";
 
+import type { Response } from "../../../models/globalTypes";
+
 const getLatestResponseForQuestionnaire = (
-  responses: any[], //all submitted check-in answers ever
+  responses: Response[],
   questionnaireId: string,
 ) =>
   responses
@@ -97,7 +99,10 @@ export default function ClientDashboard() {
     firstAvg && latestResponse ? (parseFloat(avgScore as string) - parseFloat(firstAvg)).toFixed(1) : null;
 
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  let greeting: string;
+  if (hour < 12) greeting = "Good morning";
+  else if (hour < 17) greeting = "Good afternoon";
+  else greeting = "Good evening";
 
   const stats = [
     {
@@ -173,28 +178,32 @@ export default function ClientDashboard() {
             <div className={styles.cardPad}>
               <h3 className={styles.cardTitle}>Your Check-ins</h3>
 
-              {assignedQs.length === 0 ? (
-                <p className={styles.emptyText}>No check-ins assigned yet.</p>
-              ) : availableAssignedQs.length === 0 ? (
-                <p className={styles.emptyText}>You have completed your assigned check-ins for now.</p>
-              ) : (
-                <div className={styles.checkInList}>
-                  {availableAssignedQs.map((q) => (
-                    <div key={q.id} className={styles.checkInRow}>
-                      <div>
-                        <p className={styles.checkInTitle}>{q.title}</p>
-                        <p className={styles.checkInFreq}>{q.frequency}</p>
-                      </div>
+              {(() => {
+                if (assignedQs.length === 0) {
+                  return <p className={styles.emptyText}>No check-ins assigned yet.</p>;
+                }
+                if (availableAssignedQs.length === 0) {
+                  return <p className={styles.emptyText}>You have completed your assigned check-ins for now.</p>;
+                }
+                return (
+                  <div className={styles.checkInList}>
+                    {availableAssignedQs.map((q) => (
+                      <div key={q.id} className={styles.checkInRow}>
+                        <div>
+                          <p className={styles.checkInTitle}>{q.title}</p>
+                          <p className={styles.checkInFreq}>{q.frequency}</p>
+                        </div>
 
-                      <Link to="/check-in" style={{ textDecoration: "none" }}>
-                        <Button size="sm" variant="secondary">
-                          Start
-                        </Button>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <Link to="/check-in" style={{ textDecoration: "none" }}>
+                          <Button size="sm" variant="secondary">
+                            Start
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </Card>
 

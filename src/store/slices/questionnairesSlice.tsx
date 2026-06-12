@@ -26,8 +26,10 @@ export const fetchQuestionnaires = createAsyncThunk<Questionnaire[], void>(
     if (error) return rejectWithValue(error.message);
 
     // Map questionnaire_assignments into assignedTo string[]
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase joined query result shape isn't typed by the client
     return data.map((q: any) => ({
       ...q,
+      // biome-ignore lint/suspicious/noExplicitAny: Supabase joined query result shape isn't typed by the client
       assignedTo: (q.questionnaire_assignments ?? []).map((a: any) => a.user_id),
     }));
   },
@@ -82,6 +84,7 @@ export const updateQuestionnaire = createAsyncThunk<Questionnaire, UpdateQuestio
     if (error) return rejectWithValue(error.message);
     return {
       ...data,
+      // biome-ignore lint/suspicious/noExplicitAny: Supabase joined query result shape isn't typed by the client
       assignedTo: (data.questionnaire_assignments ?? []).map((a: any) => a.user_id),
     };
   },

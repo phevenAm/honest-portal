@@ -8,7 +8,9 @@ if (import.meta.env.DEV) {
   axe(React.default, ReactDOM, 1000);
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root")!);
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Root element #root not found in DOM");
+const root = ReactDOM.createRoot(rootElement);
 root.render(
   // <React.StrictMode>
   <App />,

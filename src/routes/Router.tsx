@@ -34,12 +34,12 @@ function RootRedirect() {
 }
 
 function AppLayout() {
-  const location = useLocation();
+  const _location = useLocation();
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     topRef.current?.focus({ preventScroll: true });
-  }, [location.pathname]);
+  }, []);
 
   return (
     <>

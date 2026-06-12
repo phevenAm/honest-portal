@@ -5,7 +5,7 @@ import Button from "../../../components/shared/Button/Button";
 import Card from "../../../components/shared/Card/Card";
 import { useAuth } from "../../../context/AuthContext";
 import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
-import type { Question, Questionnaire } from "../../../models/globalTypes";
+import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchAssignmentsByUser, selectAllAssignments } from "../../../store/slices/questionnaireAssignmentsSlice";
 import { fetchResponsesByUser, selectUserResponses, submitResponse } from "../../../store/slices/responsesSlice";
@@ -37,7 +37,7 @@ type AssignmentWithQuestionnaire = {
   questionnaires?: Questionnaire;
 };
 
-const getLatestResponseForQuestionnaire = (responses: any[], questionnaireId: string) =>
+const getLatestResponseForQuestionnaire = (responses: Response[], questionnaireId: string) =>
   responses
     .filter((response) => response.questionnaire_id === questionnaireId)
     .sort((a, b) => new Date(getResponseDate(b)).getTime() - new Date(getResponseDate(a)).getTime())[0];

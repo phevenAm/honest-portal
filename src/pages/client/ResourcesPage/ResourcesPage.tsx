@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import Card from "../../../components/shared/Card/Card";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
@@ -9,17 +9,26 @@ import { fetchPublishedResources, selectPublishedResources } from "../../../stor
 
 import styles from "./ResourcesPage.module.scss";
 
+function getResourceButtonLabel(type: string): string {
+  if (type === "video") return "Watch";
+  if (type === "document") return "Open document";
+  if (type === "link") return "Visit site";
+  return "Read";
+}
+
 function ResourceModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — close button provides keyboard path
+    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
       <div
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="resource-title"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
-        <button className={styles.modalClose} onClick={onClose}>
+        <button type="button" className={styles.modalClose} onClick={onClose}>
           ×
         </button>
 
@@ -84,14 +93,8 @@ function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resou
         <p className={styles.excerpt}>{resource.summary}</p>
 
         <div className={styles.cardFooter}>
-          <button onClick={handleClick} className={styles.readMoreBtn}>
-            {resource.type === "video"
-              ? "Watch"
-              : resource.type === "document"
-                ? "Open document"
-                : resource.type === "link"
-                  ? "Visit site"
-                  : "Read"}
+          <button type="button" onClick={handleClick} className={styles.readMoreBtn}>
+            {getResourceButtonLabel(resource.type)}
           </button>
         </div>
       </div>
@@ -126,6 +129,7 @@ export default function ResourcesPage() {
           {types.map((type: string) => (
             <button
               key={type}
+              type="button"
               role="tab"
               aria-selected={filter === type}
               onClick={() => setFilter(type)}

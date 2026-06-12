@@ -12,5 +12,5 @@ export const StoreAndRouterWrapper = ({ children }: { children: React.ReactNode 
   </Provider>
 );
 
-export const renderWithProviders = (ui: React.ReactElement, options: {}) =>
+export const renderWithProviders = (ui: React.ReactElement, options?: object) =>
   render(ui, { wrapper: StoreAndRouterWrapper, ...options });

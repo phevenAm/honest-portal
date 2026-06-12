@@ -18,7 +18,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, meta?: any, accessToken?: string) => Promise<void>;
+  signUp: (email: string, password: string, meta?: Record<string, unknown>, accessToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: ProfileUpdates) => Promise<void>;
 };
@@ -74,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleSession is intentionally excluded — adding it would require memoizing the entire call chain and would cause the subscription to re-register on every render
   useEffect(() => {
     let initialised = false;
 
@@ -109,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, meta?: any, accessToken?: string) => {
+  const signUp = async (email: string, password: string, meta?: Record<string, unknown>, accessToken?: string) => {
     setError(null);
 
     const cleanedToken = accessToken?.trim();

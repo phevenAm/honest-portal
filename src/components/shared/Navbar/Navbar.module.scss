@@ -1,5 +1,5 @@
 // Navbar.scss
-@use '../../../styles/spacing' as *;
+@use "../../../styles/spacing" as *;
 
 // ── Skip to main ───────────────────────────────────────────
 .skipToMain {
@@ -100,7 +100,9 @@
   margin: 0;
   padding: 0;
 
-  @media (max-width: 768px) { display: none; }
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .navLink {
@@ -195,7 +197,9 @@
   display: none;
   align-items: center;
 
-  @media (max-width: 768px) { display: flex; }
+  @media (max-width: 768px) {
+    display: flex;
+  }
 
   &:focus-visible {
     outline: 2px solid var(--border-focus);
@@ -226,7 +230,9 @@
   font-weight: 400;
   transition: all var(--transition-base);
 
-  &:hover { background: var(--bg-muted); }
+  &:hover {
+    background: var(--bg-muted);
+  }
 
   &.active {
     color: var(--accent-dark);

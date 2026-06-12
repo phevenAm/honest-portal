@@ -28,6 +28,12 @@ const FIELDS = [
 
 type FieldId = (typeof FIELDS)[number]["id"];
 
+const getAutoComplete = (id: FieldId): string | undefined => {
+  if (id === "email") return "email";
+  if (id === "password" || id === "confirm") return "new-password";
+  return undefined;
+};
+
 export default function SignUpPage() {
   const { signUp } = useAuth();
   const [form, setForm] = useState<Record<FieldId, string>>({
@@ -83,8 +89,8 @@ export default function SignUpPage() {
         form.accessToken,
       );
       setDone(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -145,15 +151,7 @@ export default function SignUpPage() {
                   onChange={(e) => set(field.id, e.target.value)}
                   placeholder={field.ph}
                   required
-                  autoComplete={
-                    field.id === "email"
-                      ? "email"
-                      : field.id === "password"
-                        ? "new-password"
-                        : field.id === "confirm"
-                          ? "new-password"
-                          : undefined
-                  }
+                  autoComplete={getAutoComplete(field.id)}
                   {...(field.type === "date" && {
                     max: new Date().toISOString().split("T")[0],
                   })}

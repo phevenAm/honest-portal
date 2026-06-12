@@ -10,6 +10,7 @@ export default function Card({ children, style, className = "", onClick, ...prop
   const classes = [styles.card, onClick ? styles.clickable : "", className].filter(Boolean).join(" ");
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: role and keyboard handler are set conditionally when onClick is provided
     <div
       onClick={onClick}
       role={onClick ? "button" : undefined}

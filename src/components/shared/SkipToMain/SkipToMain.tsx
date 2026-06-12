@@ -6,7 +6,7 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function SkipToMain() {
-  const handleSkip = (e: MouseEvent<HTMLAnchorElement>) => {
+  const handleSkip = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const main = document.getElementById("main-content");
     if (!main) return;
@@ -15,8 +15,8 @@ export default function SkipToMain() {
   };
 
   return (
-    <a href="#main-content" className={styles.skipToMain} onClick={handleSkip}>
+    <button type="button" className={styles.skipToMain} onClick={handleSkip}>
       Skip to main content
-    </a>
+    </button>
   );
 }

@@ -79,7 +79,10 @@ const buildChartData = (responses: Response[], scaleQuestions: Question[]) =>
     return point;
   });
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+type TooltipEntry = { name: string; value: number; color: string };
+type CustomTooltipProps = { active?: boolean; payload?: TooltipEntry[]; label?: string };
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
 
   return (
@@ -103,7 +106,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         {label}
       </p>
 
-      {payload.map((entry: any) => (
+      {payload.map((entry) => (
         <p
           key={entry.name}
           style={{
@@ -166,7 +169,7 @@ function LineView({ data, scaleQuestions }: { data: Record<string, string | numb
   );
 }
 
-function HeatView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
+function _HeatView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
   const cols = responses.length;
 
   return (

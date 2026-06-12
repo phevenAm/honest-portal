@@ -1,17 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
-import { ArticleIcon, VideoIcon } from "@components/shared/Icons/Icons";
 import { Resource } from "@models/globalTypes";
-import {
-  createResource,
-  deleteResource,
-  fetchResources,
-  selectAllResources,
-  togglePublished,
-  updateResource,
-} from "@store/slices/resourcesSlice";
 
 import styles from "./AdminResourcesPage.module.scss";
 
@@ -22,6 +13,7 @@ export function ResourceForm({
   onClose,
   resource,
 }: {
+  // biome-ignore lint/suspicious/noExplicitAny: resource form data shape varies based on resource type
   onSave: (data: any) => void;
   onClose: () => void;
   resource?: Resource | null;

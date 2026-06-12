@@ -26,18 +26,22 @@ export type AuthUser = DBUser & {
     first_name?: string;
     last_name?: string;
     dob?: string;
-    [key: string]: any; // allow extra fields
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase user_metadata is an open-ended JSON object
+    [key: string]: any;
   };
 
   app_metadata?: {
     provider?: string;
     providers?: string[];
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase app_metadata is an open-ended JSON object
     [key: string]: any;
   };
 
-  identities?: any[]; // you said you're fine with loose typing here
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase identities shape varies by provider
+  identities?: any[];
 
-  [key: string]: any; // catch-all for anything else Supabase adds
+  // biome-ignore lint/suspicious/noExplicitAny: catch-all for Supabase auth fields that aren't in our schema
+  [key: string]: any;
 };
 
 //!Questionnare stuff

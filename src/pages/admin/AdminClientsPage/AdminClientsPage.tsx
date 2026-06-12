@@ -211,46 +211,44 @@ export default function AdminClientsPage() {
   );
 
   return (
-    <>
-      <div className={styles.page}>
-        <div className={styles.inner}>
-          <div className={styles.pageHeader}>
-            <div>
-              <h1>Clients</h1>
-              <p>
-                {allClients.length} active {allClients.length === 1 ? "client" : "clients"}
-              </p>
-            </div>
-
-            <Button onClick={() => setShowTokenModal(true)}>Create access token</Button>
+    <div className={styles.page}>
+      <div className={styles.inner}>
+        <div className={styles.pageHeader}>
+          <div>
+            <h1>Clients</h1>
+            <p>
+              {allClients.length} active {allClients.length === 1 ? "client" : "clients"}
+            </p>
           </div>
 
-          <div className={styles.searchWrap}>
-            <input
-              type="search"
-              placeholder="Search by name or email…"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              aria-label="Search clients"
-              className={styles.searchInput}
-            />
-          </div>
-
-          <Card>
-            {filtered.length === 0 ? (
-              <p className={styles.empty}>
-                {allClients.length === 0
-                  ? "No clients yet. Create an access token and ask a client to sign up."
-                  : "No clients match your search."}
-              </p>
-            ) : (
-              filtered.map((user) => <ClientRow key={user.id} user={user} />)
-            )}
-          </Card>
+          <Button onClick={() => setShowTokenModal(true)}>Create access token</Button>
         </div>
 
-        {showTokenModal && <AccessTokenModal onClose={() => setShowTokenModal(false)} />}
+        <div className={styles.searchWrap}>
+          <input
+            type="search"
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            aria-label="Search clients"
+            className={styles.searchInput}
+          />
+        </div>
+
+        <Card>
+          {filtered.length === 0 ? (
+            <p className={styles.empty}>
+              {allClients.length === 0
+                ? "No clients yet. Create an access token and ask a client to sign up."
+                : "No clients match your search."}
+            </p>
+          ) : (
+            filtered.map((user) => <ClientRow key={user.id} user={user} />)
+          )}
+        </Card>
       </div>
-    </>
+
+      {showTokenModal && <AccessTokenModal onClose={() => setShowTokenModal(false)} />}
+    </div>
   );
 }

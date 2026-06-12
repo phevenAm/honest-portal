@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import type { AppDispatch, RootState } from "../store";
 
+// biome-ignore lint/suspicious/noExplicitAny: RTK async thunk action creators don't have a shared type
 export function useFetchOnIdle<T>(selector: (state: RootState) => T, thunk: any, errorMessage: string) {
   const dispatch = useDispatch<AppDispatch>();
   const status = useSelector(selector);

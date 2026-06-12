@@ -1,6 +1,6 @@
-import { axe } from "jest-axe";
 import { render } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { axe } from "jest-axe";
+import { describe, expect, it } from "vitest";
 
 import Button from "./Button";
 

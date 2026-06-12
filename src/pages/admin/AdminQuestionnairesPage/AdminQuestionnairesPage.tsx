@@ -34,6 +34,7 @@ function QuestionnaireBuilder({
   onClose,
 }: {
   initial?: Questionnaire | null;
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically from builder state
   onSave: (data: any) => void;
   onClose: () => void;
 }) {
@@ -145,6 +146,7 @@ function QuestionnaireBuilder({
                 <span className={styles.questionNum}>Q{i + 1}</span>
                 {questions.length > 1 && (
                   <button
+                    type="button"
                     onClick={() => removeQuestion(q.id)}
                     aria-label={`Remove question ${i + 1}`}
                     className={styles.removeBtn}
@@ -245,6 +247,7 @@ function AssignModal({
             {clients.map((client) => {
               const assigned = assignedIds.has(client.id);
               return (
+                // biome-ignore lint/a11y/useKeyWithClickEvents: checkbox inside handles keyboard interaction
                 <li
                   key={client.id}
                   className={`${styles.clientRow} ${assigned ? styles.clientRowAssigned : ""}`}
@@ -305,8 +308,10 @@ export default function AdminQuestionnairesPage() {
     }
   }, [isAssigningQ, dispatch]);
 
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
   const handleCreate = (data: any) => dispatch(createQuestionnaire(data));
 
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
   const handleEdit = (data: any) => {
     if (!editingQ) return;
     dispatch(updateQuestionnaire({ id: editingQ.id, ...data }));
