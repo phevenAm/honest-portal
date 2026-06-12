@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@axe-core/react": "^4.11.3",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.0.0",
@@ -28,6 +29,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/ui": "^4.1.7",
+    "jest-axe": "^10.0.0",
     "jsdom": "^29.1.1",
     "sass": "^1.99.0",
     "vite": "^5.4.21",
@@ -41,6 +43,7 @@
     "sync-tokens": "node sync-tokens.js",
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "check": "biome check --write ."
+    "lint:fix": "biome check --write .",
+    "ci:check": "biome check ."
   }
 }
