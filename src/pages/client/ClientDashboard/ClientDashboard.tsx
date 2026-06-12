@@ -41,7 +41,7 @@ export default function ClientDashboard() {
     const kws = userProfile?.focus_keywords;
     if (!kws || kws.length === 0) return null;
     return kws[Math.floor(Math.random() * kws.length)];
-  }, [userProfile?.id]);
+  }, [userProfile?.focus_keywords]);
 
   const { data: taggedQuotes = [] } = useGetQuotesByTagQuery(quoteKeyword);
 
