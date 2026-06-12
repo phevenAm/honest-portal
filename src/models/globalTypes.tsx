@@ -195,4 +195,3 @@ export interface ProgressChartProps {
   questionnaire: Questionnaire | null;
   title?: string;
 }
-
