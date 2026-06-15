@@ -1,23 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+
+import Button from "../../../components/shared/Button/Button";
+import Card from "../../../components/shared/Card/Card";
 import { useAuth } from "../../../context/AuthContext";
 import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
-import {
-  fetchAssignmentsByUser,
-  selectAllAssignments,
-} from "../../../store/slices/questionnaireAssignmentsSlice";
-import {
-  fetchResponsesByUser,
-  selectUserResponses,
-  submitResponse,
-} from "../../../store/slices/responsesSlice";
-import Card from "../../../components/shared/Card/Card";
-import Button from "../../../components/shared/Button/Button";
-import type { AppDispatch } from "../../../store/index";
-import type { Question, Questionnaire } from "../../../models/globalTypes";
-import styles from "./CheckInPage.module.scss";
+import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { fetchAssignmentsByUser, selectAllAssignments } from "../../../store/slices/questionnaireAssignmentsSlice";
+import { fetchResponsesByUser, selectUserResponses, submitResponse } from "../../../store/slices/responsesSlice";
 
+import styles from "./CheckInPage.module.scss";
 
 const CheckIcon = () => (
   <svg
@@ -44,18 +37,10 @@ type AssignmentWithQuestionnaire = {
   questionnaires?: Questionnaire;
 };
 
-
-const getLatestResponseForQuestionnaire = (
-  responses: any[],
-  questionnaireId: string,
-) =>
+const getLatestResponseForQuestionnaire = (responses: Response[], questionnaireId: string) =>
   responses
     .filter((response) => response.questionnaire_id === questionnaireId)
-    .sort(
-      (a, b) =>
-        new Date(getResponseDate(b)).getTime() -
-        new Date(getResponseDate(a)).getTime(),
-    )[0];
+    .sort((a, b) => new Date(getResponseDate(b)).getTime() - new Date(getResponseDate(a)).getTime())[0];
 
 function ScaleQuestion({
   question,
@@ -71,11 +56,7 @@ function ScaleQuestion({
 
   return (
     <div className={styles.scaleWrap}>
-      <div
-        role="radiogroup"
-        aria-label={question.text}
-        className={styles.scaleButtons}
-      >
+      <div role="radiogroup" aria-label={question.text} className={styles.scaleButtons}>
         {Array.from({ length: max - min + 1 }, (_, i) => min + i).map((n) => (
           <button
             key={n}
@@ -99,21 +80,20 @@ function ScaleQuestion({
 }
 
 export default function CheckInPage() {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { authUser, userProfile } = useAuth();
 
-  const assignments = useSelector(
-    selectAllAssignments,
-  ) as AssignmentWithQuestionnaire[];
+  const assignments = useAppSelector(selectAllAssignments) as AssignmentWithQuestionnaire[];
 
-  const allUserResponses = useSelector(selectUserResponses(authUser?.id ?? ""));
+  const allUserResponses = useAppSelector(selectUserResponses(authUser?.id ?? ""));
 
   const [answers, setAnswers] = useState<Record<string, number | string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
+    //!TODO: use idle hook
     if (!authUser?.id) return;
 
     dispatch(fetchAssignmentsByUser(authUser.id))
@@ -129,18 +109,13 @@ export default function CheckInPage() {
       });
   }, [dispatch, authUser?.id]);
 
-  const activeAssignments = assignments.filter(
-    (assignment) => assignment.questionnaires?.is_active,
-  );
+  const activeAssignments = assignments.filter((assignment) => assignment.questionnaires?.is_active);
 
   const availableAssignments = activeAssignments.filter((assignment) => {
     const questionnaire = assignment.questionnaires;
     if (!questionnaire) return false;
 
-    const latestResponse = getLatestResponseForQuestionnaire(
-      allUserResponses,
-      questionnaire.id,
-    );
+    const latestResponse = getLatestResponseForQuestionnaire(allUserResponses, questionnaire.id);
 
     if (!latestResponse) return true;
 
@@ -171,8 +146,7 @@ export default function CheckInPage() {
   }
 
   const isLast = currentStep === questions.length - 1;
-  const canProceed =
-    currentQ.type === "text" || answers[currentQ.id] !== undefined;
+  const canProceed = currentQ.type === "text" || answers[currentQ.id] !== undefined;
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   const handleAnswer = (value: number | string) => {
@@ -195,8 +169,7 @@ export default function CheckInPage() {
     questions.forEach((question) => {
       if (question.type === "scale") {
         scores[question.id] =
-          (answers[question.id] as number | undefined) ??
-          Math.round((question.max_value ?? 10) / 2);
+          (answers[question.id] as number | undefined) ?? Math.round((question.max_value ?? 10) / 2);
       }
 
       if (question.type === "text") {
@@ -228,13 +201,9 @@ export default function CheckInPage() {
             <CheckIcon />
           </div>
 
-          <h2 className={styles.completeTitle}>
-            Thank you, {userProfile?.first_name}
-          </h2>
+          <h2 className={styles.completeTitle}>Thank you, {userProfile?.first_name}</h2>
 
-          <p className={styles.completeText}>
-            Your check-in has been recorded.
-          </p>
+          <p className={styles.completeText}>Your check-in has been recorded.</p>
 
           <Button onClick={() => navigate("/dashboard")} fullWidth>
             View my progress
@@ -260,10 +229,7 @@ export default function CheckInPage() {
         </div>
 
         <div className={styles.progressTrack}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${progress}%` }}
-          />
+          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
 
         <Card className={styles.questionCard}>

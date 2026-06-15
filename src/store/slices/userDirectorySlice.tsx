@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import { supabase } from "../../lib/supabase.js";
 import type { UserProfile } from "../../models/globalTypes.js";
 
@@ -14,32 +15,21 @@ const initialState: UserDirectoryState = {
   error: null,
 };
 
-export const fetchAllUsers = createAsyncThunk(
-  "userDirectory/fetchAllUsers",
-  async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase.from("users").select("*");
+export const fetchAllUsers = createAsyncThunk("userDirectory/fetchAllUsers", async (_, { rejectWithValue }) => {
+  const { data, error } = await supabase.from("users").select("*");
 
-    if (error) return rejectWithValue(error.message);
+  if (error) return rejectWithValue(error.message);
 
-    return data;
-  },
-);
+  return data;
+});
 
-export const deleteUser = createAsyncThunk(
-  "userDirectory/deleteUser",
-  async (id: string, { rejectWithValue }) => {
-    console.log("deleting id;::deleteUser: ", id);
-    const { error } = await supabase
-      .from("users")
-      .delete()
-      .eq("id", id)
-      .select();
+export const deleteUser = createAsyncThunk("userDirectory/deleteUser", async (id: string, { rejectWithValue }) => {
+  const { error } = await supabase.from("users").delete().eq("id", id).select();
 
-    if (error) return rejectWithValue(error.message);
+  if (error) return rejectWithValue(error.message);
 
-    return id;
-  },
-);
+  return id;
+});
 
 const userDirectorySlice = createSlice({
   name: "userDirectory",
@@ -60,9 +50,7 @@ const userDirectorySlice = createSlice({
             .map((n) => n[0])
             .join("")
             .toUpperCase(),
-          color: ["sage", "lavender", "blush", "sky", "peach"][
-            state.users.length % 5
-          ],
+          color: ["sage", "lavender", "blush", "sky", "peach"][state.users.length % 5],
           ...action.payload,
         });
       }
@@ -93,8 +81,6 @@ const userDirectorySlice = createSlice({
         state.error = action.payload;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
-        console.log("fulfilled delete payload", action.payload);
-
         state.status = "succeeded";
         state.users = state.users.filter((u) => u.id !== action.payload);
       })
@@ -108,17 +94,13 @@ const userDirectorySlice = createSlice({
 export const { addUser, updateUser } = userDirectorySlice.actions;
 
 // Selectors
-export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) =>
-  state.userDirectory.users;
+export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users;
 
-export const selectUserById =
-  (id: string) => (state: { userDirectory: UserDirectoryState }) =>
-    state.userDirectory.users.find((u) => u.id === id);
+export const selectUserById = (id: string) => (state: { userDirectory: UserDirectoryState }) =>
+  state.userDirectory.users.find((u) => u.id === id);
 
-export const selectClientUsers = (state: {
-  userDirectory: UserDirectoryState;
-}) => state.userDirectory.users.filter((u) => u.role === "client");
-export const selectUserCount = (state: { userDirectory: UserDirectoryState }) =>
-  state.userDirectory.users.length;
+export const selectClientUsers = (state: { userDirectory: UserDirectoryState }) =>
+  state.userDirectory.users.filter((u) => u.role === "client");
+export const selectUserCount = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users.length;
 
 export default userDirectorySlice.reducer;

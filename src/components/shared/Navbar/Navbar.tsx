@@ -1,54 +1,61 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleTheme, selectThemeMode } from '../../../store/slices/themeSlice';
-import { LogoIcon, MoonIcon, SunIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
-import Avatar from '../Avatar/Avatar';
-import { useAuth } from '../../../context/AuthContext';
-import styles from './Navbar.module.scss';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
+import { getInitials } from "@Helpers/Helpers";
 
+import { useAuth } from "../../../context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
+import Avatar from "../Avatar/Avatar";
+import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, SunIcon } from "../Icons/Icons";
+import SkipToMain from "../SkipToMain/SkipToMain";
 
+import styles from "./Navbar.module.scss";
 
 export default function Navbar() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
-  const themeMode = useSelector(selectThemeMode);
+  const themeMode = useAppSelector(selectThemeMode);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAdmin, signOut, profile } = useAuth();
+  const { isAdmin, signOut, userProfile, displayName } = useAuth();
 
   const handleLogout = async () => {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
 
   const adminLinks = [
-    { to: '/admin', label: 'Dashboard' },
-    { to: '/admin/clients', label: 'Clients' },
-    { to: '/admin/questionnaires', label: 'Questionnaires' },
-    { to: '/admin/resources', label: 'Resources' },
+    { to: "/admin", label: "Dashboard" },
+    { to: "/admin/clients", label: "Clients" },
+    { to: "/admin/questionnaires", label: "Questionnaires" },
+    { to: "/admin/resources", label: "Resources" },
   ];
 
   const clientLinks = [
-    { to: '/dashboard', label: 'My Progress' },
-    { to: '/check-in', label: 'Check-in' },
-    { to: '/resources', label: 'Resources' },
+    { to: "/dashboard", label: "My Progress" },
+    { to: "/check-in", label: "Check-in" },
+    { to: "/resources", label: "Resources" },
   ];
 
   const links = isAdmin ? adminLinks : clientLinks;
 
-  return (
-    <header role="banner" className={styles.header}>
-      <nav role="navigation" aria-label="Main navigation" className={styles.nav}>
+  const createLinkRoleTestId = (link: { to: string; label: string }) => {
+    return link.to.split("/").filter(Boolean).join("-");
+  };
 
+  return (
+    <header className={styles.header}>
+      <SkipToMain />
+      <nav aria-label="Main navigation" className={styles.nav}>
         {/* Logo */}
         <Link
-          to={isAdmin ? '/admin' : '/dashboard'}
+          to={isAdmin ? "/admin" : "/dashboard"}
           aria-label="WithMe — home"
           className={styles.logo}
+          data-testid="logo-link"
         >
           <div className={styles.logoMark}>
             <LogoIcon />
@@ -58,15 +65,16 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <ul className={styles.desktopNav} role="list">
-          {links.map(link => {
+        <ul className={styles.desktopNav}>
+          {links.map((link) => {
             const active = location.pathname === link.to;
             return (
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  aria-current={active ? 'page' : undefined}
-                  className={`${styles.navLink} ${active ? styles.active : ''}`}
+                  aria-current={active ? "page" : undefined}
+                  className={`${styles.navLink} ${active ? styles.active : ""}`}
+                  data-testid={`navbar-link-${createLinkRoleTestId(link)}`}
                 >
                   {link.label}
                 </Link>
@@ -78,32 +86,35 @@ export default function Navbar() {
         {/* Right actions */}
         <div className={styles.actions}>
           <button
+            type="button"
             onClick={() => dispatch(toggleTheme())}
-            aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={`Switch to ${themeMode === "light" ? "dark" : "light"} mode`}
             className={styles.iconBtn}
           >
-            {themeMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            {themeMode === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
 
           <div className={styles.userSection}>
-            {profile && (
+            {userProfile && (
               <Avatar
-                initials={`${profile.first_name?.[0] ?? ''}${profile.last_name?.[0] ?? ''}`}
+                initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
                 color="teal"
                 size={34}
+                imageSrc={userProfile.avatar_url || ""}
               />
             )}
-            <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn}>
+            <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn} type="button">
               Sign out
             </button>
           </div>
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             className={styles.menuBtn}
+            type="button"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -113,15 +124,15 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div id="mobile-menu" className={styles.mobileMenu}>
-          <ul role="list" className={styles.mobileMenuList}>
-            {links.map(link => {
+          <ul className={styles.mobileMenuList}>
+            {links.map((link) => {
               const active = location.pathname === link.to;
               return (
                 <li key={link.to}>
                   <Link
                     to={link.to}
                     onClick={() => setMenuOpen(false)}
-                    className={`${styles.mobileNavLink} ${active ? styles.active : ''}`}
+                    className={`${styles.mobileNavLink} ${active ? styles.active : ""}`}
                   >
                     {link.label}
                   </Link>

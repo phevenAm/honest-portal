@@ -1,1 +1,1 @@
-export { default } from './AdminQuestionnairesPage';
+export { default } from "./AdminQuestionnairesPage";

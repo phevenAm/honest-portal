@@ -1,23 +1,18 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  inspirationalQuote,
-  inspirationalSearchedQuote,
-} from "../models/globalTypes";
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+
+import type { LocalQuote } from "../data/quotes";
+import { quotes } from "../data/quotes";
 
 export const inspirationalQuotesApi = createApi({
   reducerPath: "inspirationalQuotesApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "https://api.quotable.io",
-  }),
+  baseQuery: fakeBaseQuery(),
   endpoints: (builder) => ({
-    getRandomQuote: builder.query<inspirationalQuote[], void>({
-      query: () => "/quotes/random",
-    }),
-    getQuoteByKeyword: builder.query<inspirationalSearchedQuote, string>({
-      query: (keyword) => `/search/quotes?query=${keyword}`,
+    getQuotesByTag: builder.query<LocalQuote[], string | null>({
+      queryFn: (tag) => ({
+        data: tag ? quotes.filter((q) => q.tags.includes(tag)) : quotes,
+      }),
     }),
   }),
 });
 
-export const { useGetRandomQuoteQuery, useGetQuoteByKeywordQuery } =
-  inspirationalQuotesApi;
+export const { useGetQuotesByTagQuery } = inspirationalQuotesApi;

@@ -15,22 +15,23 @@
 // }
 // ============================================================
 
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer           from './slices/authSlice';
-import usersReducer          from './slices/usersSlice';
-import questionnairesReducer from './slices/questionnairesSlice';
-import responsesReducer      from './slices/responsesSlice';
-import resourcesReducer      from './slices/resourcesSlice';
-import themeReducer          from './slices/themeSlice';
+import { configureStore } from "@reduxjs/toolkit";
+
+import authReducer from "./slices/authSlice";
+import questionnairesReducer from "./slices/questionnairesSlice";
+import resourcesReducer from "./slices/resourcesSlice";
+import responsesReducer from "./slices/responsesSlice";
+import themeReducer from "./slices/themeSlice";
+import usersReducer from "./slices/usersSlice";
 
 export const store = configureStore({
   reducer: {
-    auth:           authReducer,
-    users:          usersReducer,
+    auth: authReducer,
+    users: usersReducer,
     questionnaires: questionnairesReducer,
-    responses:      responsesReducer,
-    resources:      resourcesReducer,
-    theme:          themeReducer,
+    responses: responsesReducer,
+    resources: resourcesReducer,
+    theme: themeReducer,
   },
   // RTK enables Redux DevTools Extension automatically in development
   // Install the browser extension to inspect state changes in real time!

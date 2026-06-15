@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+
+import { LogoIcon, MailIcon } from "../../components/shared/Icons/Icons";
 import { useAuth } from "../../context/AuthContext";
+
 import styles from "./SignUpPage.module.scss";
-import {LogoIcon, MailIcon} from "../../components/shared/Icons/Icons";
 
 const FIELDS = [
   { id: "firstName", label: "First name", type: "text", ph: "" },
@@ -26,6 +28,12 @@ const FIELDS = [
 
 type FieldId = (typeof FIELDS)[number]["id"];
 
+const getAutoComplete = (id: FieldId): string | undefined => {
+  if (id === "email") return "email";
+  if (id === "password" || id === "confirm") return "new-password";
+  return undefined;
+};
+
 export default function SignUpPage() {
   const { signUp } = useAuth();
   const [form, setForm] = useState<Record<FieldId, string>>({
@@ -41,8 +49,7 @@ export default function SignUpPage() {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const set = (id: FieldId, value: string) =>
-    setForm((current) => ({ ...current, [id]: value }));
+  const set = (id: FieldId, value: string) => setForm((current) => ({ ...current, [id]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,8 +89,8 @@ export default function SignUpPage() {
         form.accessToken,
       );
       setDone(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -98,9 +105,8 @@ export default function SignUpPage() {
           </div>
           <h2 className={styles.confirmTitle}>Check your email</h2>
           <p className={styles.confirmText}>
-            We've sent a confirmation link to <strong>{form.email}</strong>.
-            Click it to activate your account, then come back to sign in. Check
-            your spam folder if you don't see it within a few minutes.
+            We've sent a confirmation link to <strong>{form.email}</strong>. Click it to activate your account, then
+            come back to sign in. Check your spam folder if you don't see it within a few minutes.
           </p>
           <Link to="/login" className={styles.backLink}>
             ← Back to sign in
@@ -145,15 +151,7 @@ export default function SignUpPage() {
                   onChange={(e) => set(field.id, e.target.value)}
                   placeholder={field.ph}
                   required
-                  autoComplete={
-                    field.id === "email"
-                      ? "email"
-                      : field.id === "password"
-                        ? "new-password"
-                        : field.id === "confirm"
-                          ? "new-password"
-                          : undefined
-                  }
+                  autoComplete={getAutoComplete(field.id)}
                   {...(field.type === "date" && {
                     max: new Date().toISOString().split("T")[0],
                   })}
@@ -164,14 +162,7 @@ export default function SignUpPage() {
 
             <button
               type="submit"
-              disabled={
-                loading ||
-                !form.email ||
-                !form.dob ||
-                !form.password ||
-                !form.confirm ||
-                !form.accessToken
-              }
+              disabled={loading || !form.email || !form.dob || !form.password || !form.confirm || !form.accessToken}
               className={styles.submitBtn}
             >
               {loading ? "Creating account…" : "Create account"}
@@ -179,7 +170,7 @@ export default function SignUpPage() {
           </form>
 
           <p className={styles.footer}>
-            Already have an account? {" "}
+            Already have an account?{" "}
             <Link to="/login" className={styles.link}>
               Sign in
             </Link>

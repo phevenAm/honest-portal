@@ -1,4 +1,4 @@
-export type Role = "admin" | "user";
+export type Role = "admin" | "client";
 
 export type DBUser = {
   id: string;
@@ -26,18 +26,22 @@ export type AuthUser = DBUser & {
     first_name?: string;
     last_name?: string;
     dob?: string;
-    [key: string]: any; // allow extra fields
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase user_metadata is an open-ended JSON object
+    [key: string]: any;
   };
 
   app_metadata?: {
     provider?: string;
     providers?: string[];
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase app_metadata is an open-ended JSON object
     [key: string]: any;
   };
 
-  identities?: any[]; // you said you're fine with loose typing here
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase identities shape varies by provider
+  identities?: any[];
 
-  [key: string]: any; // catch-all for anything else Supabase adds
+  // biome-ignore lint/suspicious/noExplicitAny: catch-all for Supabase auth fields that aren't in our schema
+  [key: string]: any;
 };
 
 //!Questionnare stuff
@@ -86,6 +90,7 @@ export enum ContentFormat {
 export type UserProfile = {
   id: string;
   created_at: string;
+  email: string;
   first_name: string;
   last_name: string;
   dob: string | null;
@@ -136,10 +141,7 @@ export type QuestionnaireAssignment = {
   assigned_at: string;
 
   // joined optionally
-  questionnaires?: Pick<
-    Questionnaire,
-    "id" | "title" | "frequency" | "is_active"
-  >;
+  questionnaires?: Pick<Questionnaire, "id" | "title" | "frequency" | "is_active">;
   users?: Pick<UserProfile, "id" | "first_name" | "last_name">;
 };
 
@@ -173,20 +175,6 @@ export type Resource = {
 
 // ─── App-level types (not in DB) ───────────────────────────
 
-// Used in authSlice — enriched user object for the session
-export type User = {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  dob: string;
-  role: UserRole | string;
-  jointedAt: string;
-  avatar: string; // initials e.g. "JD"
-  color: string; // UI color token e.g. "sage"
-  disabled: boolean;
-};
-
 // ─── Utility types ─────────────────────────────────────────
 
 // Scores payload shape for a submitted response
@@ -194,9 +182,9 @@ export type User = {
 export type ResponseScores = Record<string, number | string>;
 
 // Partial update helpers
-export type UpdateQuestionnaire = Partial<
-  Omit<Questionnaire, "id" | "created_at" | "questions" | "assignedTo">
-> & { id: string };
+export type UpdateQuestionnaire = Partial<Omit<Questionnaire, "id" | "created_at" | "questions" | "assignedTo">> & {
+  id: string;
+};
 export type UpdateUser = Partial<Omit<UserProfile, "id" | "created_at">> & {
   id: string;
 };
@@ -211,24 +199,3 @@ export interface ProgressChartProps {
   questionnaire: Questionnaire | null;
   title?: string;
 }
-
-//-------- Quotes -------------
-
-export type inspirationalQuote = {
-  author: string;
-  authorSlug: string;
-  content: string;
-  dateAdded: string;
-  dateModified: string;
-  length: number;
-  tags: string[];
-  id: string;
-};
-
-export type inspirationalSearchedQuote = {
-  count: number;
-  totalCount: number;
-  page: number;
-  totalPages: number;
-  results: inspirationalQuote[];
-};

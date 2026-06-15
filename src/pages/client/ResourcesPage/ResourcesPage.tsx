@@ -1,33 +1,34 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import {
-  selectPublishedResources,
-  fetchPublishedResources,
-} from "../../../store/slices/resourcesSlice";
-import Card from "../../../components/shared/Card/Card";
-import styles from "./ResourcesPage.module.scss";
-import type { Resource } from "../../../models/globalTypes";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
-import type { RootState } from "../../../store/index";
-import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
+import { useState } from "react";
 
-function ResourceModal({
-  resource,
-  onClose,
-}: {
-  resource: Resource;
-  onClose: () => void;
-}) {
+import Card from "../../../components/shared/Card/Card";
+import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
+import type { Resource } from "../../../models/globalTypes";
+import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
+import type { RootState } from "../../../store/index";
+import { fetchPublishedResources, selectPublishedResources } from "../../../store/slices/resourcesSlice";
+
+import styles from "./ResourcesPage.module.scss";
+
+function getResourceButtonLabel(type: string): string {
+  if (type === "video") return "Watch";
+  if (type === "document") return "Open document";
+  if (type === "link") return "Visit site";
+  return "Read";
+}
+
+function ResourceModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — close button provides keyboard path
+    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
       <div
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="resource-title"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
-        <button className={styles.modalClose} onClick={onClose}>
+        <button type="button" className={styles.modalClose} onClick={onClose}>
           ×
         </button>
 
@@ -59,12 +60,7 @@ function ResourceModal({
 
         {(resource.type === "document" || resource.type === "link") && (
           <div className={styles.externalWrap}>
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.externalBtn}
-            >
+            <a href={resource.url} target="_blank" rel="noopener noreferrer" className={styles.externalBtn}>
               {resource.type === "document" ? "Open document" : "Visit website"}
             </a>
           </div>
@@ -74,14 +70,8 @@ function ResourceModal({
   );
 }
 
-function ResourceCard({
-  resource,
-  onOpen,
-}: {
-  resource: Resource;
-  onOpen: (resource: Resource) => void;
-}) {
-    const handleClick = () => {
+function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resource: Resource) => void }) {
+  const handleClick = () => {
     if (resource.type === "document" || resource.type === "link") {
       window.open(resource.url, "_blank");
     } else {
@@ -90,10 +80,7 @@ function ResourceCard({
   };
   return (
     <Card>
-      <div
-        className={styles.accentBar}
-        style={{ background: "var(--accent)" }}
-      />
+      <div className={styles.accentBar} style={{ background: "var(--accent)" }} />
 
       <div className={styles.cardBody}>
         <span className={styles.categoryBadge}>
@@ -106,17 +93,8 @@ function ResourceCard({
         <p className={styles.excerpt}>{resource.summary}</p>
 
         <div className={styles.cardFooter}>
-          <button
-            onClick={handleClick}
-            className={styles.readMoreBtn}
-          >
-            {resource.type === "video"
-              ? "Watch"
-              : resource.type === "document"
-                ? "Open document"
-                : resource.type === "link"
-                  ? "Visit site"
-                  : "Read"}
+          <button type="button" onClick={handleClick} className={styles.readMoreBtn}>
+            {getResourceButtonLabel(resource.type)}
           </button>
         </div>
       </div>
@@ -125,11 +103,9 @@ function ResourceCard({
 }
 
 export default function ResourcesPage() {
-  const resources = useSelector(selectPublishedResources);
+  const resources = useAppSelector(selectPublishedResources);
   const [filter, setFilter] = useState("all");
-  const [selectedResource, setSelectedResource] = useState<Resource | null>(
-    null,
-  );
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
@@ -139,8 +115,7 @@ export default function ResourcesPage() {
 
   const types = ["all", ...new Set(resources.map((r) => r.type))];
 
-  const filtered =
-    filter === "all" ? resources : resources.filter((r) => r.type === filter);
+  const filtered = filter === "all" ? resources : resources.filter((r) => r.type === filter);
 
   return (
     <div className={styles.page}>
@@ -150,20 +125,15 @@ export default function ResourcesPage() {
           <p>Curated by your practitioner — take your time with these.</p>
         </div>
 
-        <div
-          role="tablist"
-          aria-label="Filter resources by type"
-          className={styles.filterRow}
-        >
+        <div role="tablist" aria-label="Filter resources by type" className={styles.filterRow}>
           {types.map((type: string) => (
             <button
               key={type}
+              type="button"
               role="tab"
               aria-selected={filter === type}
               onClick={() => setFilter(type)}
-              className={
-                filter === type ? styles.filterBtnActive : styles.filterBtn
-              }
+              className={filter === type ? styles.filterBtnActive : styles.filterBtn}
             >
               {type === "all" ? "All resources" : `${type}s`}
             </button>
@@ -172,25 +142,14 @@ export default function ResourcesPage() {
 
         <div className={styles.grid}>
           {filtered.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              resource={resource}
-              onOpen={setSelectedResource}
-            />
+            <ResourceCard key={resource.id} resource={resource} onOpen={setSelectedResource} />
           ))}
         </div>
 
-        {filtered.length === 0 && (
-          <p className={styles.empty}>No resources available yet.</p>
-        )}
+        {filtered.length === 0 && <p className={styles.empty}>No resources available yet.</p>}
       </div>
 
-      {selectedResource && (
-        <ResourceModal
-          resource={selectedResource}
-          onClose={() => setSelectedResource(null)}
-        />
-      )}
+      {selectedResource && <ResourceModal resource={selectedResource} onClose={() => setSelectedResource(null)} />}
     </div>
   );
 }

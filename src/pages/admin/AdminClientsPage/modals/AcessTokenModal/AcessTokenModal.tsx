@@ -1,11 +1,10 @@
 import { useState } from "react";
-import Card from "../../../../../components/shared/Card/Card";
 
-import {generateAccessToken} from "../../utils/AdminClientsPageUtils";
 import Button from "../../../../../components/shared/Button/Button";
+import Card from "../../../../../components/shared/Card/Card";
 import { supabase } from "../../../../../lib/supabase";
 import styles from "../../AdminClientsPage.module.scss";
-
+import { generateAccessToken } from "../../utils/AdminClientsPageUtils";
 
 export default function AccessTokenModal({ onClose }: { onClose: () => void }) {
   const [token, setToken] = useState(generateAccessToken());
@@ -54,15 +53,16 @@ export default function AccessTokenModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — close button provides keyboard path
     <div
       className={styles.overlay}
       onClick={(event) => event.target === event.currentTarget && onClose()}
+      role="presentation"
     >
       <Card className={styles.modal}>
         <h3 className={styles.modalTitle}>Create client access token</h3>
         <p className={styles.modalText}>
-          Give this token to a client. They must enter it during sign up before
-          an account can be created.
+          Give this token to a client. They must enter it during sign up before an account can be created.
         </p>
 
         {error && <p className={styles.modalError}>{error}</p>}
@@ -71,11 +71,7 @@ export default function AccessTokenModal({ onClose }: { onClose: () => void }) {
           <>
             <div className={styles.field}>
               <label htmlFor="access-token">Access token</label>
-              <input
-                id="access-token"
-                value={token}
-                onChange={(event) => setToken(event.target.value)}
-              />
+              <input id="access-token" value={token} onChange={(event) => setToken(event.target.value)} />
             </div>
 
             <div className={styles.modalActions}>

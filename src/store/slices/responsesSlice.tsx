@@ -2,11 +2,8 @@
 // RESPONSES SLICE — client questionnaire submissions
 // ============================================================
 
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
+
 import { supabase } from "../../lib/supabase.js";
 import type { Response, ResponseScores } from "../../models/globalTypes.js";
 
@@ -28,10 +25,7 @@ const initialState: ResponsesState = {
 export const fetchAllResponses = createAsyncThunk<Response[]>(
   "responses/fetchAllResponses",
   async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase
-      .from("responses")
-      .select("*")
-      .order("submitted_at", { ascending: false });
+    const { data, error } = await supabase.from("responses").select("*").order("submitted_at", { ascending: false });
     if (error) return rejectWithValue(error.message);
     return data;
   },
@@ -52,10 +46,7 @@ export const fetchResponsesByUser = createAsyncThunk<Response[], string>(
 );
 
 // Admin: fetch responses for a specific questionnaire (for analytics)
-export const fetchResponsesByQuestionnaire = createAsyncThunk<
-  Response[],
-  string
->(
+export const fetchResponsesByQuestionnaire = createAsyncThunk<Response[], string>(
   "responses/fetchResponsesByQuestionnaire",
   async (questionnaireId, { rejectWithValue }) => {
     const { data, error } = await supabase
@@ -144,9 +135,7 @@ const responsesSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(deleteResponse.fulfilled, (state, action) => {
-        state.responses = state.responses.filter(
-          (r) => r.id !== action.payload,
-        );
+        state.responses = state.responses.filter((r) => r.id !== action.payload);
       })
       .addCase(deleteResponse.rejected, (state, action) => {
         state.error = action.payload as string;
@@ -160,10 +149,8 @@ export const { clearResponseError } = responsesSlice.actions;
 
 type RootState = { responses: ResponsesState };
 
-export const selectAllResponses = (state: RootState) =>
-  state.responses.responses;
-export const selectResponsesStatus = (state: RootState) =>
-  state.responses.status;
+export const selectAllResponses = (state: RootState) => state.responses.responses;
+export const selectResponsesStatus = (state: RootState) => state.responses.status;
 export const selectResponsesError = (state: RootState) => state.responses.error;
 
 // All responses for a user, oldest first (for trend/progress charts)
@@ -171,28 +158,15 @@ export const selectResponsesByUser = (userId: string) =>
   createSelector(selectAllResponses, (responses) =>
     responses
       .filter((r) => r.user_id === userId)
-      .sort(
-        (a, b) =>
-          new Date(a.submitted_at).getTime() -
-          new Date(b.submitted_at).getTime(),
-      ),
+      .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()),
   );
 
 // Responses for a user + specific questionnaire (progress tracking)
-export const selectUserQuestionnaireResponses = (
-  userId: string,
-  questionnaireId: string,
-) =>
+export const selectUserQuestionnaireResponses = (userId: string, questionnaireId: string) =>
   createSelector(selectAllResponses, (responses) =>
     responses
-      .filter(
-        (r) => r.user_id === userId && r.questionnaire_id === questionnaireId,
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.submitted_at).getTime() -
-          new Date(b.submitted_at).getTime(),
-      ),
+      .filter((r) => r.user_id === userId && r.questionnaire_id === questionnaireId)
+      .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()),
   );
 
 // Most recent response per questionnaire for a user (client dashboard summary)
@@ -202,19 +176,14 @@ export const selectLatestResponsesByUser = (userId: string) =>
     const latest = new Map<string, Response>();
     for (const r of userResponses) {
       const existing = latest.get(r.questionnaire_id);
-      if (
-        !existing ||
-        new Date(r.submitted_at) > new Date(existing.submitted_at)
-      ) {
+      if (!existing || new Date(r.submitted_at) > new Date(existing.submitted_at)) {
         latest.set(r.questionnaire_id, r);
       }
     }
     return Array.from(latest.values());
   });
 
-  export const selectUserResponses = (userId: string) =>
-  createSelector(selectAllResponses, (responses) =>
-    responses.filter((response) => response.user_id === userId),
-  );
+export const selectUserResponses = (userId: string) =>
+  createSelector(selectAllResponses, (responses) => responses.filter((response) => response.user_id === userId));
 
 export default responsesSlice.reducer;

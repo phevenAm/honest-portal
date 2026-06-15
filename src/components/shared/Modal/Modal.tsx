@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import styles from "./Modal.module.scss";
+
 import CloseIcon from "@mui/icons-material/Close";
+
+import styles from "./Modal.module.scss";
 
 type ModalProps = {
   title: string;
@@ -9,12 +11,7 @@ type ModalProps = {
   actions?: React.ReactNode;
 };
 
-export default function Modal({
-  title,
-  onClose,
-  children,
-  actions,
-}: ModalProps) {
+export default function Modal({ title, onClose, children, actions }: ModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -27,18 +24,24 @@ export default function Modal({
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEsc);
     };
-  }, []);
+  }, [onClose]);
+
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — keyboard handled via Escape in useEffect
+    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
       <div
         className={styles.modalContainer}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <header className={styles.modalHeader}>
-          <h2>{title}</h2>
-          <a onClick={onClose}>
+          <h2 id="modal-title">{title}</h2>
+          <button type="button" onClick={onClose} aria-label="Close modal">
             <CloseIcon />
-          </a>
+          </button>
         </header>
 
         <main className={styles.modalBody}>

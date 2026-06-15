@@ -1,5 +1,28 @@
 // Navbar.scss
-@use '../../../styles/spacing' as *;
+@use "../../../styles/spacing" as *;
+
+// ── Skip to main ───────────────────────────────────────────
+.skipToMain {
+  position: absolute;
+  top: -100%;
+  left: var(--sp-4);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-4);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  z-index: 9999;
+  transition: top 0.1s ease;
+
+  &:focus-visible {
+    top: var(--sp-2);
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+}
 
 .header {
   background: var(--bg-card);
@@ -77,7 +100,9 @@
   margin: 0;
   padding: 0;
 
-  @media (max-width: 768px) { display: none; }
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .navLink {
@@ -172,7 +197,9 @@
   display: none;
   align-items: center;
 
-  @media (max-width: 768px) { display: flex; }
+  @media (max-width: 768px) {
+    display: flex;
+  }
 
   &:focus-visible {
     outline: 2px solid var(--border-focus);
@@ -203,7 +230,9 @@
   font-weight: 400;
   transition: all var(--transition-base);
 
-  &:hover { background: var(--bg-muted); }
+  &:hover {
+    background: var(--bg-muted);
+  }
 
   &.active {
     color: var(--accent-dark);

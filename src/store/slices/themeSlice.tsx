@@ -5,19 +5,20 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
-// Read saved preference on startup (gracefully handle SSR/no localStorage)
-const getSavedTheme = () => {
-  try {
-    return localStorage.getItem("theme") || "light";
-  } catch {
-    return "light";
-  }
-};
-
 type ThemeMode = "light" | "dark";
 
 type ThemeState = {
   mode: ThemeMode;
+};
+
+// Read saved preference on startup (gracefully handle SSR/no localStorage)
+const getSavedTheme = (): ThemeMode => {
+  try {
+    const saved = localStorage.getItem("theme");
+    return saved === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
 };
 
 const themeSlice = createSlice({
@@ -40,6 +41,5 @@ const themeSlice = createSlice({
 });
 
 export const { toggleTheme, setTheme } = themeSlice.actions;
-export const selectThemeMode = (state: { theme: ThemeState }) =>
-  state.theme.mode;
+export const selectThemeMode = (state: { theme: ThemeState }) => state.theme.mode;
 export default themeSlice.reducer;

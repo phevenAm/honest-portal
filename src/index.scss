@@ -76,6 +76,7 @@
 
   // Layout
   --navbar-height:      #{$navbar-height};
+  --footer-height:      #{$footer-height};
   --max-width:          #{$max-width-xl};
 }
 
@@ -174,6 +175,17 @@ h1, h2, h3 {
 h4, h5, h6 {
   font-family: var(--font-sans);
   font-weight: 600;
+}
+
+// ── App shell layout ───────────────────────────────────────
+#main-content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+.page-content {
+  flex: 1;
 }
 
 // ── Utilities ──────────────────────────────────────────────

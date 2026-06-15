@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAllResources, createResource, deleteResource, togglePublished,fetchResources, updateResource } from '../../../store/slices/resourcesSlice';
-import Card from '../../../components/shared/Card/Card';
-import Button from '../../../components/shared/Button/Button';
-import styles from './AdminResourcesPage.module.scss';
-import type { AppDispatch, RootState } from '../../../store/index';
-import { Resource } from '../../../models/globalTypes';
-import { ArticleIcon, VideoIcon } from '../../../components/shared/Icons/Icons';
+import { useEffect, useState } from "react";
 
-const CATEGORIES = ['Psychoeducation', 'Coping Skills', 'Breathwork', 'Self-Compassion', 'Relationships', 'General'];
+import Button from "@components/shared/Button/Button";
+import Card from "@components/shared/Card/Card";
+import { Resource } from "@models/globalTypes";
+
+import styles from "./AdminResourcesPage.module.scss";
+
+const CATEGORIES = ["Psychoeducation", "Coping Skills", "Breathwork", "Self-Compassion", "Relationships", "General"];
 
 export function ResourceForm({
   onSave,
   onClose,
   resource,
 }: {
+  // biome-ignore lint/suspicious/noExplicitAny: resource form data shape varies based on resource type
   onSave: (data: any) => void;
   onClose: () => void;
   resource?: Resource | null;
@@ -30,8 +29,7 @@ export function ResourceForm({
     is_sensitive: false,
   });
 
-  const set = (key: string, value: string) =>
-    setForm((current) => ({ ...current, [key]: value }));
+  const set = (key: string, value: string) => setForm((current) => ({ ...current, [key]: value }));
 
   useEffect(() => {
     if (!resource) return;
@@ -71,18 +69,12 @@ export function ResourceForm({
   return (
     <div className={styles.overlay}>
       <Card className={styles.modal}>
-        <h3 className={styles.modalTitle}>
-          {resource ? "Edit resource" : "New resource"}
-        </h3>
+        <h3 className={styles.modalTitle}>{resource ? "Edit resource" : "New resource"}</h3>
 
         <div className={styles.formGrid}>
           <div className={styles.formField}>
             <label htmlFor="r-type">Type</label>
-            <select
-              id="r-type"
-              value={form.type}
-              onChange={(e) => set("type", e.target.value)}
-            >
+            <select id="r-type" value={form.type} onChange={(e) => set("type", e.target.value)}>
               <option value="article">Article</option>
               <option value="video">Video</option>
               <option value="document">Document</option>
@@ -92,11 +84,7 @@ export function ResourceForm({
 
           <div className={styles.formField}>
             <label htmlFor="r-cat">Category</label>
-            <select
-              id="r-cat"
-              value={form.category}
-              onChange={(e) => set("category", e.target.value)}
-            >
+            <select id="r-cat" value={form.category} onChange={(e) => set("category", e.target.value)}>
               {CATEGORIES.map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -153,18 +141,12 @@ export function ResourceForm({
 
           {(form.type === "document" || form.type === "link") && (
             <div className={`${styles.formField} ${styles.fullCol}`}>
-              <label htmlFor="r-url">
-                {form.type === "document" ? "Document URL *" : "Website URL *"}
-              </label>
+              <label htmlFor="r-url">{form.type === "document" ? "Document URL *" : "Website URL *"}</label>
               <input
                 id="r-url"
                 value={form.url}
                 onChange={(e) => set("url", e.target.value)}
-                placeholder={
-                  form.type === "document"
-                    ? "https://docs.google.com/document/..."
-                    : "https://example.com"
-                }
+                placeholder={form.type === "document" ? "https://docs.google.com/document/..." : "https://example.com"}
               />
             </div>
           )}
@@ -174,9 +156,7 @@ export function ResourceForm({
           <input
             type="checkbox"
             checked={form.is_sensitive}
-            onChange={(e) =>
-              setForm((current) => ({ ...current, is_sensitive: e.target.checked }))
-            }
+            onChange={(e) => setForm((current) => ({ ...current, is_sensitive: e.target.checked }))}
           />
           <span>
             <strong>Sensitive content</strong> — restrict to adult clients only
@@ -188,9 +168,7 @@ export function ResourceForm({
             Cancel
           </Button>
 
-          <Button onClick={handleSave}>
-            {resource ? "Update resource" : "Save resource"}
-          </Button>
+          <Button onClick={handleSave}>{resource ? "Update resource" : "Save resource"}</Button>
         </div>
       </Card>
     </div>

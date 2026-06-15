@@ -1,29 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  createQuestionnaire,
-  updateQuestionnaire,
-  pauseQuestionnaire,
-  deleteQuestionnaire,
-  selectAllQuestionnaires,
-  fetchQuestionnaires,
-} from "../../../store/slices/questionnairesSlice";
+import { useEffect, useState } from "react";
+
+import Button from "@components/shared/Button/Button";
+import Card from "@components/shared/Card/Card";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
+import type { RootState } from "@store/index";
 import {
   assignQuestionnaire,
-  unassignQuestionnaireByIds,
   fetchAssignmentsByQuestionnaire,
   selectAssignmentsByQuestionnaire,
-} from "../../../store/slices/questionnaireAssignmentsSlice";
+  unassignQuestionnaireByIds,
+} from "@store/slices/questionnaireAssignmentsSlice";
 import {
-  fetchAllUsers,
-  selectClientUsers,
-} from "../../../store/slices/userDirectorySlice";
-import Card from "../../../components/shared/Card/Card";
-import Button from "../../../components/shared/Button/Button";
+  createQuestionnaire,
+  deleteQuestionnaire,
+  fetchQuestionnaires,
+  pauseQuestionnaire,
+  selectAllQuestionnaires,
+  updateQuestionnaire,
+} from "@store/slices/questionnairesSlice";
+import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
+
+import type { Questionnaire, UserProfile } from "@/models/globalTypes";
+
 import styles from "./AdminQuestionnairesPage.module.scss";
-import type { AppDispatch, RootState } from "../../../store/index";
-import type { Questionnaire, UserProfile } from "../../../models/globalTypes";
-import { useFetchOnIdle } from "../../../Hooks/Hooks";
 
 const QUESTION_TYPES = ["scale", "text"];
 
@@ -35,30 +34,37 @@ function QuestionnaireBuilder({
   onClose,
 }: {
   initial?: Questionnaire | null;
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically from builder state
   onSave: (data: any) => void;
   onClose: () => void;
 }) {
   const isEdit = !!initial;
 
-  const [title,       setTitle]    = useState(initial?.title       ?? "");
-  const [description, setDesc]     = useState(initial?.description ?? "");
-  const [frequency,   setFrequency]= useState(initial?.frequency   ?? "weekly");
-  const [questions,   setQuestions]= useState(
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [description, setDesc] = useState(initial?.description ?? "");
+  const [frequency, setFrequency] = useState(initial?.frequency ?? "weekly");
+  const [questions, setQuestions] = useState(
     initial?.questions?.map((q) => ({
-      id:          q.id,
-      text:        q.text,
-      type:        q.type,
-      min:         q.min_value  ?? 1,
-      max:         q.max_value  ?? 10,
-      minLabel:    q.min_label  ?? "",
-      maxLabel:    q.max_label  ?? "",
-      orderIndex:  q.order_index,
+      id: q.id,
+      text: q.text,
+      type: q.type,
+      min: q.min_value ?? 1,
+      max: q.max_value ?? 10,
+      minLabel: q.min_label ?? "",
+      maxLabel: q.max_label ?? "",
+      orderIndex: q.order_index,
       is_required: q.is_required,
     })) ?? [
       {
         id: `nq-${Date.now()}`,
-        text: "", type: "scale", min: 1, max: 10,
-        minLabel: "", maxLabel: "", orderIndex: 1, is_required: true,
+        text: "",
+        type: "scale",
+        min: 1,
+        max: 10,
+        minLabel: "",
+        maxLabel: "",
+        orderIndex: 1,
+        is_required: true,
       },
     ],
   );
@@ -67,18 +73,22 @@ function QuestionnaireBuilder({
     setQuestions((qs) => [
       ...qs,
       {
-        id: `nq-${Date.now()}`, text: "", type: "scale", min: 1, max: 10,
-        minLabel: "", maxLabel: "", orderIndex: qs.length + 1, is_required: true,
+        id: `nq-${Date.now()}`,
+        text: "",
+        type: "scale",
+        min: 1,
+        max: 10,
+        minLabel: "",
+        maxLabel: "",
+        orderIndex: qs.length + 1,
+        is_required: true,
       },
     ]);
 
-  const removeQuestion = (id: string) =>
-    setQuestions((qs) => qs.filter((q) => q.id !== id));
+  const removeQuestion = (id: string) => setQuestions((qs) => qs.filter((q) => q.id !== id));
 
   const updateQuestion = (id: string, field: string, value: string) =>
-    setQuestions((qs) =>
-      qs.map((q) => (q.id === id ? { ...q, [field]: value } : q)),
-    );
+    setQuestions((qs) => qs.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
 
   const handleSave = () => {
     if (!title.trim() || questions.some((q) => !q.text.trim())) {
@@ -92,9 +102,7 @@ function QuestionnaireBuilder({
   return (
     <div className={styles.overlay}>
       <Card className={styles.modal}>
-        <h3 className={styles.modalTitle}>
-          {isEdit ? "Edit questionnaire" : "New questionnaire"}
-        </h3>
+        <h3 className={styles.modalTitle}>{isEdit ? "Edit questionnaire" : "New questionnaire"}</h3>
 
         <div className={styles.metaGrid}>
           <div className={`${styles.formField} ${styles.fullCol}`}>
@@ -117,11 +125,7 @@ function QuestionnaireBuilder({
           </div>
           <div className={styles.formField}>
             <label htmlFor="q-freq">Frequency</label>
-            <select
-              id="q-freq"
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value)}
-            >
+            <select id="q-freq" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="fortnightly">Fortnightly</option>
@@ -142,6 +146,7 @@ function QuestionnaireBuilder({
                 <span className={styles.questionNum}>Q{i + 1}</span>
                 {questions.length > 1 && (
                   <button
+                    type="button"
                     onClick={() => removeQuestion(q.id)}
                     aria-label={`Remove question ${i + 1}`}
                     className={styles.removeBtn}
@@ -157,10 +162,7 @@ function QuestionnaireBuilder({
                 className={styles.questionTextInput}
               />
               <div className={styles.questionInputs}>
-                <select
-                  value={q.type}
-                  onChange={(e) => updateQuestion(q.id, "type", e.target.value)}
-                >
+                <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
                   {QUESTION_TYPES.map((t) => (
                     <option key={t} value={t}>
                       {t === "scale" ? "Scale (1–10)" : "Free text"}
@@ -187,10 +189,10 @@ function QuestionnaireBuilder({
         </div>
 
         <div className={styles.modalActions}>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave}>
-            {isEdit ? "Save changes" : "Save questionnaire"}
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
           </Button>
+          <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
         </div>
       </Card>
     </div>
@@ -208,22 +210,25 @@ function AssignModal({
   clients: UserProfile[];
   onClose: () => void;
 }) {
-  const dispatch    = useDispatch<AppDispatch>();
-  const assignments = useSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
+  const dispatch = useAppDispatch();
+  const assignments = useAppSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
   const assignedIds = new Set(assignments.map((a) => a.user_id));
-  console.log('assignments:', assignments, 'assignedIds:', assignedIds);
 
   const toggle = (userId: string) => {
     if (assignedIds.has(userId)) {
-      dispatch(unassignQuestionnaireByIds({
-        questionnaire_id: questionnaire.id,
-        user_id: userId,
-      }));
+      dispatch(
+        unassignQuestionnaireByIds({
+          questionnaire_id: questionnaire.id,
+          user_id: userId,
+        }),
+      );
     } else {
-      dispatch(assignQuestionnaire({
-        questionnaire_id: questionnaire.id,
-        user_id: userId,
-      }));
+      dispatch(
+        assignQuestionnaire({
+          questionnaire_id: questionnaire.id,
+          user_id: userId,
+        }),
+      );
     }
   };
 
@@ -242,6 +247,7 @@ function AssignModal({
             {clients.map((client) => {
               const assigned = assignedIds.has(client.id);
               return (
+                // biome-ignore lint/a11y/useKeyWithClickEvents: checkbox inside handles keyboard interaction
                 <li
                   key={client.id}
                   className={`${styles.clientRow} ${assigned ? styles.clientRowAssigned : ""}`}
@@ -257,9 +263,7 @@ function AssignModal({
                   <span className={styles.clientName}>
                     {client.first_name} {client.last_name}
                   </span>
-                  {assigned && (
-                    <span className={styles.assignedBadge}>Assigned</span>
-                  )}
+                  {assigned && <span className={styles.assignedBadge}>Assigned</span>}
                 </li>
               );
             })}
@@ -277,13 +281,13 @@ function AssignModal({
 // ─── Page ───────────────────────────────────────────────────
 
 export default function AdminQuestionnairesPage() {
-  const dispatch       = useDispatch<AppDispatch>();
-  const questionnaires = useSelector(selectAllQuestionnaires);
-  const clients        = useSelector(selectClientUsers);
+  const dispatch = useAppDispatch();
+  const questionnaires = useAppSelector(selectAllQuestionnaires);
+  const clients = useAppSelector(selectClientUsers);
 
-  const [showBuilder,    setShowBuilder]    = useState(false);
-  const [editingQ,       setEditingQ]       = useState<Questionnaire | null>(null);
-  const [isAssigningQ,     setIsAssigningQ]     = useState<Questionnaire | null>(null);
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [editingQ, setEditingQ] = useState<Questionnaire | null>(null);
+  const [isAssigningQ, setIsAssigningQ] = useState<Questionnaire | null>(null);
 
   useFetchOnIdle(
     (state: RootState) => state.questionnaires.status,
@@ -304,8 +308,10 @@ export default function AdminQuestionnairesPage() {
     }
   }, [isAssigningQ, dispatch]);
 
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
   const handleCreate = (data: any) => dispatch(createQuestionnaire(data));
 
+  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
   const handleEdit = (data: any) => {
     if (!editingQ) return;
     dispatch(updateQuestionnaire({ id: editingQ.id, ...data }));
@@ -336,23 +342,14 @@ export default function AdminQuestionnairesPage() {
                     </div>
                     <p className={styles.qDesc}>{q.description}</p>
                     <p className={styles.qMeta}>
-                      {q.questions.length} questions · {q.frequency} ·{" "}
-                      {q.assignedTo?.length ?? 0} clients assigned
+                      {q.questions.length} questions · {q.frequency} · {q.assignedTo?.length ?? 0} clients assigned
                     </p>
                   </div>
                   <div className={styles.qActions}>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setIsAssigningQ(q)}
-                    >
+                    <Button variant="secondary" size="sm" onClick={() => setIsAssigningQ(q)}>
                       Assign
                     </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setEditingQ(q)}
-                    >
+                    <Button variant="secondary" size="sm" onClick={() => setEditingQ(q)}>
                       Edit
                     </Button>
                     <Button
@@ -362,11 +359,7 @@ export default function AdminQuestionnairesPage() {
                     >
                       {q.is_active ? "Pause" : "Activate"}
                     </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => dispatch(deleteQuestionnaire(q.id))}
-                    >
+                    <Button variant="danger" size="sm" onClick={() => dispatch(deleteQuestionnaire(q.id))}>
                       Delete
                     </Button>
                   </div>
@@ -380,27 +373,12 @@ export default function AdminQuestionnairesPage() {
         </div>
       </div>
 
-      {showBuilder && (
-        <QuestionnaireBuilder
-          onSave={handleCreate}
-          onClose={() => setShowBuilder(false)}
-        />
-      )}
+      {showBuilder && <QuestionnaireBuilder onSave={handleCreate} onClose={() => setShowBuilder(false)} />}
 
-      {editingQ && (
-        <QuestionnaireBuilder
-          initial={editingQ}
-          onSave={handleEdit}
-          onClose={() => setEditingQ(null)}
-        />
-      )}
+      {editingQ && <QuestionnaireBuilder initial={editingQ} onSave={handleEdit} onClose={() => setEditingQ(null)} />}
 
       {isAssigningQ && (
-        <AssignModal
-          questionnaire={isAssigningQ}
-          clients={clients}
-          onClose={() => setIsAssigningQ(null)}
-        />
+        <AssignModal questionnaire={isAssigningQ} clients={clients} onClose={() => setIsAssigningQ(null)} />
       )}
     </div>
   );
