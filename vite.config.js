@@ -30,6 +30,10 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: "src/test/setupTests.js",
+    env: {
+      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || "https://placeholder.supabase.co",
+      VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || "placeholder-anon-key",
+    },
     coverage: {
       provider: "istanbul",
     },
