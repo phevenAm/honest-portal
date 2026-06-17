@@ -37,7 +37,7 @@ interface Props {
 }
 
 export default function OnboardingModal({ onComplete }: Props) {
-  const { userProfile, updateProfile } = useAuth();
+  const { userProfile, updateProfile, isAdmin } = useAuth();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [nameInput, setNameInput] = useState(userProfile?.first_name ?? "");
@@ -69,90 +69,108 @@ export default function OnboardingModal({ onComplete }: Props) {
     }
   };
 
-  return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <div className={styles.stepDots}>
-          <span className={step === 1 ? styles.dotActive : styles.dot} />
-          <span className={step === 2 ? styles.dotActive : styles.dot} />
-        </div>
+  const stepContent = (() => {
+    if (step === 1) {
+      return (
+        <>
+          <div className={styles.textCenter}>
+            <h2 className={styles.title}>Welcome, {userProfile?.first_name}!</h2>
+            <p className={styles.subtitle}>Let's personalize your space. You can always update this later.</p>
+          </div>
 
-        {step === 1 ? (
-          <>
-            <div className={styles.textCenter}>
-              <h2 className={styles.title}>Welcome, {userProfile?.first_name}!</h2>
-              <p className={styles.subtitle}>Let's personalize your space. You can always update this later.</p>
-            </div>
+          <div className={styles.avatarPreview}>
+            <Avatar initials={initials} color={color} size={80} imageSrc={avatarUrl.trim()} />
+          </div>
 
-            <div className={styles.avatarPreview}>
-              <Avatar initials={initials} color={color} size={80} src={avatarUrl.trim() || undefined} />
-            </div>
+          <div className={styles.fields}>
+            <label className={styles.label}>
+              Display name
+              <input
+                className={styles.input}
+                type="text"
+                placeholder={userProfile?.first_name}
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                maxLength={40}
+              />
+            </label>
 
-            <div className={styles.fields}>
-              <label className={styles.label}>
-                Display name
-                <input
-                  className={styles.input}
-                  type="text"
-                  placeholder={userProfile?.first_name}
-                  value={nameInput}
-                  onChange={(e) => setNameInput(e.target.value)}
-                  maxLength={40}
-                />
-              </label>
+            <label className={styles.label}>
+              Profile picture URL <span className={styles.optional}>(optional)</span>
+              <input
+                className={styles.input}
+                type="url"
+                placeholder="https://..."
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+              />
+            </label>
+          </div>
 
-              <label className={styles.label}>
-                Profile picture URL <span className={styles.optional}>(optional)</span>
-                <input
-                  className={styles.input}
-                  type="url"
-                  placeholder="https://..."
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                />
-              </label>
-            </div>
+          {isAdmin && saveError && <p className={styles.error}>{saveError}</p>}
 
-            <div className={styles.actions}>
+          <div className={styles.actions}>
+            {isAdmin ? (
+              <Button variant="primary" onClick={() => save([])} disabled={saving}>
+                {saving ? "Saving…" : "Save"}
+              </Button>
+            ) : (
               <Button variant="primary" onClick={() => setStep(2)}>
                 Next →
               </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={styles.textCenter}>
-              <h2 className={styles.title}>What would you like to focus on?</h2>
-              <p className={styles.subtitle}>
-                Pick topics that resonate — they shape the quotes you'll see. Skip to get the full range.
-              </p>
-            </div>
+            )}
+          </div>
+        </>
+      );
+    }
 
-            <div className={styles.keywords}>
-              {KEYWORDS.map((kw) => (
-                <button
-                  key={kw}
-                  type="button"
-                  className={`${styles.chip} ${selected.includes(kw) ? styles.chipSelected : ""}`}
-                  onClick={() => toggleKeyword(kw)}
-                >
-                  {kw}
-                </button>
-              ))}
-            </div>
+    return (
+      <>
+        <div className={styles.textCenter}>
+          <h2 className={styles.title}>What would you like to focus on?</h2>
+          <p className={styles.subtitle}>
+            Pick topics that resonate — they shape the quotes you'll see. Skip to get the full range.
+          </p>
+        </div>
 
-            {saveError && <p className={styles.error}>{saveError}</p>}
+        <div className={styles.keywords}>
+          {KEYWORDS.map((kw) => (
+            <button
+              key={kw}
+              type="button"
+              className={`${styles.chip} ${selected.includes(kw) ? styles.chipSelected : ""}`}
+              onClick={() => toggleKeyword(kw)}
+            >
+              {kw}
+            </button>
+          ))}
+        </div>
 
-            <div className={styles.actions}>
-              <Button variant="ghost" onClick={() => save([])} disabled={saving}>
-                Skip — show me everything
-              </Button>
-              <Button variant="primary" onClick={() => save(selected)} disabled={saving || selected.length === 0}>
-                {saving ? "Saving…" : "Let's go"}
-              </Button>
-            </div>
-          </>
+        {saveError && <p className={styles.error}>{saveError}</p>}
+
+        <div className={styles.actions}>
+          <Button variant="ghost" onClick={() => save([])} disabled={saving}>
+            Skip — show me everything
+          </Button>
+          <Button variant="primary" onClick={() => save(selected)} disabled={saving || selected.length === 0}>
+            {saving ? "Saving…" : "Let's go"}
+          </Button>
+        </div>
+      </>
+    );
+  })();
+
+  return (
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
+        {!isAdmin && (
+          <div className={styles.stepDots}>
+            <span className={step === 1 ? styles.dotActive : styles.dot} />
+            <span className={step === 2 ? styles.dotActive : styles.dot} />
+          </div>
         )}
+
+        {stepContent}
       </div>
     </div>
   );
