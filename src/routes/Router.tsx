@@ -15,6 +15,7 @@ import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
 import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
 import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
+import SettingsPage from "../pages/common/SettingsPage/SettingsPage";
 import { useAppSelector } from "../store/hooks";
 import { selectThemeMode } from "../store/slices/themeSlice";
 
@@ -77,6 +78,16 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
 
           <Route
             element={

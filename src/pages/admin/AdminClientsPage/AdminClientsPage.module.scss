@@ -1,5 +1,5 @@
 // AdminClientsPage.scss
-@use '../../../styles/spacing' as *;
+@use "../../../styles/spacing" as *;
 
 .page {
   min-height: 100vh;
@@ -28,7 +28,11 @@
     margin: 0 0 $sp-1;
   }
 
-  p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
 }
 
 .searchWrap {
@@ -48,8 +52,12 @@
   outline: none;
   transition: border-color var(--transition-base);
 
-  &:focus { border-color: var(--border-focus); }
-  &::placeholder { color: var(--text-muted); }
+  &:focus {
+    border-color: var(--border-focus);
+  }
+  &::placeholder {
+    color: var(--text-muted);
+  }
 }
 
 // ── Client row ─────────────────────────────────────────────
@@ -61,7 +69,9 @@
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .clientMeta {
@@ -192,7 +202,9 @@
     box-sizing: border-box;
     transition: border-color var(--transition-base);
 
-    &:focus { border-color: var(--border-focus); }
+    &:focus {
+      border-color: var(--border-focus);
+    }
   }
 }
 

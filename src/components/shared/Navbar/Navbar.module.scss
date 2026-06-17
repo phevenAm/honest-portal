@@ -240,3 +240,38 @@
     font-weight: 600;
   }
 }
+
+//Avatar / settings
+
+.settingsLinkCog {
+  position: relative;
+
+  &:hover,
+  &:focus-visible {
+    background-color: red;
+    .settingsLinkCog {
+      background-color: var(--bg-muted) !important;
+
+      svg {
+        fill: var(--accent-dark) !important;
+      }
+    }
+  }
+
+  .settingsIcon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(30%, 15%);
+    display: grid;
+    place-items: center;
+    background-color: var(--accent);
+    padding: 2px;
+    border-radius: 200%;
+
+    svg {
+      font-size: 0.95rem;
+      fill: var(--accent-light) !important;
+    }
+  }
+}

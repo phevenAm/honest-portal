@@ -7,7 +7,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
 import Avatar from "../Avatar/Avatar";
-import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, SunIcon } from "../Icons/Icons";
+import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, SunIcon, Settingsicon } from "../Icons/Icons";
 import SkipToMain from "../SkipToMain/SkipToMain";
 
 import styles from "./Navbar.module.scss";
@@ -96,12 +96,17 @@ export default function Navbar() {
 
           <div className={styles.userSection}>
             {userProfile && (
-              <Avatar
-                initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
-                color="teal"
-                size={34}
-                imageSrc={userProfile.avatar_url || ""}
-              />
+              <Link to="/settings" className={styles.settingsLinkCog} aria-label="settings">
+                <span className={styles.settingsIcon}>
+                  <Settingsicon />
+                </span>
+                <Avatar
+                  initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
+                  color="teal"
+                  size={34}
+                  imageSrc={userProfile.avatar_url || ""}
+                />
+              </Link>
             )}
             <button onClick={handleLogout} aria-label="Sign out" className={styles.signOutBtn} type="button">
               Sign out

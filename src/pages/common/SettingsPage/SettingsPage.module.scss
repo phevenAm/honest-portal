@@ -1,0 +1,30 @@
+@use "../../../styles/spacing" as *;
+
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
