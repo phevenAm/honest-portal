@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { LogoIcon, MailIcon } from "../../components/shared/Icons/Icons";
-import { useAuth } from "../../context/AuthContext";
+import { LogoIcon, MailIcon } from "../../../components/shared/Icons/Icons";
+import { useAuth } from "../../../context/AuthContext";
 
 import styles from "./SignUpPage.module.scss";
 

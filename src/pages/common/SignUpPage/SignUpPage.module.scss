@@ -1,5 +1,5 @@
 // SignUpPage.scss
-@use '../../styles/spacing' as *;
+@use "../../../styles/spacing" as *;
 
 // Reuses same layout as login — shared auth page structure
 .page {
@@ -124,8 +124,12 @@
   box-sizing: border-box;
   transition: border-color var(--transition-base);
 
-  &:focus { border-color: var(--border-focus); }
-  &::placeholder { color: var(--text-muted); }
+  &:focus {
+    border-color: var(--border-focus);
+  }
+  &::placeholder {
+    color: var(--text-muted);
+  }
 }
 
 .submitBtn {
@@ -142,7 +146,9 @@
   cursor: pointer;
   transition: background var(--transition-base);
 
-  &:hover:not(:disabled) { background: var(--accent-dark); }
+  &:hover:not(:disabled) {
+    background: var(--accent-dark);
+  }
 
   &:disabled {
     opacity: 0.5;
@@ -186,7 +192,9 @@
   font-weight: 500;
   text-decoration: none;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 // ── Email confirmation screen ──────────────────────────────
@@ -237,5 +245,7 @@
   font-size: 0.875rem;
   text-decoration: none;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
