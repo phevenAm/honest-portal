@@ -9,6 +9,19 @@
 .inner {
   max-width: var(--max-width);
   margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  > section {
+    flex: 1;
+    display: grid;
+    place-content: center;
+
+    &:nth-of-type(2) {
+      background-color: indianred;
+    }
+  }
 }
 
 .pageHeader {

@@ -71,7 +71,7 @@ function ClientRow({ user }: { user: UserProfile }) {
   return (
     <>
       <div className={styles.clientRow}>
-        <Avatar initials={`${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`} color="teal" size={40} />
+        <Avatar name={user?.display_name || ""} color="teal" size={40} />
 
         <div className={styles.clientMeta}>
           <p className={styles.clientName}>

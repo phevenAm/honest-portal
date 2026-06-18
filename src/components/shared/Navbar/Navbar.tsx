@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import { getInitials } from "@Helpers/Helpers";
-
+import { pickColor } from "@Helpers/Helpers";
 import { useAuth } from "../../../context/AuthContext";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
@@ -101,8 +100,8 @@ export default function Navbar() {
                   <Settingsicon />
                 </span>
                 <Avatar
-                  initials={getInitials(displayName, userProfile.first_name, userProfile.last_name)}
-                  color="teal"
+                  name={displayName || `${userProfile.first_name} ${userProfile.last_name}`}
+                  color={pickColor(userProfile.id)}
                   size={34}
                   imageSrc={userProfile.avatar_url || ""}
                 />

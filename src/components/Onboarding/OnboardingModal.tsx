@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { getInitials } from "@Helpers/Helpers";
+import { getInitials, AVATAR_COLORS, type AvatarColor, pickColor } from "@Helpers/Helpers";
 
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../shared/Avatar/Avatar";
@@ -25,12 +25,6 @@ const KEYWORDS = [
   "resilience",
 ];
 
-const AVATAR_COLORS = ["teal", "sage", "stone", "sky", "clay"] as const;
-type AvatarColor = (typeof AVATAR_COLORS)[number];
-
-function pickColor(userId: string): AvatarColor {
-  return AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
-}
 
 interface Props {
   onComplete: () => void;

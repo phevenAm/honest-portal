@@ -1,19 +1,19 @@
 import { useState } from "react";
-
+import { getInitials, type AvatarColor } from "@Helpers/Helpers";
 import styles from "./Avatar.module.scss";
 
-type AvatarColor = "teal" | "sage" | "stone" | "sky" | "clay";
-
 interface AvatarProps {
-  initials: string;
+  name: string;
   color?: AvatarColor;
   size?: number;
   imageSrc?: string;
 }
 
-export default function Avatar({ initials, color = "teal", size = 40, imageSrc = "" }: AvatarProps) {
+export default function Avatar({ name, color = "teal", size = 40, imageSrc = "" }: AvatarProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = !!imageSrc && !imgFailed;
+
+  const initials = getInitials(name);
 
   return (
     <div

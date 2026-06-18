@@ -1,75 +1,76 @@
 import React, { useState, useEffect } from "react";
-import styles from "../SettingsPage/SettingsPage.module.scss";
-import Avatar from "@/components/shared/Avatar/Avatar";
+
+import { pickColor } from "@Helpers/Helpers";
 import { useAuth } from "@context/AuthContext";
+import Avatar from "@components/shared/Avatar/Avatar";
+
+import styles from "./SettingsPage.module.scss";
 
 const SettingsPage = () => {
-  const avatarDetails = {
-    //!get these from api, so use effect to fetch
-    name: "John Doe",
-    imageUrl: "https://www.pexels.com/photo/my-lounge-living-room-27383726/",
-    initials: "JD",
-  };
+  const { userProfile, updateProfile } = useAuth();
+  const [name, setName] = useState(userProfile?.display_name ?? "");
+  const [imageUrl, setImageUrl] = useState(userProfile?.avatar_url ?? "");
+  const [saving, setSaving] = useState(false);
 
-  const [name, setName] = useState(avatarDetails.name);
-  const [imageUrl, setImageUrl] = useState(avatarDetails.imageUrl);
-
-  //!duplicated from onboarding modal! TODO: refactor soon
-  const KEYWORDS = [
-    "love",
-    "hope",
-    "forgiveness",
-    "self-love",
-    "worth",
-    "peace",
-    "friendship",
-    "strength",
-    "growth",
-    "healing",
-    "courage",
-    "mindfulness",
-    "gratitude",
-    "resilience",
-  ];
-  //!duplicated from onboarding modal! TODO: refactor soon
-  const AVATAR_COLORS = ["teal", "sage", "stone", "sky", "clay"] as const;
-  type AvatarColor = (typeof AVATAR_COLORS)[number];
-  //!duplicated from onboarding modal! TODO: refactor soon
-  function pickColor(userId: string): AvatarColor {
-    return AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
-  }
-
-  const { isAdmin } = useAuth();
+  const avatarColor = userProfile?.id ? pickColor(userProfile.id) : "teal";
 
   useEffect(() => {
-    console.log("loaded", isAdmin);
-    console.log(useAuth);
-  }, []);
+    setName(userProfile?.display_name ?? userProfile?.first_name ?? "");
+    setImageUrl(userProfile?.avatar_url ?? "");
+  }, [userProfile]);
 
-  //!help me practice implementhing things to stop rerendering
+  const handleUpdateProfile = async () => {
+    setSaving(true);
+    await updateProfile({ display_name: name, avatar_url: imageUrl });
+    setSaving(false);
+  };
 
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
         <section className={styles.left}>
           <div className={styles.pageHeader}>
-            <h1> Settings</h1>
+            <h1>Settings</h1>
             <p>Update or remove your profile</p>
           </div>
           <form>
             <legend>
-              <label for="displayName">Display name</label>
-              <input id="displayName" name="display name" />
+              <label htmlFor="displayName">Display name</label>
+              <input
+                id="displayName"
+                onChange={(e) => setName(e.target.value)}
+                maxLength={40}
+                value={name}
+                name="display name"
+              />
             </legend>
             <legend>
-              <label for="profilePicture">Profile picture URL</label>
-              <input id="profilePicture" name="profile picture URL" />
+              <label htmlFor="profilePicture">Profile picture URL</label>
+              <input
+                id="profilePicture"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                name="profile picture URL"
+              />
             </legend>
+
+            <button
+              type="submit"
+              className={styles.saveButton}
+              onClick={async (e) => {
+                e.preventDefault();
+                await handleUpdateProfile();
+              }}
+            >
+              {saving ? "Updating profile..." : "Update profile"}
+            </button>
           </form>
+
           <div className={styles.deleteAccountBlock}>delete account block</div>
         </section>
         <section className={styles.right}>
-          <Avatar {...avatarDetails} />
+          <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={150} />
+          <h2>{name}</h2>
         </section>
       </div>
     </div>

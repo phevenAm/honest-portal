@@ -113,7 +113,7 @@ export default function AdminDashboard() {
               <div className={styles.clientList}>
                 {allClients.slice(0, 4).map((u) => (
                   <div key={u.id} className={styles.clientRow}>
-                    <Avatar initials={`${u.first_name?.[0] ?? ""}${u.last_name?.[0] ?? ""}`} color="teal" size={36} />
+                    <Avatar name={u?.display_name || ""} color="teal" size={36} />
                     <div className={styles.clientInfo}>
                       <p className={styles.clientName}>
                         {u.first_name} {u.last_name}
