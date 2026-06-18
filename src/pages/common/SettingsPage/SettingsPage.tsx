@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { pickColor } from "@Helpers/Helpers";
 import Avatar from "@components/shared/Avatar/Avatar";
@@ -39,8 +39,8 @@ const SettingsPage = () => {
         </div>
         <Card className={styles.sectionsContainer}>
           <section className={styles.left}>
-            <form>
-              <legend>
+            <form className={styles.form}>
+              <div className={styles.field}>
                 <label htmlFor="displayName">Display name</label>
                 <input
                   id="displayName"
@@ -49,8 +49,8 @@ const SettingsPage = () => {
                   value={name}
                   name="display name"
                 />
-              </legend>
-              <legend>
+              </div>
+              <div className={styles.field}>
                 <label htmlFor="profilePicture">Profile picture URL</label>
                 <input
                   id="profilePicture"
@@ -58,9 +58,9 @@ const SettingsPage = () => {
                   onChange={(e) => setImageUrl(e.target.value)}
                   name="profile picture URL"
                 />
-              </legend>
-
+              </div>
               <Button
+                variant="primary"
                 type="submit"
                 className={styles.saveButton}
                 onClick={async (e) => {
@@ -72,25 +72,20 @@ const SettingsPage = () => {
               </Button>
             </form>
 
-            <div className={styles.deleteAccountBlock}>
-              {!isAdmin && (
-                <Button type="button" onClick={() => setIsDeleteModalOpen(true)}>
+            {!isAdmin && (
+              <div className={styles.deleteAccountBlock}>
+                <Button variant="ghost-danger" size="sm" onClick={() => setIsDeleteModalOpen(true)}>
                   Delete account
                 </Button>
-              )}
-            </div>
-            {isDeleteModalOpen && (
-              <DeleteUserModal
-                onClose={() => setIsDeleteModalOpen(false)}
-                // modalTitle="Delete your account forever?"
-                // idToDelete={userProfile?.id ?? ""} //! can all be set internally in the modal, no need to pass as props
-                // bodyText={"test"}
-              ></DeleteUserModal>
+              </div>
             )}
+
+            {isDeleteModalOpen && <DeleteUserModal onClose={() => setIsDeleteModalOpen(false)} />}
           </section>
+
           <section className={styles.right}>
             <div className={styles.avatarCard}>
-              <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={150} />
+              <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={210} />
               <h2>{name}</h2>
             </div>
           </section>

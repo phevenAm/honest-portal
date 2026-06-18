@@ -1,26 +1,44 @@
 @use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
 
 .columns {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
 
-  .sectionsContainer {
-    display: flex;
+// ── Two-column card ────────────────────────────────────────
+.sectionsContainer {
+  display: flex;
+  flex-direction: column-reverse;
+
+  @include md {
     flex-direction: row;
-
-    >section {
-      flex: 1;
-      display: grid;
-      place-content: center;
-
-      &:nth-of-type(2) {
-        background-color: indianred;
-      }
-    }
   }
 }
 
+.left {
+  flex: 1;
+  padding: $sp-6;
+
+  @include max-md {
+    border-top: 1px solid var(--border);
+  }
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $sp-8 $sp-6;
+
+  @include max-md {
+    padding: $sp-6;
+  }
+}
+
+// ── Page header ────────────────────────────────────────────
 .pageHeader {
   margin-bottom: $sp-8;
 
@@ -35,6 +53,58 @@
   p {
     color: var(--text-muted);
     font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// ── Form ───────────────────────────────────────────────────
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-5;
+}
+
+.field {
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: $sp-2;
+    letter-spacing: 0.01em;
+  }
+
+  input {
+    @include input-base;
+  }
+}
+
+.saveButton {
+  @include max-md {
+    width: 100%;
+  }
+}
+
+// ── Delete account ─────────────────────────────────────────
+.deleteAccountBlock {
+  margin-top: $sp-6;
+  padding-top: $sp-5;
+  border-top: 1px solid var(--border);
+}
+
+// ── Avatar preview ─────────────────────────────────────────
+.avatarCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $sp-4;
+  text-align: center;
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-primary);
     margin: 0;
   }
 }
