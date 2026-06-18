@@ -203,7 +203,7 @@ h6 {
   padding: $sp-8 $sp-6;
 
   .inner {
-    @include container-inner($max: var(--max-width));
+    @include container-inner($max: var(--max-width)); // control max with and responsive padding
   }
 }
 
