@@ -3,14 +3,16 @@ import React, { useState, useEffect } from "react";
 import { pickColor } from "@Helpers/Helpers";
 import { useAuth } from "@context/AuthContext";
 import Avatar from "@components/shared/Avatar/Avatar";
+import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
 
 const SettingsPage = () => {
-  const { userProfile, updateProfile } = useAuth();
+  const { userProfile, updateProfile, isAdmin } = useAuth();
   const [name, setName] = useState(userProfile?.display_name ?? "");
   const [imageUrl, setImageUrl] = useState(userProfile?.avatar_url ?? "");
   const [saving, setSaving] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const avatarColor = userProfile?.id ? pickColor(userProfile.id) : "teal";
 
@@ -66,7 +68,21 @@ const SettingsPage = () => {
             </button>
           </form>
 
-          <div className={styles.deleteAccountBlock}>delete account block</div>
+          <div className={styles.deleteAccountBlock}>
+            {!isAdmin && (
+              <button type="button" onClick={() => setIsDeleteModalOpen(true)}>
+                Delete account
+              </button>
+            )}
+          </div>
+          {isDeleteModalOpen && (
+            <DeleteUserModal
+              onClose={() => setIsDeleteModalOpen(false)}
+              // modalTitle="Delete your account forever?"
+              // idToDelete={userProfile?.id ?? ""} //! can all be set internally in the modal, no need to pass as props
+              // bodyText={"test"}
+            ></DeleteUserModal>
+          )}
         </section>
         <section className={styles.right}>
           <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={150} />

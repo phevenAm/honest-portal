@@ -1,9 +1,9 @@
 import React from "react";
 
-import Button from "../../../../../components/shared/Button/Button";
-import Modal from "../../../../../components/shared/Modal/Modal";
-import { useAppDispatch } from "../../../../../store/hooks";
-import { deleteUser } from "../../../../../store/slices/userDirectorySlice";
+import Button from "@components/shared/Button/Button";
+import Modal from "@components/shared/Modal/Modal";
+import { useAppDispatch } from "@store/hooks";
+import { deleteUser } from "@store/slices/userDirectorySlice";
 
 type DeleteClientModalProps = {
   onClose: () => void;
@@ -22,6 +22,7 @@ export default function DeleteClientModal({
 
   const handleConfirm = async () => {
     await dispatch(deleteUser(id)).unwrap();
+    //!how to use unwrapp?
     onClose();
   };
 

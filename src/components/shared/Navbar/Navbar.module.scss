@@ -245,15 +245,15 @@
 
 .settingsLinkCog {
   position: relative;
+  text-decoration: none;
 
   &:hover,
   &:focus-visible {
-    background-color: red;
-    .settingsLinkCog {
-      background-color: var(--bg-muted) !important;
+    .settingsIcon {
+      background-color: var(--accent-dark);
 
       svg {
-        fill: var(--accent-dark) !important;
+        fill: var(--accent-light);
       }
     }
   }
