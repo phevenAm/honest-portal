@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { getInitials, type AvatarColor } from "@Helpers/Helpers";
+
+import { type AvatarColor, getInitials } from "@Helpers/Helpers";
+
 import styles from "./Avatar.module.scss";
 
 interface AvatarProps {

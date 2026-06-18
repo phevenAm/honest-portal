@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { pickColor } from "@Helpers/Helpers";
-import { useAuth } from "@context/AuthContext";
 import Avatar from "@components/shared/Avatar/Avatar";
+import Button from "@components/shared/Button/Button";
+import Card from "@components/shared/Card/Card";
+import { useAuth } from "@context/AuthContext";
+
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
@@ -30,64 +33,68 @@ const SettingsPage = () => {
   return (
     <div className="page">
       <div className={`inner ${styles.columns}`}>
-        <section className={styles.left}>
-          <div className={styles.pageHeader}>
-            <h1>Settings</h1>
-            <p>Update or remove your profile</p>
-          </div>
-          <form>
-            <legend>
-              <label htmlFor="displayName">Display name</label>
-              <input
-                id="displayName"
-                onChange={(e) => setName(e.target.value)}
-                maxLength={40}
-                value={name}
-                name="display name"
-              />
-            </legend>
-            <legend>
-              <label htmlFor="profilePicture">Profile picture URL</label>
-              <input
-                id="profilePicture"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                name="profile picture URL"
-              />
-            </legend>
+        <div className={styles.pageHeader}>
+          <h1>Settings</h1>
+          <p>Update or remove your profile</p>
+        </div>
+        <Card className={styles.sectionsContainer}>
+          <section className={styles.left}>
+            <form>
+              <legend>
+                <label htmlFor="displayName">Display name</label>
+                <input
+                  id="displayName"
+                  onChange={(e) => setName(e.target.value)}
+                  maxLength={40}
+                  value={name}
+                  name="display name"
+                />
+              </legend>
+              <legend>
+                <label htmlFor="profilePicture">Profile picture URL</label>
+                <input
+                  id="profilePicture"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  name="profile picture URL"
+                />
+              </legend>
 
-            <button
-              type="submit"
-              className={styles.saveButton}
-              onClick={async (e) => {
-                e.preventDefault();
-                await handleUpdateProfile();
-              }}
-            >
-              {saving ? "Updating profile..." : "Update profile"}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                className={styles.saveButton}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  await handleUpdateProfile();
+                }}
+              >
+                {saving ? "Updating profile..." : "Update profile"}
+              </Button>
+            </form>
 
-          <div className={styles.deleteAccountBlock}>
-            {!isAdmin && (
-              <button type="button" onClick={() => setIsDeleteModalOpen(true)}>
-                Delete account
-              </button>
+            <div className={styles.deleteAccountBlock}>
+              {!isAdmin && (
+                <Button type="button" onClick={() => setIsDeleteModalOpen(true)}>
+                  Delete account
+                </Button>
+              )}
+            </div>
+            {isDeleteModalOpen && (
+              <DeleteUserModal
+                onClose={() => setIsDeleteModalOpen(false)}
+                // modalTitle="Delete your account forever?"
+                // idToDelete={userProfile?.id ?? ""} //! can all be set internally in the modal, no need to pass as props
+                // bodyText={"test"}
+              ></DeleteUserModal>
             )}
-          </div>
-          {isDeleteModalOpen && (
-            <DeleteUserModal
-              onClose={() => setIsDeleteModalOpen(false)}
-              // modalTitle="Delete your account forever?"
-              // idToDelete={userProfile?.id ?? ""} //! can all be set internally in the modal, no need to pass as props
-              // bodyText={"test"}
-            ></DeleteUserModal>
-          )}
-        </section>
-        <section className={styles.right}>
-          <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={150} />
-          <h2>{name}</h2>
-        </section>
+          </section>
+          <section className={styles.right}>
+            <div className={styles.avatarCard}>
+              <Avatar name={name} imageSrc={imageUrl} color={avatarColor} size={150} />
+              <h2>{name}</h2>
+            </div>
+          </section>
+        </Card>
       </div>
     </div>
   );

@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { pickColor } from "@Helpers/Helpers";
+
 import { useAuth } from "../../../context/AuthContext";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
 import Avatar from "../Avatar/Avatar";
-import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, SunIcon, Settingsicon } from "../Icons/Icons";
+import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, Settingsicon, SunIcon } from "../Icons/Icons";
 import SkipToMain from "../SkipToMain/SkipToMain";
 
 import styles from "./Navbar.module.scss";

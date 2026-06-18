@@ -1,10 +1,10 @@
 import React from "react";
 
+import Button from "@components/shared/Button/Button";
+import Modal from "@components/shared/Modal/Modal";
+import { useAuth } from "@context/AuthContext";
 import { useAppDispatch } from "@store/hooks";
 import { deleteUser } from "@store/slices/userDirectorySlice";
-import { useAuth } from "@context/AuthContext";
-import Modal from "@components/shared/Modal/Modal";
-import Button from "@components/shared/Button/Button";
 
 type DelteUserModalProps = {
   onClose: () => void;

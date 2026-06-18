@@ -25,8 +25,7 @@ export const getInitials = (displayName: string | null, firstName = "", lastName
 
 export const AVATAR_COLORS = ["teal", "sage", "stone", "sky", "clay"] as const;
 export type AvatarColor = (typeof AVATAR_COLORS)[number];
-export const pickColor = (userId: string): AvatarColor =>
-  AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
+export const pickColor = (userId: string): AvatarColor => AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
 
 export const isAdultFromDob = (dob: string | null | undefined): boolean => {
   if (!dob) return false;

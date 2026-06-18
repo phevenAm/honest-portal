@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { getInitials, AVATAR_COLORS, type AvatarColor, pickColor } from "@Helpers/Helpers";
+import { AVATAR_COLORS, type AvatarColor, getInitials, pickColor } from "@Helpers/Helpers";
 
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../shared/Avatar/Avatar";
@@ -24,7 +24,6 @@ const KEYWORDS = [
   "gratitude",
   "resilience",
 ];
-
 
 interface Props {
   onComplete: () => void;

@@ -2,16 +2,21 @@
 
 .columns {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
 
-  > section {
-    flex: 1;
-    display: grid;
-    place-content: center;
+  .sectionsContainer {
+    display: flex;
+    flex-direction: row;
 
-    &:nth-of-type(2) {
-      background-color: indianred;
+    >section {
+      flex: 1;
+      display: grid;
+      place-content: center;
+
+      &:nth-of-type(2) {
+        background-color: indianred;
+      }
     }
   }
 }

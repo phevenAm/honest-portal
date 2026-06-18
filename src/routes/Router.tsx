@@ -14,8 +14,8 @@ import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
 import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
-import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
 import SettingsPage from "../pages/common/SettingsPage/SettingsPage";
+import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
 import { useAppSelector } from "../store/hooks";
 import { selectThemeMode } from "../store/slices/themeSlice";
 
