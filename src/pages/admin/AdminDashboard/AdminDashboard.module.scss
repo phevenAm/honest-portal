@@ -1,5 +1,6 @@
 // AdminDashboard.scss
 @use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
 
 .header {
   margin-bottom: $sp-8;
@@ -86,7 +87,7 @@
   grid-template-columns: 1fr 1fr;
   gap: $sp-6;
 
-  @media (max-width: 640px) {
+  @include until-sm {
     grid-template-columns: 1fr;
   }
 }
