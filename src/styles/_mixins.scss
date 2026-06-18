@@ -6,47 +6,16 @@
 @use 'spacing' as *;
 
 // ── Responsive breakpoints ─────────────────────────────────
-@mixin sm {
-  @media (min-width: #{$bp-sm}) {
-    @content;
-  }
-}
+// from-*  → min-width (this size and up)
+// until-* → max-width (below this size)
+@mixin from-sm { @media (min-width: #{$bp-sm}) { @content; } }
+@mixin from-md { @media (min-width: #{$bp-md}) { @content; } }
+@mixin from-lg { @media (min-width: #{$bp-lg}) { @content; } }
+@mixin from-xl { @media (min-width: #{$bp-xl}) { @content; } }
 
-@mixin md {
-  @media (min-width: #{$bp-md}) {
-    @content;
-  }
-}
-
-@mixin lg {
-  @media (min-width: #{$bp-lg}) {
-    @content;
-  }
-}
-
-@mixin xl {
-  @media (min-width: #{$bp-xl}) {
-    @content;
-  }
-}
-
-@mixin max-sm {
-  @media (max-width: #{$bp-sm - 1px}) {
-    @content;
-  }
-}
-
-@mixin max-md {
-  @media (max-width: #{$bp-md - 1px}) {
-    @content;
-  }
-}
-
-@mixin max-lg {
-  @media (max-width: #{$bp-lg - 1px}) {
-    @content;
-  }
-}
+@mixin until-sm { @media (max-width: #{$bp-sm - 1px}) { @content; } }
+@mixin until-md { @media (max-width: #{$bp-md - 1px}) { @content; } }
+@mixin until-lg { @media (max-width: #{$bp-lg - 1px}) { @content; } }
 
 // ── Layout helpers ─────────────────────────────────────────
 @mixin flex-center {
@@ -77,7 +46,7 @@
   margin: 0 auto;
   padding: 0 $sp-6;
 
-  @include max-md {
+  @include until-md {
     padding: 0 $sp-4;
   }
 }
