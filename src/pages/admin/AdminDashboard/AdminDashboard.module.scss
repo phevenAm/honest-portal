@@ -1,17 +1,6 @@
 // AdminDashboard.scss
 @use "../../../styles/spacing" as *;
 
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-  padding: $sp-8 $sp-6;
-}
-
-.inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
-
 .header {
   margin-bottom: $sp-8;
 

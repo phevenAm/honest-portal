@@ -118,8 +118,8 @@ export default function ResourcesPage() {
   const filtered = filter === "all" ? resources : resources.filter((r) => r.type === filter);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>Resources</h1>
           <p>Curated by your practitioner — take your time with these.</p>

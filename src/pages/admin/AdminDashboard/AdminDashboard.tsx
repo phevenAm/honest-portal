@@ -78,8 +78,8 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>Welcome back, {userProfile?.first_name}</h1>
           <p>Here's a summary of your practice portal</p>

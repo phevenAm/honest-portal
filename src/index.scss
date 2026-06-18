@@ -178,14 +178,17 @@ h4, h5, h6 {
 }
 
 // ── App shell layout ───────────────────────────────────────
-#main-content, .page   {
+#main-content   {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - (var(--navbar-height) + var(--footer-height) + 2px));
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
 
   .inner {
     max-width: var(--max-width);
     margin: 0 auto;
+    padding: 0 var(--sp-16);
   }
 }
 

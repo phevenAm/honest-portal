@@ -133,14 +133,14 @@ export default function ClientDashboard() {
 
   if (questionnairesStatus !== "succeeded" || responsesStatus !== "succeeded") {
     return (
-      <div className={styles.page}>
+      <div className="page">
         <Spinner />
       </div>
     );
   }
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>
             {greeting}, {displayName ?? "friend"}

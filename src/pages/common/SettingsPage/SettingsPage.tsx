@@ -28,8 +28,8 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className={`inner ${styles.columns}`}>
         <section className={styles.left}>
           <div className={styles.pageHeader}>
             <h1>Settings</h1>

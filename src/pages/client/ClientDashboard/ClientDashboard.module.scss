@@ -2,17 +2,6 @@
 @use '../../../styles/spacing' as *;
 @import url('https://fonts.googleapis.com/css2?family=Revalia&display=swap');
 
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-}
-
-.inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: $sp-8 $sp-6;
-}
-
 .header {
   margin-bottom: $sp-8;
 

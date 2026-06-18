@@ -1,14 +1,6 @@
 @use "../../../styles/spacing" as *;
 
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-  padding: $sp-8 $sp-6;
-}
-
-.inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
+.columns {
   display: flex;
   flex-direction: row;
   width: 100%;

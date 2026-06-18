@@ -211,8 +211,8 @@ export default function AdminClientsPage() {
   );
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.pageHeader}>
           <div>
             <h1>Clients</h1>

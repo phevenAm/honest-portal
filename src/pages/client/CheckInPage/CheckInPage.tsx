@@ -214,8 +214,8 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>{questionnaire.title}</h1>
           <p>{questionnaire.description}</p>
