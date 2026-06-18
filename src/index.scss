@@ -160,10 +160,10 @@ body {
 }
 
 // ── Scrollbar ──────────────────────────────────────────────
-::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: var(--bg-muted); }
-::-webkit-scrollbar-thumb  { background: var(--border); border-radius: var(--r-full); }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+// ::-webkit-scrollbar        { width: 6px; height: 6px; }
+// ::-webkit-scrollbar-track  { background: var(--bg-muted); }
+// ::-webkit-scrollbar-thumb  { background: var(--border); border-radius: var(--r-full); }
+// ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 // ── Typography base ────────────────────────────────────────
 h1, h2, h3 {
@@ -178,10 +178,15 @@ h4, h5, h6 {
 }
 
 // ── App shell layout ───────────────────────────────────────
-#main-content {
+#main-content, .page   {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100vh - (var(--navbar-height) + var(--footer-height) + 2px));
+
+  .inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
 }
 
 .page-content {
