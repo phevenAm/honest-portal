@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
+import Modal from "@components/shared/Modal/Modal";
 import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "@components/shared/Icons/Icons";
 import type { Resource } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
@@ -21,7 +22,7 @@ import styles from "./AdminResourcesPage.module.scss";
 
 const RESOURCE_TYPES = ["all", "article", "video", "document", "link"] as const;
 
-const getResourceTypeLabel = (type: string) => {
+export const getResourceTypeLabel = (type: string) => {
   if (type === "all") return "All";
   if (type === "article") return "Articles";
   if (type === "video") return "Videos";

@@ -8,6 +8,7 @@ import type { RootState } from "../../../store/index";
 import { fetchPublishedResources, selectPublishedResources } from "../../../store/slices/resourcesSlice";
 
 import styles from "./ResourcesPage.module.scss";
+import { getResourceTypeLabel } from "@/pages/admin/AdminResourcesPage/AdminResourcesPage";
 
 function getResourceButtonLabel(type: string): string {
   if (type === "video") return "Watch";
@@ -135,7 +136,7 @@ export default function ResourcesPage() {
               onClick={() => setFilter(type)}
               className={filter === type ? styles.filterBtnActive : styles.filterBtn}
             >
-              {type === "all" ? "All resources" : `${type}s`}
+              {getResourceTypeLabel(type)}
             </button>
           ))}
         </div>
