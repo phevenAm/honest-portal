@@ -278,8 +278,8 @@ export default function ProgressChart({ responses, questionnaire, title = "Your 
             {responses.length} check-in{responses.length !== 1 ? "s" : ""} tracked
           </p>
         </div>
-
-        <div role="group" aria-label="Chart type" className={styles.toggle}>
+        {/* //!TODO: fix radar not working */}
+        {/* <div role="group" aria-label="Chart type" className={styles.toggle}>
           {(["line", "radar"] as const).map((value) => (
             <button
               key={value}
@@ -291,7 +291,7 @@ export default function ProgressChart({ responses, questionnaire, title = "Your 
               {value === "line" ? "Line graph" : "Radar"}
             </button>
           ))}
-        </div>
+        </div> */}
       </div>
 
       {view === "line" ? (
