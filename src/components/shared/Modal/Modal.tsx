@@ -35,8 +35,12 @@ export default function Modal({ title, onClose, children, actions, size = "md" }
     // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — keyboard handled via Escape in useEffect
     <div
       className={styles.modalOverlay}
-      onMouseDown={(e) => { mouseDownTarget.current = e.target; }}
-      onClick={(e) => { if (mouseDownTarget.current === e.currentTarget) onClose(); }}
+      onMouseDown={(e) => {
+        mouseDownTarget.current = e.target;
+      }}
+      onClick={(e) => {
+        if (mouseDownTarget.current === e.currentTarget) onClose();
+      }}
       role="presentation"
     >
       <div

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { getResourceTypeLabel } from "@/pages/admin/AdminResourcesPage/AdminResourcesPage";
 import Card from "../../../components/shared/Card/Card";
 import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
 import type { Resource } from "../../../models/globalTypes";
@@ -8,7 +9,6 @@ import type { RootState } from "../../../store/index";
 import { fetchPublishedResources, selectPublishedResources } from "../../../store/slices/resourcesSlice";
 
 import styles from "./ResourcesPage.module.scss";
-import { getResourceTypeLabel } from "@/pages/admin/AdminResourcesPage/AdminResourcesPage";
 
 function getResourceButtonLabel(type: string): string {
   if (type === "video") return "Watch";
