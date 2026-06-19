@@ -7,8 +7,9 @@ import type { Resource } from "../../../models/globalTypes";
 import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
 import type { RootState } from "../../../store/index";
 import { fetchPublishedResources, selectPublishedResources } from "../../../store/slices/resourcesSlice";
-
+import { isAdultFromDob } from "@Helpers/Helpers";
 import styles from "./ResourcesPage.module.scss";
+import { useAuth } from "@/context/AuthContext";
 
 function getResourceButtonLabel(type: string): string {
   if (type === "video") return "Watch";
@@ -16,6 +17,8 @@ function getResourceButtonLabel(type: string): string {
   if (type === "link") return "Visit site";
   return "Read";
 }
+
+//TODO: could do with a search to find things by words and even have a favourites. (add a star icon to the card to favourite it, and then have a filter for favourites)
 
 function ResourceModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
   return (
@@ -105,8 +108,10 @@ function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resou
 
 export default function ResourcesPage() {
   const resources = useAppSelector(selectPublishedResources);
+  const { userProfile } = useAuth();
   const [filter, setFilter] = useState("all");
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const nonSensitiveResources = resources.filter((item) => !item.is_sensitive);
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
@@ -114,9 +119,10 @@ export default function ResourcesPage() {
     "Failed to fetch resources:",
   );
 
-  const types = ["all", ...new Set(resources.map((r) => r.type))];
+  const contentToRender = isAdultFromDob(userProfile?.dob ?? "") ? resources : nonSensitiveResources;
+  const types = ["all", ...new Set(contentToRender.map((r) => r.type))];
 
-  const filtered = filter === "all" ? resources : resources.filter((r) => r.type === filter);
+  const filtered = filter === "all" ? contentToRender : contentToRender.filter((r) => r.type === filter);
 
   return (
     <div className="page">
