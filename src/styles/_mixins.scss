@@ -8,14 +8,47 @@
 // ── Responsive breakpoints ─────────────────────────────────
 // from-*  → min-width (this size and up)
 // until-* → max-width (below this size)
-@mixin from-sm { @media (min-width: #{$bp-sm}) { @content; } }
-@mixin from-md { @media (min-width: #{$bp-md}) { @content; } }
-@mixin from-lg { @media (min-width: #{$bp-lg}) { @content; } }
-@mixin from-xl { @media (min-width: #{$bp-xl}) { @content; } }
+@mixin from-sm {
+  @media (min-width: #{$bp-sm}) {
+    @content;
+  }
+}
 
-@mixin until-sm { @media (max-width: #{$bp-sm - 1px}) { @content; } }
-@mixin until-md { @media (max-width: #{$bp-md - 1px}) { @content; } }
-@mixin until-lg { @media (max-width: #{$bp-lg - 1px}) { @content; } }
+@mixin from-md {
+  @media (min-width: #{$bp-md}) {
+    @content;
+  }
+}
+
+@mixin from-lg {
+  @media (min-width: #{$bp-lg}) {
+    @content;
+  }
+}
+
+@mixin from-xl {
+  @media (min-width: #{$bp-xl}) {
+    @content;
+  }
+}
+
+@mixin until-sm {
+  @media (max-width: #{$bp-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-md {
+  @media (max-width: #{$bp-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin until-lg {
+  @media (max-width: #{$bp-lg - 1px}) {
+    @content;
+  }
+}
 
 // ── Layout helpers ─────────────────────────────────────────
 @mixin flex-center {

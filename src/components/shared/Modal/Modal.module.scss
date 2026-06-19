@@ -1,30 +1,50 @@
+@use "../../../styles/spacing" as *;
+
 .modalOverlay {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100dvh;
-  background-color: rgba(115, 148, 134, 0.562);
-  backdrop-filter: blur(15px);
-  display: grid;
-  place-content: center;
-  z-index: 100;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $sp-6;
 }
 
 .modalContainer {
-  min-height: 250px;
-  min-width: 200px;
   height: fit-content;
+  width: 100%;
   background-color: var(--bg-card);
   padding: 20px;
   border-radius: var(--r-lg);
   position: relative;
   border: 1px solid var(--border);
 
+  &.sm { max-width: 420px; }
+  &.md { max-width: 560px; }
+  &.lg { max-width: 720px; }
+
   .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--sp-3);
+    margin-bottom: var(--sp-6);
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 $sp-8;
+    }
+
+
+    .closeButton {
+      background: none;
+      width: auto;
+      padding: 0;
+      border: none;
+    }
   }
 
   main {
@@ -32,9 +52,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    color: var(--text);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: -0.5rem 0 1.25rem;
 
     .children {
-      min-height: 100px;
+      margin: 0 0 $sp-3;
     }
 
     .modalActions {
