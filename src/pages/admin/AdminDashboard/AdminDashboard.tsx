@@ -74,7 +74,7 @@ export default function AdminDashboard() {
   const quickActions = [
     { to: "/admin/questionnaires", label: "New questionnaire", color: "teal" },
     { to: "/admin/resources", label: "Create a new resource", color: "stone" },
-    { to: "/admin/clients", label: "Add a client", color: "warm" },
+    { to: "/admin/clients", label: "Create sign-up token", color: "warm" },
   ];
 
   return (
@@ -111,17 +111,24 @@ export default function AdminDashboard() {
                 </Link>
               </div>
               <div className={styles.clientList}>
-                {allClients.slice(0, 4).map((u) => (
-                  <div key={u.id} className={styles.clientRow}>
-                    <Avatar name={u?.display_name || ""} color="teal" size={36} />
-                    <div className={styles.clientInfo}>
-                      <p className={styles.clientName}>
-                        {u.first_name} {u.last_name}
-                      </p>
-                      <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
+                {allClients
+                  .filter((user) => user.role === "client")
+                  .slice(0, 4)
+                  .map((u) => (
+                    <div key={u.id} className={styles.clientRow}>
+                      <Avatar name={u?.display_name || ""} color="teal" size={36} />
+                      <div className={styles.clientInfo}>
+                        {/* //!TODO: include if they've paid or not */}
+                        <p className={styles.clientName}>
+                          {u.first_name} {u.last_name}
+                        </p>
+                        <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
+                      </div>
+
+                      <small>awaiting payment</small>
+                      {/* //!TODO: have a table of whos paid for next sessions / bulk as that is linked to the users profile and the scheduler table/page */}
                     </div>
-                  </div>
-                ))}
+                  ))}
                 {allClients.length === 0 && <p className={styles.empty}>No clients yet. Add one to get started.</p>}
               </div>
             </div>

@@ -165,6 +165,8 @@ export default function ClientDashboard() {
           ))}
         </div>
 
+        {/* //!show upcomiing sessions and if they user hasnt paid yet / they need to cancel. user should be emailed 4 days in advance */}
+
         <div className={styles.chartWrap}>
           <ProgressChart responses={responses} questionnaire={questionnaire} title="Your Wellbeing Over Time" />
           {/* //!TODO: questons should really have categories like sleep, selfcare, love-tank etc etc, for each question thats made, it should map to a category. and its these cats. that will be plotted and not the long winded questions. assignment to cat. is required */}
