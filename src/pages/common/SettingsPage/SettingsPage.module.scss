@@ -30,6 +30,16 @@
   @include until-md {
     border-top: 1px solid var(--border);
   }
+
+  @include from-md {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    form {
+      width: 100% !important;
+    }
+  }
 }
 
 .right {
