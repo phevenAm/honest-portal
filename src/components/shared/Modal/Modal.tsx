@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -15,6 +15,8 @@ type ModalProps = {
 };
 
 export default function Modal({ title, onClose, children, actions, size = "md" }: ModalProps) {
+  const mouseDownTarget = useRef<EventTarget | null>(null);
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -31,7 +33,12 @@ export default function Modal({ title, onClose, children, actions, size = "md" }
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss — keyboard handled via Escape in useEffect
-    <div className={styles.modalOverlay} onClick={onClose} role="presentation">
+    <div
+      className={styles.modalOverlay}
+      onMouseDown={(e) => { mouseDownTarget.current = e.target; }}
+      onClick={(e) => { if (mouseDownTarget.current === e.currentTarget) onClose(); }}
+      role="presentation"
+    >
       <div
         className={`${styles.modalContainer} ${styles[size]}`}
         role="dialog"
