@@ -7,8 +7,14 @@
   width: 100%;
 }
 
-// ── Two-column card ────────────────────────────────────────
-.sectionsContainer {
+// ── Card ───────────────────────────────────────────────────
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Two-column top row ─────────────────────────────────────
+.topRow {
   display: flex;
   flex-direction: column-reverse;
 
@@ -79,19 +85,6 @@
   }
 }
 
-.saveButton {
-  @include until-md {
-    width: 100%;
-  }
-}
-
-// ── Delete account ─────────────────────────────────────────
-.deleteAccountBlock {
-  margin-top: $sp-6;
-  padding-top: $sp-5;
-  border-top: 1px solid var(--border);
-}
-
 // ── Avatar preview ─────────────────────────────────────────
 .avatarCard {
   display: flex;
@@ -107,4 +100,84 @@
     color: var(--text-primary);
     margin: 0;
   }
+}
+
+// ── Focus keywords ─────────────────────────────────────────
+.keywords {
+  padding: $sp-6;
+  border-top: 1px solid var(--border);
+
+  h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 $sp-4;
+  }
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-2;
+}
+
+.chip {
+  padding: 0.4rem 1rem;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--border);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border-color: var(--accent-light);
+  }
+}
+
+.chipSelected {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+
+  &:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: var(--text-inverse);
+  }
+}
+
+// ── Actions ────────────────────────────────────────────────
+.actions {
+  padding: $sp-6;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+}
+
+.saveButton {
+  align-self: flex-start;
+
+  @include until-md {
+    align-self: stretch;
+  }
+}
+
+// ── Delete account ─────────────────────────────────────────
+.deleteAccountBlock {
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
 }

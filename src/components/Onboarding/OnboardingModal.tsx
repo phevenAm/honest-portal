@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 
+import { KEYWORDS } from "@constants/constants";
+
 import { AVATAR_COLORS, type AvatarColor, getInitials, pickColor } from "@Helpers/Helpers";
 
 import { useAuth } from "../../context/AuthContext";
@@ -7,23 +9,6 @@ import Avatar from "../shared/Avatar/Avatar";
 import Button from "../shared/Button/Button";
 
 import styles from "./OnboardingModal.module.scss";
-
-const KEYWORDS = [
-  "love",
-  "hope",
-  "forgiveness",
-  "self-love",
-  "worth",
-  "peace",
-  "friendship",
-  "strength",
-  "growth",
-  "healing",
-  "courage",
-  "mindfulness",
-  "gratitude",
-  "resilience",
-];
 
 interface Props {
   onComplete: () => void;
