@@ -30,6 +30,7 @@
       "@Helpers/*": ["src/Helpers/*"],
       "@Hooks/*": ["src/Hooks/*"],
       "@services/*": ["src/services/*"],
+      "@constants/*": ["src/constants/*"],
     }
   },
   "include": ["src"]
