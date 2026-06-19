@@ -14,7 +14,8 @@ import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
 import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
-import SignUpPage from "../pages/SignUpPage/SignUpPage";
+import SettingsPage from "../pages/common/SettingsPage/SettingsPage";
+import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
 import { useAppSelector } from "../store/hooks";
 import { selectThemeMode } from "../store/slices/themeSlice";
 
@@ -56,14 +57,14 @@ function AppLayout() {
 }
 
 function OnboardingGate() {
-  const { userProfile, isAdmin, isAuthenticated, loading } = useAuth();
+  const { userProfile, isAuthenticated, loading } = useAuth();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!loading && isAuthenticated && !isAdmin && userProfile !== null && !userProfile.onboarding_completed) {
+    if (!loading && isAuthenticated && userProfile !== null && !userProfile.onboarding_completed) {
       setShow(true);
     }
-  }, [loading, isAuthenticated, isAdmin, userProfile]);
+  }, [loading, isAuthenticated, userProfile]);
 
   if (!show) return null;
   return <OnboardingModal onComplete={() => setShow(false)} />;
@@ -77,6 +78,16 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
 
           <Route
             element={

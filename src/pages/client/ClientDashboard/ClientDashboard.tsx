@@ -133,14 +133,14 @@ export default function ClientDashboard() {
 
   if (questionnairesStatus !== "succeeded" || responsesStatus !== "succeeded") {
     return (
-      <div className={styles.page}>
+      <div className="page">
         <Spinner />
       </div>
     );
   }
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>
             {greeting}, {displayName ?? "friend"}
@@ -167,6 +167,7 @@ export default function ClientDashboard() {
 
         <div className={styles.chartWrap}>
           <ProgressChart responses={responses} questionnaire={questionnaire} title="Your Wellbeing Over Time" />
+          {/* //!TODO: questons should really have categories like sleep, selfcare, love-tank etc etc, for each question thats made, it should map to a category. and its these cats. that will be plotted and not the long winded questions. assignment to cat. is required */}
         </div>
 
         <div className={styles.bottomGrid}>

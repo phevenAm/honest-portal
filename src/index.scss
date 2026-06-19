@@ -4,126 +4,137 @@
 // Edit _colors, _spacing, _typography to retheme the app.
 // ============================================================
 
-@use 'styles/colors'     as *;
+@use 'styles/colors' as *;
 @use 'styles/typography' as *;
-@use 'styles/spacing'    as *;
+@use 'styles/spacing' as *;
+@use 'styles/mixins' as *;
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
 // ── Light mode tokens ──────────────────────────────────────
 :root {
   // Accent
-  --accent:             #{$color-accent};
-  --accent-dark:        #{$color-accent-dark};
-  --accent-hover:       #{$color-accent-dark};
-  --accent-light:       #{$color-accent-light};
-  --accent-subtle:      #{$color-accent-subtle};
+  --accent: #{$color-accent};
+  --accent-dark: #{$color-accent-dark};
+  --accent-hover: #{$color-accent-dark};
+  --accent-light: #{$color-accent-light};
+  --accent-subtle: #{$color-accent-subtle};
 
   // Text
-  --text-primary:       #{$color-text-primary};
-  --text-secondary:     #{$color-text-secondary};
-  --text-muted:         #{$color-text-muted};
-  --text-disabled:      #{$color-text-disabled};
-  --text-inverse:       #{$color-text-inverse};
+  --text-primary: #{$color-text-primary};
+  --text-secondary: #{$color-text-secondary};
+  --text-muted: #{$color-text-muted};
+  --text-disabled: #{$color-text-disabled};
+  --text-inverse: #{$color-text-inverse};
 
   // Backgrounds
-  --bg-base:            #{$color-bg-base};
-  --bg-card:            #{$color-bg-card};
-  --bg-muted:           #{$color-bg-muted};
-  --bg-overlay:         #{$color-bg-overlay};
+  --bg-base: #{$color-bg-base};
+  --bg-card: #{$color-bg-card};
+  --bg-muted: #{$color-bg-muted};
+  --bg-overlay: #{$color-bg-overlay};
 
   // Borders
-  --border:             #{$color-border};
-  --border-strong:      #{$color-border};
-  --border-focus:       #{$color-border-focus};
+  --border: #{$color-border};
+  --border-strong: #{$color-border};
+  --border-focus: #{$color-border-focus};
 
   // Feedback
-  --danger:             #{$color-danger};
-  --danger-light:       #{$color-danger-light};
-  --danger-border:      #{$color-danger-border};
-  --success:            #{$color-success};
-  --warning:            #{$color-warning};
-  --warning-light:      #{$color-warning-light};
+  --danger: #{$color-danger};
+  --danger-light: #{$color-danger-light};
+  --danger-border: #{$color-danger-border};
+  --success: #{$color-success};
+  --warning: #{$color-warning};
+  --warning-light: #{$color-warning-light};
 
   // Shadows
-  --shadow-xs:          #{$shadow-xs};
-  --shadow-sm:          #{$shadow-sm};
-  --shadow-md:          #{$shadow-md};
-  --shadow-lg:          #{$shadow-lg};
-  --shadow-xl:          #{$shadow-xl};
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
 
   // Radius
-  --r-sm:               #{$r-sm};
-  --r-md:               #{$r-md};
-  --r-lg:               #{$r-lg};
-  --r-xl:               #{$r-xl};
-  --r-2xl:              #{$r-2xl};
-  --r-full:             #{$r-full};
+  --r-sm: #{$r-sm};
+  --r-md: #{$r-md};
+  --r-lg: #{$r-lg};
+  --r-xl: #{$r-xl};
+  --r-2xl: #{$r-2xl};
+  --r-full: #{$r-full};
 
   // Typography
-  --font-serif:         #{$font-serif};
-  --font-sans:          #{$font-sans};
+  --font-serif: #{$font-serif};
+  --font-sans: #{$font-sans};
 
   // Spacing
-  --sp-1: #{$sp-1}; --sp-2: #{$sp-2}; --sp-3: #{$sp-3}; --sp-4: #{$sp-4};
-  --sp-5: #{$sp-5}; --sp-6: #{$sp-6}; --sp-7: #{$sp-7}; --sp-8: #{$sp-8};
-  --sp-10: #{$sp-10}; --sp-12: #{$sp-12}; --sp-16: #{$sp-16};
+  --sp-1: #{$sp-1};
+  --sp-2: #{$sp-2};
+  --sp-3: #{$sp-3};
+  --sp-4: #{$sp-4};
+  --sp-5: #{$sp-5};
+  --sp-6: #{$sp-6};
+  --sp-7: #{$sp-7};
+  --sp-8: #{$sp-8};
+  --sp-10: #{$sp-10};
+  --sp-12: #{$sp-12};
+  --sp-16: #{$sp-16};
 
   // Transitions
-  --transition-fast:    #{$transition-fast};
-  --transition-base:    #{$transition-base};
-  --transition-slow:    #{$transition-slow};
+  --transition-fast: #{$transition-fast};
+  --transition-base: #{$transition-base};
+  --transition-slow: #{$transition-slow};
 
   // Layout
-  --navbar-height:      #{$navbar-height};
-  --footer-height:      #{$footer-height};
-  --max-width:          #{$max-width-xl};
+  --navbar-height: #{$navbar-height};
+  --footer-height: #{$footer-height};
+  --max-width: #{$max-width-xl};
 }
 
 // ── Dark mode tokens ───────────────────────────────────────
 .dark {
   // Accent — lighter for dark backgrounds
-  --accent:             #{$dark-accent};
-  --accent-dark:        #{$teal-400};
-  --accent-hover:       #{$teal-400};
-  --accent-light:       #{$dark-accent-light};
-  --accent-subtle:      #{$dark-accent-light};
+  --accent: #{$dark-accent};
+  --accent-dark: #{$teal-400};
+  --accent-hover: #{$teal-400};
+  --accent-light: #{$dark-accent-light};
+  --accent-subtle: #{$dark-accent-light};
 
   // Text
-  --text-primary:       #{$dark-text-primary};
-  --text-secondary:     #{$dark-text-secondary};
-  --text-muted:         #{$dark-text-muted};
-  --text-disabled:      #{$teal-900};
-  --text-inverse:       #0f1f1c;
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-muted: #{$dark-text-muted};
+  --text-disabled: #{$teal-900};
+  --text-inverse: #0f1f1c;
 
   // Backgrounds
-  --bg-base:            #{$dark-bg-base};
-  --bg-card:            #{$dark-bg-card};
-  --bg-muted:           #{$dark-bg-muted};
-  --bg-overlay:         rgba(15, 31, 28, 0.92);
+  --bg-base: #{$dark-bg-base};
+  --bg-card: #{$dark-bg-card};
+  --bg-muted: #{$dark-bg-muted};
+  --bg-overlay: rgba(15, 31, 28, 0.92);
 
   // Borders
-  --border:             #{$dark-border};
-  --border-strong:      #{$teal-700};
-  --border-focus:       #{$teal-300};
+  --border: #{$dark-border};
+  --border-strong: #{$teal-700};
+  --border-focus: #{$teal-300};
 
   // Feedback — adjusted for dark bg contrast
-  --danger:             #fca5a5;
-  --danger-light:       rgba(185, 28, 28, 0.2);
-  --danger-border:      rgba(185, 28, 28, 0.4);
-  --success:            #{$teal-300};
-  --warning:            #fcd34d;
-  --warning-light:      rgba(146, 64, 14, 0.2);
+  --danger: #fca5a5;
+  --danger-light: rgba(185, 28, 28, 0.2);
+  --danger-border: rgba(185, 28, 28, 0.4);
+  --success: #{$teal-300};
+  --warning: #fcd34d;
+  --warning-light: rgba(146, 64, 14, 0.2);
 
   // Shadows — stronger on dark
-  --shadow-sm:          0 1px 4px rgba(0, 0, 0, 0.35);
-  --shadow-md:          0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg:          0 8px 28px rgba(0, 0, 0, 0.55);
-  --shadow-xl:          0 16px 48px rgba(0, 0, 0, 0.65);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.65);
 }
 
 // ── Reset ──────────────────────────────────────────────────
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -136,7 +147,9 @@ html {
   @media (prefers-reduced-motion: reduce) {
     scroll-behavior: auto;
 
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
@@ -160,19 +173,23 @@ body {
 }
 
 // ── Scrollbar ──────────────────────────────────────────────
-::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: var(--bg-muted); }
-::-webkit-scrollbar-thumb  { background: var(--border); border-radius: var(--r-full); }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+// ::-webkit-scrollbar        { width: 6px; height: 6px; }
+// ::-webkit-scrollbar-track  { background: var(--bg-muted); }
+// ::-webkit-scrollbar-thumb  { background: var(--border); border-radius: var(--r-full); }
+// ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 // ── Typography base ────────────────────────────────────────
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--font-serif);
   line-height: 1.25;
   color: var(--text-primary);
 }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   font-family: var(--font-sans);
   font-weight: 600;
 }
@@ -181,7 +198,13 @@ h4, h5, h6 {
 #main-content {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100vh - (var(--navbar-height) + var(--footer-height) + 2px));
+  background: var(--bg-base);
+  padding: $sp-8 $sp-6;
+
+  .inner {
+    @include container-inner($max: var(--max-width)); // control max with and responsive padding
+  }
 }
 
 .page-content {

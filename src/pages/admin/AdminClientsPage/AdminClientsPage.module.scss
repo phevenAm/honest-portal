@@ -1,16 +1,5 @@
 // AdminClientsPage.scss
-@use '../../../styles/spacing' as *;
-
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-  padding: $sp-8 $sp-6;
-}
-
-.inner {
-  max-width: 1000px;
-  margin: 0 auto;
-}
+@use "../../../styles/spacing" as *;
 
 .pageHeader {
   display: flex;
@@ -28,7 +17,11 @@
     margin: 0 0 $sp-1;
   }
 
-  p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
 }
 
 .searchWrap {
@@ -48,8 +41,13 @@
   outline: none;
   transition: border-color var(--transition-base);
 
-  &:focus { border-color: var(--border-focus); }
-  &::placeholder { color: var(--text-muted); }
+  &:focus {
+    border-color: var(--border-focus);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
 }
 
 // ── Client row ─────────────────────────────────────────────
@@ -61,7 +59,9 @@
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .clientMeta {
@@ -192,7 +192,9 @@
     box-sizing: border-box;
     transition: border-color var(--transition-base);
 
-    &:focus { border-color: var(--border-focus); }
+    &:focus {
+      border-color: var(--border-focus);
+    }
   }
 }
 

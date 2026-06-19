@@ -11,7 +11,7 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal";
+import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
@@ -71,7 +71,7 @@ function ClientRow({ user }: { user: UserProfile }) {
   return (
     <>
       <div className={styles.clientRow}>
-        <Avatar initials={`${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`} color="teal" size={40} />
+        <Avatar name={user?.display_name || ""} color="teal" size={40} />
 
         <div className={styles.clientMeta}>
           <p className={styles.clientName}>
@@ -211,8 +211,8 @@ export default function AdminClientsPage() {
   );
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.pageHeader}>
           <div>
             <h1>Clients</h1>

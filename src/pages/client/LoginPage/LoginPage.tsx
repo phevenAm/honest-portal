@@ -52,8 +52,8 @@ export default function LoginPage() {
   const isLoading = submitting || loading;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
+    <div className={`${styles.page} page`}>
+      <div className={`${styles.container} container`}>
         <div className={styles.logoWrap}>
           <div className={styles.logoMark}>
             <LogoIcon />

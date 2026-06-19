@@ -15,15 +15,17 @@ export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
 
 export const getResponseDate = (response: Response) => response.submitted_at ?? response.created_at ?? "";
 
-export const getInitials = (displayName: string | null, firstName: string, lastName: string): string => {
-  const name = displayName?.trim() || `${firstName} ${lastName}`;
-  return name
-    .split(" ")
-    .map((w) => w[0] ?? "")
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+export const getInitials = (displayName: string | null, firstName = "", lastName = ""): string => {
+  const name = displayName?.trim() || `${firstName} ${lastName}`.trim();
+  const parts = name.split(" ").filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
+  return (first + last).toUpperCase();
 };
+
+export const AVATAR_COLORS = ["teal", "sage", "stone", "sky", "clay"] as const;
+export type AvatarColor = (typeof AVATAR_COLORS)[number];
+export const pickColor = (userId: string): AvatarColor => AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length];
 
 export const isAdultFromDob = (dob: string | null | undefined): boolean => {
   if (!dob) return false;

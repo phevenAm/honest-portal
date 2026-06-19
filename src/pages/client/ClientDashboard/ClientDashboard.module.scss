@@ -1,17 +1,7 @@
 // ClientDashboard.scss
 @use '../../../styles/spacing' as *;
+@use '../../../styles/mixins' as *;
 @import url('https://fonts.googleapis.com/css2?family=Revalia&display=swap');
-
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-}
-
-.inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: $sp-8 $sp-6;
-}
 
 .header {
   margin-bottom: $sp-8;
@@ -104,7 +94,7 @@
   grid-template-columns: 1fr 1fr;
   gap: $sp-5;
 
-  @media (max-width: 640px) {
+  @include until-sm {
     grid-template-columns: 1fr;
   }
 }

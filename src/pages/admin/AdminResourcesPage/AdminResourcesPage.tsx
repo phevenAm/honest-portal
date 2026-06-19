@@ -3,6 +3,7 @@ import { useState } from "react";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "@components/shared/Icons/Icons";
+import Modal from "@components/shared/Modal/Modal";
 import type { Resource } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -21,7 +22,7 @@ import styles from "./AdminResourcesPage.module.scss";
 
 const RESOURCE_TYPES = ["all", "article", "video", "document", "link"] as const;
 
-const getResourceTypeLabel = (type: string) => {
+export const getResourceTypeLabel = (type: string) => {
   if (type === "all") return "All";
   if (type === "article") return "Articles";
   if (type === "video") return "Videos";
@@ -69,8 +70,8 @@ export default function AdminResourcesPage() {
   const draftCount = resources.filter((resource) => !resource.is_published).length;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.pageHeader}>
           <div>
             <h1>Resources</h1>

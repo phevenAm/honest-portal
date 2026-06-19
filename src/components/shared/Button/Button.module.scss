@@ -29,9 +29,20 @@
 }
 
 // ── Sizes ──────────────────────────────────────────────────
-.sm  { padding: $sp-2 $sp-4;  font-size: 0.8rem; }
-.md  { padding: $sp-3 $sp-5;  font-size: 0.875rem; }
-.lg  { padding: $sp-4 $sp-7;  font-size: 1rem; }
+.sm {
+  padding: $sp-2 $sp-4;
+  font-size: 0.8rem;
+}
+
+.md {
+  padding: $sp-3 $sp-5;
+  font-size: 0.875rem;
+}
+
+.lg {
+  padding: $sp-4 $sp-7;
+  font-size: 1rem;
+}
 
 // ── Variants ───────────────────────────────────────────────
 .primary {
@@ -77,5 +88,28 @@
   }
 }
 
+.dropdown {
+  padding-right: $sp-6;
+  justify-content: flex-start;
+}
+
+.ghost-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover:not(:disabled) {
+    opacity: 0.7;
+  }
+
+  &:focus-visible {
+    outline-color: var(--danger);
+  }
+}
+
 // ── Full width ─────────────────────────────────────────────
-.fullWidth { width: 100%; }
+.fullWidth {
+  width: 100%;
+}

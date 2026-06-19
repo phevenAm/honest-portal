@@ -1,5 +1,6 @@
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export const ArticleIcon = () => (
   <svg
@@ -237,3 +238,5 @@ export const CloseIcon = () => (
 export const LinkIcon = () => <InsertLinkOutlinedIcon />;
 
 export const DocumentIcon = () => <ArticleOutlinedIcon />;
+
+export const Settingsicon = () => <SettingsIcon />;

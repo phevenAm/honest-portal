@@ -1,0 +1,193 @@
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// ── Card ───────────────────────────────────────────────────
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Two-column top row ─────────────────────────────────────
+.topRow {
+  display: flex;
+  flex-direction: column-reverse;
+
+  @include from-md {
+    flex-direction: row;
+  }
+}
+
+.left {
+  flex: 1;
+  padding: $sp-6;
+
+  @include until-md {
+    border-top: 1px solid var(--border);
+  }
+
+  @include from-md {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    form {
+      width: 100% !important;
+    }
+  }
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $sp-8 $sp-6;
+
+  @include until-md {
+    padding: $sp-6;
+  }
+}
+
+// ── Page header ────────────────────────────────────────────
+.pageHeader {
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+// ── Form ───────────────────────────────────────────────────
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-5;
+}
+
+.field {
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: $sp-2;
+    letter-spacing: 0.01em;
+  }
+
+  input {
+    @include input-base;
+  }
+}
+
+// ── Avatar preview ─────────────────────────────────────────
+.avatarCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $sp-4;
+  text-align: center;
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+// ── Focus keywords ─────────────────────────────────────────
+.keywords {
+  padding: $sp-6;
+  border-top: 1px solid var(--border);
+
+  h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 $sp-4;
+  }
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-2;
+}
+
+.chip {
+  padding: 0.4rem 1rem;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--border);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border-color: var(--accent-light);
+  }
+}
+
+.chipSelected {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+
+  &:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: var(--text-inverse);
+  }
+}
+
+// ── Actions ────────────────────────────────────────────────
+.actions {
+  padding: $sp-6;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+}
+
+.saveButton {
+  align-self: flex-start;
+
+  @include until-md {
+    align-self: stretch;
+  }
+}
+
+// ── Delete account ─────────────────────────────────────────
+.deleteAccountBlock {
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
+}

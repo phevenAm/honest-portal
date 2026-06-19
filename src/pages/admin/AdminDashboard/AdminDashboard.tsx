@@ -78,8 +78,8 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
+    <div className="page">
+      <div className="inner">
         <div className={styles.header}>
           <h1>Welcome back, {userProfile?.first_name}</h1>
           <p>Here's a summary of your practice portal</p>
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
               <div className={styles.clientList}>
                 {allClients.slice(0, 4).map((u) => (
                   <div key={u.id} className={styles.clientRow}>
-                    <Avatar initials={`${u.first_name?.[0] ?? ""}${u.last_name?.[0] ?? ""}`} color="teal" size={36} />
+                    <Avatar name={u?.display_name || ""} color="teal" size={36} />
                     <div className={styles.clientInfo}>
                       <p className={styles.clientName}>
                         {u.first_name} {u.last_name}

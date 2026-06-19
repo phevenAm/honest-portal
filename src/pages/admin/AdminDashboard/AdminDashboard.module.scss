@@ -1,16 +1,6 @@
 // AdminDashboard.scss
-@use '../../../styles/spacing' as *;
-
-.page {
-  min-height: 100vh;
-  background: var(--bg-base);
-  padding: $sp-8 $sp-6;
-}
-
-.inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
 
 .header {
   margin-bottom: $sp-8;
@@ -44,7 +34,9 @@
   display: block;
   transition: transform var(--transition-base);
 
-  &:hover { transform: translateY(-2px); }
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .metricIcon {
@@ -56,10 +48,22 @@
   justify-content: center;
   margin-bottom: $sp-4;
 
-  &.teal  { background: var(--accent-light);   color: var(--accent-dark); }
-  &.stone { background: var(--bg-muted);        color: var(--text-secondary); }
-  &.sky   { background: var(--accent-subtle);   color: var(--accent-dark); }
-  &.peach { background: var(--warning-light);   color: var(--warning); }
+  &.teal {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+  }
+  &.stone {
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+  }
+  &.sky {
+    background: var(--accent-subtle);
+    color: var(--accent-dark);
+  }
+  &.peach {
+    background: var(--warning-light);
+    color: var(--warning);
+  }
 }
 
 .metricValue {
@@ -83,11 +87,15 @@
   grid-template-columns: 1fr 1fr;
   gap: $sp-6;
 
-  @media (max-width: 640px) { grid-template-columns: 1fr; }
+  @include until-sm {
+    grid-template-columns: 1fr;
+  }
 }
 
 // ── Client list card ───────────────────────────────────────
-.cardPad { padding: $sp-6; }
+.cardPad {
+  padding: $sp-6;
+}
 
 .cardHeader {
   display: flex;
@@ -118,7 +126,9 @@
   background: var(--bg-muted);
 }
 
-.clientInfo { flex: 1; }
+.clientInfo {
+  flex: 1;
+}
 
 .clientName {
   font-size: 0.9rem;
@@ -158,7 +168,9 @@
   gap: $sp-2;
 }
 
-.actionLink { text-decoration: none; }
+.actionLink {
+  text-decoration: none;
+}
 
 .actionItem {
   padding: $sp-4;
@@ -172,9 +184,17 @@
   align-items: center;
   gap: $sp-3;
 
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 
-  &.teal  { background: var(--accent-light); }
-  &.stone { background: var(--bg-muted); }
-  &.warm  { background: var(--warning-light); }
+  &.teal {
+    background: var(--accent-light);
+  }
+  &.stone {
+    background: var(--bg-muted);
+  }
+  &.warm {
+    background: var(--warning-light);
+  }
 }
