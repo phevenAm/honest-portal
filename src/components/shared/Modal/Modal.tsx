@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
+
 import Button from "@components/shared/Button/Button";
 
 import styles from "./Modal.module.scss";

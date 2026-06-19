@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { KEYWORDS } from "@constants/constants";
+
 import { pickColor } from "@Helpers/Helpers";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
@@ -7,7 +9,6 @@ import Card from "@components/shared/Card/Card";
 import { useAuth } from "@context/AuthContext";
 
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
-import { KEYWORDS } from "@constants/constants";
 
 import styles from "./SettingsPage.module.scss";
 
