@@ -25,7 +25,6 @@ export default function OnboardingModal({ onComplete }: Props) {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const color = useMemo(() => pickColor(userProfile?.id ?? "a"), [userProfile?.id]);
-  const initials = getInitials(nameInput, userProfile?.first_name ?? "", userProfile?.last_name ?? "");
 
   const toggleKeyword = (kw: string) =>
     setSelected((prev) => (prev.includes(kw) ? prev.filter((k) => k !== kw) : [...prev, kw]));
@@ -53,11 +52,13 @@ export default function OnboardingModal({ onComplete }: Props) {
         <>
           <div className={styles.textCenter}>
             <h2 className={styles.title}>Welcome, {userProfile?.first_name}!</h2>
-            <p className={styles.subtitle}>Let's personalize your space. You can always update this later.</p>
+            <p className={styles.subtitle}>
+              Let's personalize your space. You can always update this later in your settings.
+            </p>
           </div>
 
           <div className={styles.avatarPreview}>
-            <Avatar initials={initials} color={color} size={80} imageSrc={avatarUrl.trim()} />
+            <Avatar name={nameInput} color={color} size={80} imageSrc={avatarUrl.trim()} />
           </div>
 
           <div className={styles.fields}>

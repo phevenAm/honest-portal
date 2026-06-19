@@ -5,6 +5,7 @@ import { renderWithProviders } from "@/__testUtils__/testUtils";
 import Navbar from "./Navbar";
 
 const DummyProfile = {
+  id: "test-user-id",
   first_name: "John",
   last_name: "Doe",
 };
