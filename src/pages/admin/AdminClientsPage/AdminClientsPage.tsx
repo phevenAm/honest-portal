@@ -11,7 +11,7 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import AccessTokenModal from "./modals/AcessTokenModal/AcessTokenModal";
+import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
