@@ -1,15 +1,17 @@
 import { useState } from "react";
 
-import { getResourceTypeLabel } from "@/pages/admin/AdminResourcesPage/AdminResourcesPage";
-import Card from "../../../components/shared/Card/Card";
-import { ArticleIcon, VideoIcon } from "../../../components/shared/Icons/Icons";
-import type { Resource } from "../../../models/globalTypes";
-import { useAppSelector, useFetchOnIdle } from "../../../store/hooks";
-import type { RootState } from "../../../store/index";
-import { fetchPublishedResources, selectPublishedResources } from "../../../store/slices/resourcesSlice";
 import { isAdultFromDob } from "@Helpers/Helpers";
-import styles from "./ResourcesPage.module.scss";
+import Card from "@components/shared/Card/Card";
+import { ArticleIcon, VideoIcon } from "@components/shared/Icons/Icons";
+import type { Resource } from "@models/globalTypes";
+import { useAppSelector, useFetchOnIdle } from "@store/hooks";
+import type { RootState } from "@store/index";
+import { fetchPublishedResources, selectPublishedResources } from "@store/slices/resourcesSlice";
+
 import { useAuth } from "@/context/AuthContext";
+import { getResourceTypeLabel } from "@/pages/admin/AdminResourcesPage/AdminResourcesPage";
+
+import styles from "./ResourcesPage.module.scss";
 
 function getResourceButtonLabel(type: string): string {
   if (type === "video") return "Watch";
