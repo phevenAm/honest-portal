@@ -20,9 +20,28 @@ import {
 } from "@store/slices/questionnairesSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
-import type { Questionnaire, UserProfile } from "@/models/globalTypes";
+import type { Questionnaire, QuestionnaireFrequency, UserProfile } from "@/models/globalTypes";
 
 import styles from "./AdminQuestionnairesPage.module.scss";
+
+type QuestionDraft = {
+  id: string;
+  text: string;
+  type: string;
+  min: number;
+  max: number;
+  minLabel: string;
+  maxLabel: string;
+  orderIndex: number;
+  is_required: boolean;
+};
+
+type QuestionnaireFormData = {
+  title: string;
+  description: string;
+  frequency: QuestionnaireFrequency;
+  questions: QuestionDraft[];
+};
 
 const QUESTION_TYPES = ["scale", "text"];
 
@@ -34,8 +53,7 @@ function QuestionnaireBuilder({
   onClose,
 }: {
   initial?: Questionnaire | null;
-  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically from builder state
-  onSave: (data: any) => void;
+  onSave: (data: QuestionnaireFormData) => void;
   onClose: () => void;
 }) {
   const isEdit = !!initial;
@@ -308,13 +326,11 @@ export default function AdminQuestionnairesPage() {
     }
   }, [isAssigningQ, dispatch]);
 
-  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
-  const handleCreate = (data: any) => dispatch(createQuestionnaire(data));
+  const handleCreate = (data: QuestionnaireFormData) => dispatch(createQuestionnaire(data as unknown as Questionnaire));
 
-  // biome-ignore lint/suspicious/noExplicitAny: questionnaire form data is assembled dynamically
-  const handleEdit = (data: any) => {
+  const handleEdit = ({ questions: _, ...fields }: QuestionnaireFormData) => {
     if (!editingQ) return;
-    dispatch(updateQuestionnaire({ id: editingQ.id, ...data }));
+    dispatch(updateQuestionnaire({ id: editingQ.id, ...fields }));
   };
 
   return (

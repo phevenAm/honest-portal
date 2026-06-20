@@ -111,7 +111,8 @@ const responsesSlice = createSlice({
       })
       .addCase(fetchResponsesByUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.responses = action.payload;
+        const incomingIds = new Set(action.payload.map((r) => r.id));
+        state.responses = [...state.responses.filter((r) => !incomingIds.has(r.id)), ...action.payload];
       })
       .addCase(fetchResponsesByUser.rejected, (state, action) => {
         state.status = "failed";
@@ -122,7 +123,8 @@ const responsesSlice = createSlice({
       })
       .addCase(fetchResponsesByQuestionnaire.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.responses = action.payload;
+        const incomingIds = new Set(action.payload.map((r) => r.id));
+        state.responses = [...state.responses.filter((r) => !incomingIds.has(r.id)), ...action.payload];
       })
       .addCase(fetchResponsesByQuestionnaire.rejected, (state, action) => {
         state.status = "failed";

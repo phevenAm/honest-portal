@@ -182,8 +182,6 @@ export default function AdminClientsPage() {
 
   const userDirectoryStatus = useAppSelector((state: RootState) => state.userDirectory.status);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
-  const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
-
   useEffect(() => {
     if (userDirectoryStatus === "idle") {
       dispatch(fetchAllUsers());
@@ -197,10 +195,8 @@ export default function AdminClientsPage() {
   }, [dispatch, questionnairesStatus]);
 
   useEffect(() => {
-    if (responsesStatus === "idle") {
-      dispatch(fetchAllResponses());
-    }
-  }, [dispatch, responsesStatus]);
+    dispatch(fetchAllResponses());
+  }, [dispatch]);
 
   const allClients = allUsers.filter((user) => user.role !== "admin");
 
