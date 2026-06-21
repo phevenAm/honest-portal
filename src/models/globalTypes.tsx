@@ -167,7 +167,6 @@ export type Resource = {
   type: ResourceType | string;
   url?: string;
   videoUrl?: string;
-  tags?: string; // comma-separated or JSON string
   content_format?: ContentFormat | string;
   is_published: boolean;
   is_sensitive: boolean;
