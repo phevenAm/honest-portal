@@ -219,105 +219,6 @@ function QuestionnaireBuilder({
       </div>
     </Modal>
   );
-
-  // return (
-  //   <div className={styles.overlay}>
-  //     <Card className={styles.modal}>
-  //       <h3 className={styles.modalTitle}>{isEdit ? "Edit questionnaire" : "New questionnaire"}</h3>
-
-  //       <div className={styles.metaGrid}>
-  //         <div className={`${styles.formField} ${styles.fullCol}`}>
-  //           <label htmlFor="q-title">Title *</label>
-  //           <input
-  //             id="q-title"
-  //             value={title}
-  //             onChange={(e) => setTitle(e.target.value)}
-  //             placeholder="e.g. Weekly Wellbeing Check-in"
-  //           />
-  //         </div>
-  //         <div className={`${styles.formField} ${styles.fullCol}`}>
-  //           <label htmlFor="q-desc">Description</label>
-  //           <input
-  //             id="q-desc"
-  //             value={description}
-  //             onChange={(e) => setDesc(e.target.value)}
-  //             placeholder="Brief description for your client"
-  //           />
-  //         </div>
-  //         <div className={styles.formField}>
-  //           <label htmlFor="q-freq">Frequency</label>
-  //           <select id="q-freq" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
-  //             <option value="daily">Daily</option>
-  //             <option value="weekly">Weekly</option>
-  //             <option value="fortnightly">Fortnightly</option>
-  //           </select>
-  //         </div>
-  //       </div>
-
-  //       <div className={styles.questionsSection}>
-  //         <div className={styles.questionsSectionHeader}>
-  //           <h4>Questions</h4>
-  //           <Button variant="secondary" size="sm" onClick={addQuestion}>
-  //             + Add question
-  //           </Button>
-  //         </div>
-  //         {questions.map((q, i) => (
-  //           <div key={q.id} className={styles.questionBlock}>
-  //             <div className={styles.questionBlockHeader}>
-  //               <span className={styles.questionNum}>Q{i + 1}</span>
-  //               {questions.length > 1 && (
-  //                 <button
-  //                   type="button"
-  //                   onClick={() => removeQuestion(q.id)}
-  //                   aria-label={`Remove question ${i + 1}`}
-  //                   className={styles.removeBtn}
-  //                 >
-  //                   ×
-  //                 </button>
-  //               )}
-  //             </div>
-  //             <input
-  //               value={q.text}
-  //               onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
-  //               placeholder="Question text…"
-  //               className={styles.questionTextInput}
-  //             />
-  //             <div className={styles.questionInputs}>
-  //               <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
-  //                 {QUESTION_TYPES.map((t) => (
-  //                   <option key={t} value={t}>
-  //                     {t === "scale" ? "Scale (1–10)" : "Free text"}
-  //                   </option>
-  //                 ))}
-  //               </select>
-  //               {q.type === "scale" && (
-  //                 <>
-  //                   <input
-  //                     value={q.minLabel}
-  //                     onChange={(e) => updateQuestion(q.id, "minLabel", e.target.value)}
-  //                     placeholder="Low label"
-  //                   />
-  //                   <input
-  //                     value={q.maxLabel}
-  //                     onChange={(e) => updateQuestion(q.id, "maxLabel", e.target.value)}
-  //                     placeholder="High label"
-  //                   />
-  //                 </>
-  //               )}
-  //             </div>
-  //           </div>
-  //         ))}
-  //       </div>
-
-  //       <div className={styles.modalActions}>
-  //         <Button variant="ghost" onClick={onClose}>
-  //           Cancel
-  //         </Button>
-  //         <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
-  //       </div>
-  //     </Card>
-  //   </div>
-  // );
 }
 
 // ─── Assign modal ───────────────────────────────────────────
@@ -354,48 +255,45 @@ function AssignModal({
   };
 
   return (
-    <div className={styles.overlay}>
-      <Card className={styles.assignModal}>
-        <h3 className={styles.modalTitle}>Assign clients</h3>
-        <p className={styles.assignSubtitle}>
-          Select which clients should receive <strong>{questionnaire.title}</strong>.
-        </p>
+    <Modal title="Assign clients" onClose={onClose}>
+      <p className={styles.assignSubtitle}>
+        Select which clients should receive <strong>{questionnaire.title}</strong>.
+      </p>
 
-        {clients.length === 0 ? (
-          <p className={styles.emptyText}>No clients found.</p>
-        ) : (
-          <ul className={styles.clientList}>
-            {clients.map((client) => {
-              const assigned = assignedIds.has(client.id);
-              return (
-                // biome-ignore lint/a11y/useKeyWithClickEvents: checkbox inside handles keyboard interaction
-                <li
-                  key={client.id}
-                  className={`${styles.clientRow} ${assigned ? styles.clientRowAssigned : ""}`}
-                  onClick={() => toggle(client.id)}
-                >
-                  <input
-                    type="checkbox"
-                    checked={assigned}
-                    onChange={() => toggle(client.id)}
-                    className={styles.clientCheckbox}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <span className={styles.clientName}>
-                    {client.first_name} {client.last_name}
-                  </span>
-                  {assigned && <span className={styles.assignedBadge}>Assigned</span>}
-                </li>
-              );
-            })}
-          </ul>
-        )}
+      {clients.length === 0 ? (
+        <p className={styles.emptyText}>No clients found.</p>
+      ) : (
+        <ul className={styles.clientList}>
+          {clients.map((client) => {
+            const assigned = assignedIds.has(client.id);
+            return (
+              // biome-ignore lint/a11y/useKeyWithClickEvents: checkbox inside handles keyboard interaction
+              <li
+                key={client.id}
+                className={`${styles.clientRow} ${assigned ? styles.clientRowAssigned : ""}`}
+                onClick={() => toggle(client.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={assigned}
+                  onChange={() => toggle(client.id)}
+                  className={styles.clientCheckbox}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className={styles.clientName}>
+                  {client.first_name} {client.last_name}
+                </span>
+                {assigned && <span className={styles.assignedBadge}>Assigned</span>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-        <div className={styles.modalActions}>
-          <Button onClick={onClose}>Done</Button>
-        </div>
-      </Card>
-    </div>
+      <div className={styles.modalActions}>
+        <Button onClick={onClose}>Done</Button>
+      </div>
+    </Modal>
   );
 }
 
