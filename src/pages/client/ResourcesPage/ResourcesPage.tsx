@@ -114,6 +114,7 @@ export default function ResourcesPage() {
   const [filter, setFilter] = useState("all");
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const nonSensitiveResources = resources.filter((item) => !item.is_sensitive);
+  const [search, setSearch] = useState<string>("");
 
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
@@ -124,7 +125,29 @@ export default function ResourcesPage() {
   const contentToRender = isAdultFromDob(userProfile?.dob ?? "") ? resources : nonSensitiveResources;
   const types = ["all", ...new Set(contentToRender.map((r) => r.type))];
 
-  const filtered = filter === "all" ? contentToRender : contentToRender.filter((r) => r.type === filter);
+  const byType = filter === "all" ? contentToRender : contentToRender.filter((r) => r.type === filter);
+  const term = search.toLowerCase().trim();
+  const filtered = term
+    ? byType.filter((r) => {
+        const tags = parseTags(r.tags); // see below
+        return (
+          r.title.toLowerCase().includes(term) ||
+          (r.summary ?? "").toLowerCase().includes(term) ||
+          r.category.toLowerCase().includes(term) ||
+          tags.toLowerCase().includes(term)
+        );
+      })
+    : byType;
+
+  function parseTags(tags?: string): string {
+    if (!tags) return "";
+    try {
+      const arr = JSON.parse(tags);
+      return Array.isArray(arr) ? arr.join(" ") : tags;
+    } catch {
+      return tags;
+    }
+  }
 
   return (
     <div className="page">
@@ -132,6 +155,17 @@ export default function ResourcesPage() {
         <div className={styles.header}>
           <h1>Resources</h1>
           <p>Curated by your practitioner — take your time with these.</p>
+        </div>
+
+        <div className={styles.searchWrap}>
+          <input
+            placeholder="Search for resource..."
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search for a resource"
+            className={styles.searchInput}
+          />
         </div>
 
         <div role="tablist" aria-label="Filter resources by type" className={styles.filterRow}>
@@ -155,7 +189,9 @@ export default function ResourcesPage() {
           ))}
         </div>
 
-        {filtered.length === 0 && <p className={styles.empty}>No resources available yet.</p>}
+        {filtered.length === 0 && (
+          <p className={styles.empty}>{term ? `No resources match "${search}".` : "No resources available yet."}</p>
+        )}
       </div>
 
       {selectedResource && <ResourceModal resource={selectedResource} onClose={() => setSelectedResource(null)} />}
