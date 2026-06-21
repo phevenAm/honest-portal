@@ -1,27 +1,12 @@
 export type Role = "admin" | "client";
 
-export type DBUser = {
+export type AuthUser = {
   id: string;
-  created_at: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  dob: string;
-  role: Role;
-  disabled: boolean;
-};
-
-export type AuthUser = DBUser & {
-  // id: string;
   email: string | null;
-  // role: string;
-
   created_at: string;
   updated_at: string;
   last_sign_in_at: string | null;
-
   email_confirmed_at?: string | null;
-
   user_metadata?: {
     first_name?: string;
     last_name?: string;
@@ -29,28 +14,17 @@ export type AuthUser = DBUser & {
     // biome-ignore lint/suspicious/noExplicitAny: Supabase user_metadata is an open-ended JSON object
     [key: string]: any;
   };
-
   app_metadata?: {
     provider?: string;
     providers?: string[];
     // biome-ignore lint/suspicious/noExplicitAny: Supabase app_metadata is an open-ended JSON object
     [key: string]: any;
   };
-
   // biome-ignore lint/suspicious/noExplicitAny: Supabase identities shape varies by provider
   identities?: any[];
-
-  // biome-ignore lint/suspicious/noExplicitAny: catch-all for Supabase auth fields that aren't in our schema
+  // biome-ignore lint/suspicious/noExplicitAny: catch-all for Supabase auth fields not in our schema
   [key: string]: any;
 };
-
-//!Questionnare stuff
-
-//Claude below
-
-// ============================================================
-// GLOBAL TYPES — mirrors Supabase schema exactly
-// ============================================================
 
 // ─── Enums ─────────────────────────────────────────────────
 
@@ -84,9 +58,8 @@ export enum ContentFormat {
   PLAIN = "plain",
 }
 
-// ─── Database models ───────────────────────────────────────
+// ─── App types (mirrors Supabase schema + app-level extensions) ────
 
-// users table
 export type UserProfile = {
   id: string;
   created_at: string;
@@ -102,7 +75,6 @@ export type UserProfile = {
   focus_keywords: string[] | null;
 };
 
-// questionnaires table
 export type Questionnaire = {
   id: string;
   created_at: string;
@@ -110,15 +82,10 @@ export type Questionnaire = {
   description?: string;
   frequency: QuestionnaireFrequency;
   is_active: boolean;
-
-  // joined via select
   questions: Question[];
-
-  // derived from questionnaire_assignments
   assignedTo: string[];
 };
 
-// questions table
 export type Question = {
   id: string;
   created_at?: string;
@@ -133,29 +100,24 @@ export type Question = {
   is_required: boolean;
 };
 
-// questionnaire_assignments table
 export type QuestionnaireAssignment = {
   id: string;
   questionnaire_id: string;
   user_id: string;
   assigned_at: string;
-
-  // joined optionally
   questionnaires?: Pick<Questionnaire, "id" | "title" | "frequency" | "is_active">;
   users?: Pick<UserProfile, "id" | "first_name" | "last_name">;
 };
 
-// responses table
 export type Response = {
   id: string;
   created_at: string;
   user_id: string;
   questionnaire_id: string;
-  scores: Record<string, unknown>; // jsonb — { questionId: score/answer }
+  scores: Record<string, unknown>;
   submitted_at: string;
 };
 
-// resources table
 export type Resource = {
   id: string;
   created_at: string;
@@ -172,15 +134,10 @@ export type Resource = {
   is_sensitive: boolean;
 };
 
-// ─── App-level types (not in DB) ───────────────────────────
-
 // ─── Utility types ─────────────────────────────────────────
 
-// Scores payload shape for a submitted response
-// key = question id, value = answer (number for scale, string for text)
 export type ResponseScores = Record<string, number | string>;
 
-// Partial update helpers
 export type UpdateQuestionnaire = Partial<Omit<Questionnaire, "id" | "created_at" | "questions" | "assignedTo">> & {
   id: string;
 };
@@ -190,8 +147,6 @@ export type UpdateUser = Partial<Omit<UserProfile, "id" | "created_at">> & {
 export type UpdateResource = Partial<Omit<Resource, "id" | "created_at">> & {
   id: string;
 };
-
-/// Chart
 
 export interface ProgressChartProps {
   responses: Response[];
