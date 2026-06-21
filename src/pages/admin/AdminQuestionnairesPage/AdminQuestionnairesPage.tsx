@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Button from "@components/shared/Button/Button";
+import Modal from "@components/shared/Modal/Modal";
 import Card from "@components/shared/Card/Card";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -117,104 +118,206 @@ function QuestionnaireBuilder({
     onClose();
   };
 
+  const modalObj = {
+    title: isEdit ? "Edit questionnaire" : "New questionnaire",
+    actions: (
+      <div className={styles.modalActions}>
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
+      </div>
+    ),
+    onClose,
+    size: "md",
+  };
+
   return (
-    <div className={styles.overlay}>
-      <Card className={styles.modal}>
-        <h3 className={styles.modalTitle}>{isEdit ? "Edit questionnaire" : "New questionnaire"}</h3>
-
-        <div className={styles.metaGrid}>
-          <div className={`${styles.formField} ${styles.fullCol}`}>
-            <label htmlFor="q-title">Title *</label>
-            <input
-              id="q-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Weekly Wellbeing Check-in"
-            />
-          </div>
-          <div className={`${styles.formField} ${styles.fullCol}`}>
-            <label htmlFor="q-desc">Description</label>
-            <input
-              id="q-desc"
-              value={description}
-              onChange={(e) => setDesc(e.target.value)}
-              placeholder="Brief description for your client"
-            />
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="q-freq">Frequency</label>
-            <select id="q-freq" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="fortnightly">Fortnightly</option>
-            </select>
-          </div>
+    <Modal {...modalObj}>
+      <div className={styles.metaGrid}>
+        <div className={`${styles.formField} ${styles.fullCol}`}>
+          <label htmlFor="q-title">Title *</label>
+          <input
+            id="q-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Weekly Wellbeing Check-in"
+          />
         </div>
-
-        <div className={styles.questionsSection}>
-          <div className={styles.questionsSectionHeader}>
-            <h4>Questions</h4>
-            <Button variant="secondary" size="sm" onClick={addQuestion}>
-              + Add question
-            </Button>
-          </div>
-          {questions.map((q, i) => (
-            <div key={q.id} className={styles.questionBlock}>
-              <div className={styles.questionBlockHeader}>
-                <span className={styles.questionNum}>Q{i + 1}</span>
-                {questions.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeQuestion(q.id)}
-                    aria-label={`Remove question ${i + 1}`}
-                    className={styles.removeBtn}
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-              <input
-                value={q.text}
-                onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
-                placeholder="Question text…"
-                className={styles.questionTextInput}
-              />
-              <div className={styles.questionInputs}>
-                <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
-                  {QUESTION_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t === "scale" ? "Scale (1–10)" : "Free text"}
-                    </option>
-                  ))}
-                </select>
-                {q.type === "scale" && (
-                  <>
-                    <input
-                      value={q.minLabel}
-                      onChange={(e) => updateQuestion(q.id, "minLabel", e.target.value)}
-                      placeholder="Low label"
-                    />
-                    <input
-                      value={q.maxLabel}
-                      onChange={(e) => updateQuestion(q.id, "maxLabel", e.target.value)}
-                      placeholder="High label"
-                    />
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className={`${styles.formField} ${styles.fullCol}`}>
+          <label htmlFor="q-desc">Description</label>
+          <input
+            id="q-desc"
+            value={description}
+            onChange={(e) => setDesc(e.target.value)}
+            placeholder="Brief description for your client"
+          />
         </div>
+        <div className={styles.formField}>
+          <label htmlFor="q-freq">Frequency</label>
+          <select id="q-freq" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="fortnightly">Fortnightly</option>
+          </select>
+        </div>
+      </div>
 
-        <div className={styles.modalActions}>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
+      <div className={styles.questionsSection}>
+        <div className={styles.questionsSectionHeader}>
+          <h4>Questions</h4>
+          <Button variant="secondary" size="sm" onClick={addQuestion}>
+            + Add question
           </Button>
-          <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
         </div>
-      </Card>
-    </div>
+        {questions.map((q, i) => (
+          <div key={q.id} className={styles.questionBlock}>
+            <div className={styles.questionBlockHeader}>
+              <span className={styles.questionNum}>Q{i + 1}</span>
+              {questions.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeQuestion(q.id)}
+                  aria-label={`Remove question ${i + 1}`}
+                  className={styles.removeBtn}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <input
+              value={q.text}
+              onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
+              placeholder="Question text…"
+              className={styles.questionTextInput}
+            />
+            <div className={styles.questionInputs}>
+              <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
+                {QUESTION_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t === "scale" ? "Scale (1–10)" : "Free text"}
+                  </option>
+                ))}
+              </select>
+              {q.type === "scale" && (
+                <>
+                  <input
+                    value={q.minLabel}
+                    onChange={(e) => updateQuestion(q.id, "minLabel", e.target.value)}
+                    placeholder="Low label"
+                  />
+                  <input
+                    value={q.maxLabel}
+                    onChange={(e) => updateQuestion(q.id, "maxLabel", e.target.value)}
+                    placeholder="High label"
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Modal>
   );
+
+  // return (
+  //   <div className={styles.overlay}>
+  //     <Card className={styles.modal}>
+  //       <h3 className={styles.modalTitle}>{isEdit ? "Edit questionnaire" : "New questionnaire"}</h3>
+
+  //       <div className={styles.metaGrid}>
+  //         <div className={`${styles.formField} ${styles.fullCol}`}>
+  //           <label htmlFor="q-title">Title *</label>
+  //           <input
+  //             id="q-title"
+  //             value={title}
+  //             onChange={(e) => setTitle(e.target.value)}
+  //             placeholder="e.g. Weekly Wellbeing Check-in"
+  //           />
+  //         </div>
+  //         <div className={`${styles.formField} ${styles.fullCol}`}>
+  //           <label htmlFor="q-desc">Description</label>
+  //           <input
+  //             id="q-desc"
+  //             value={description}
+  //             onChange={(e) => setDesc(e.target.value)}
+  //             placeholder="Brief description for your client"
+  //           />
+  //         </div>
+  //         <div className={styles.formField}>
+  //           <label htmlFor="q-freq">Frequency</label>
+  //           <select id="q-freq" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+  //             <option value="daily">Daily</option>
+  //             <option value="weekly">Weekly</option>
+  //             <option value="fortnightly">Fortnightly</option>
+  //           </select>
+  //         </div>
+  //       </div>
+
+  //       <div className={styles.questionsSection}>
+  //         <div className={styles.questionsSectionHeader}>
+  //           <h4>Questions</h4>
+  //           <Button variant="secondary" size="sm" onClick={addQuestion}>
+  //             + Add question
+  //           </Button>
+  //         </div>
+  //         {questions.map((q, i) => (
+  //           <div key={q.id} className={styles.questionBlock}>
+  //             <div className={styles.questionBlockHeader}>
+  //               <span className={styles.questionNum}>Q{i + 1}</span>
+  //               {questions.length > 1 && (
+  //                 <button
+  //                   type="button"
+  //                   onClick={() => removeQuestion(q.id)}
+  //                   aria-label={`Remove question ${i + 1}`}
+  //                   className={styles.removeBtn}
+  //                 >
+  //                   ×
+  //                 </button>
+  //               )}
+  //             </div>
+  //             <input
+  //               value={q.text}
+  //               onChange={(e) => updateQuestion(q.id, "text", e.target.value)}
+  //               placeholder="Question text…"
+  //               className={styles.questionTextInput}
+  //             />
+  //             <div className={styles.questionInputs}>
+  //               <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
+  //                 {QUESTION_TYPES.map((t) => (
+  //                   <option key={t} value={t}>
+  //                     {t === "scale" ? "Scale (1–10)" : "Free text"}
+  //                   </option>
+  //                 ))}
+  //               </select>
+  //               {q.type === "scale" && (
+  //                 <>
+  //                   <input
+  //                     value={q.minLabel}
+  //                     onChange={(e) => updateQuestion(q.id, "minLabel", e.target.value)}
+  //                     placeholder="Low label"
+  //                   />
+  //                   <input
+  //                     value={q.maxLabel}
+  //                     onChange={(e) => updateQuestion(q.id, "maxLabel", e.target.value)}
+  //                     placeholder="High label"
+  //                   />
+  //                 </>
+  //               )}
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+
+  //       <div className={styles.modalActions}>
+  //         <Button variant="ghost" onClick={onClose}>
+  //           Cancel
+  //         </Button>
+  //         <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
+  //       </div>
+  //     </Card>
+  //   </div>
+  // );
 }
 
 // ─── Assign modal ───────────────────────────────────────────
