@@ -111,7 +111,7 @@ function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resou
 export default function ResourcesPage() {
   const resources = useAppSelector(selectPublishedResources);
   const { userProfile } = useAuth();
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<string>("all");
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const nonSensitiveResources = resources.filter((item) => !item.is_sensitive);
   const [search, setSearch] = useState<string>("");
@@ -128,26 +128,13 @@ export default function ResourcesPage() {
   const byType = filter === "all" ? contentToRender : contentToRender.filter((r) => r.type === filter);
   const term = search.toLowerCase().trim();
   const filtered = term
-    ? byType.filter((r) => {
-        const tags = parseTags(r.tags); // see below
-        return (
+    ? byType.filter(
+        (r) =>
           r.title.toLowerCase().includes(term) ||
           (r.summary ?? "").toLowerCase().includes(term) ||
-          r.category.toLowerCase().includes(term) ||
-          tags.toLowerCase().includes(term)
-        );
-      })
+          r.category.toLowerCase().includes(term),
+      )
     : byType;
-
-  function parseTags(tags?: string): string {
-    if (!tags) return "";
-    try {
-      const arr = JSON.parse(tags);
-      return Array.isArray(arr) ? arr.join(" ") : tags;
-    } catch {
-      return tags;
-    }
-  }
 
   return (
     <div className="page">
