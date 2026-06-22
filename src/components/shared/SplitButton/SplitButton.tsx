@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { ChevronDown } from "../Icons/Icons";
 
@@ -30,9 +30,9 @@ const SplitButton = ({
   size = "md",
   primaryAction,
   options = [
-    { label: "Test Label", onClick: () => console.log("hi") },
-    { label: "Test Label", onClick: () => console.log("hi") },
-    { label: "Test Label", onClick: () => console.log("hi") },
+    { label: "Test Labeasd", onClick: () => console.log("hi") },
+    { label: "Test Labaasdssdel", onClick: () => console.log("hi") },
+    { label: "Test Lasdabel", onClick: () => console.log("hi") },
     { label: "Test Label", onClick: () => console.log("hi") },
   ],
   primaryLabel = "placeholder primary label",
@@ -40,8 +40,24 @@ const SplitButton = ({
 }: ButtonProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const classes = [styles.btn, styles[variant], styles[size]].filter(Boolean).join(" ");
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent | KeyboardEvent) => {
+      //!move here to remove infinite re-renders
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, []);
+
   return (
-    <div className={[styles.buttonWrapper, isDropdownOpen ? styles.dropdownOpen : ""].filter(Boolean).join(" ")}>
+    <div
+      ref={wrapperRef}
+      className={[styles.buttonWrapper, isDropdownOpen ? styles.dropdownOpen : ""].filter(Boolean).join(" ")}
+    >
       <button
         type="button"
         className={[classes, styles.mainButton].filter(Boolean).join(" ")}
