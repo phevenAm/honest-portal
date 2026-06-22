@@ -73,7 +73,7 @@ const SplitButton = ({
       >
         <ChevronDown />
       </button>
-      <div className={styles.secondaryDropdown}>
+      <div className={[styles.secondaryDropdown, isDropdownOpen ? styles.meh : ""].filter(Boolean).join(" ")}>
         {isDropdownOpen && (
           <ul>
             {options?.map(({ label, onClick }) => {

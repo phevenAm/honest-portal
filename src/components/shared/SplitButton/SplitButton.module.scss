@@ -4,7 +4,7 @@
     display: inline-flex;
     position: relative;
 
-    > button {
+    >button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -43,8 +43,13 @@
     }
 
     &.dropdownOpen {
-        > button:first-of-type { border-bottom-left-radius: 0; }
-        > button:last-of-type  { border-bottom-right-radius: 0; }
+        >button:first-of-type {
+            border-bottom-left-radius: 0;
+        }
+
+        >button:last-of-type {
+            border-bottom-right-radius: 0;
+        }
     }
 
     .secondaryDropdown {
@@ -53,16 +58,25 @@
         right: 0;
         min-width: 100%;
         z-index: 100;
+        opacity: 0;
+        transition: all 100ms 100ms;
+        height: 0px;
+
+        &.meh {
+            opacity: 1;
+            height: 100%;
+        }
 
         ul {
             background: var(--bg-card);
             border: 1.5px solid var(--border);
-            border-top: none;
+            border-top: 0 !important;
             border-bottom-left-radius: var(--r-md);
             border-bottom-right-radius: var(--r-md);
             list-style: none;
             padding: $sp-1 0;
             margin: 0;
+
 
             li {
                 cursor: pointer;
