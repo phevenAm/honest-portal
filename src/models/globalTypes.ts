@@ -1,3 +1,5 @@
+import type { Tables } from "./database.types";
+
 export type Role = "admin" | "client";
 
 export type AuthUser = {
@@ -58,80 +60,78 @@ export enum ContentFormat {
   PLAIN = "plain",
 }
 
-// ─── App types (mirrors Supabase schema + app-level extensions) ────
+// ─── App types derived from DB schema ──────────────────────
+// Each type uses Omit<Tables<'table'>, fields> & { stricterFields }
+// Fields in the Omit list are re-added with stricter (non-null) types.
+// Fields NOT in the Omit list are inherited from the DB type and
+// automatically updated when the schema changes.
 
-export type UserProfile = {
-  id: string;
-  created_at: string;
+export type UserProfile = Omit<
+  Tables<"users">,
+  "age" | "first_name" | "last_name" | "role" | "disabled"
+> & {
   email: string;
   first_name: string;
   last_name: string;
-  dob: string | null;
   role: UserRole | string;
   disabled: boolean;
-  onboarding_completed: boolean;
-  display_name: string | null;
-  avatar_url: string | null;
-  focus_keywords: string[] | null;
 };
 
-export type Questionnaire = {
-  id: string;
-  created_at: string;
+export type Questionnaire = Omit<
+  Tables<"questionnaires">,
+  "title" | "description" | "frequency" | "is_active"
+> & {
   title: string;
   description?: string;
   frequency: QuestionnaireFrequency;
   is_active: boolean;
+  // joined — not in DB row
   questions: Question[];
   assignedTo: string[];
 };
 
-export type Question = {
-  id: string;
-  created_at?: string;
+export type Question = Omit<
+  Tables<"questions">,
+  "questionnaire_id" | "text" | "type" | "order_index" | "is_required"
+> & {
   questionnaire_id: string;
   text: string;
   type: QuestionType | "scale" | "text";
-  min_label?: string;
-  min_value?: number;
-  max_label?: string;
-  max_value?: number;
   order_index: number;
   is_required: boolean;
 };
 
-export type QuestionnaireAssignment = {
-  id: string;
+export type QuestionnaireAssignment = Omit<
+  Tables<"questionnaire_assignments">,
+  "questionnaire_id" | "user_id" | "assigned_at"
+> & {
   questionnaire_id: string;
   user_id: string;
   assigned_at: string;
+  // join extensions
   questionnaires?: Pick<Questionnaire, "id" | "title" | "frequency" | "is_active">;
   users?: Pick<UserProfile, "id" | "first_name" | "last_name">;
 };
 
-export type Response = {
-  id: string;
-  created_at: string;
-  user_id: string;
+export type Response = Omit<
+  Tables<"responses">,
+  "questionnaire_id" | "user_id" | "scores" | "submitted_at"
+> & {
   questionnaire_id: string;
+  user_id: string;
   scores: Record<string, unknown>;
   submitted_at: string;
 };
 
-export type Resource = {
-  id: string;
-  created_at: string;
-  updated_at: string;
+export type Resource = Omit<
+  Tables<"resources">,
+  "title" | "category" | "type" | "is_published" | "updated_at"
+> & {
   title: string;
-  summary?: string;
   category: string;
-  content?: string;
   type: ResourceType | string;
-  url?: string;
-  videoUrl?: string;
-  content_format?: ContentFormat | string;
   is_published: boolean;
-  is_sensitive: boolean;
+  updated_at: string;
 };
 
 // ─── Utility types ─────────────────────────────────────────
