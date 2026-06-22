@@ -53,6 +53,7 @@ const SettingsPage = () => {
           <div className={styles.topRow}>
             <section className={styles.left}>
               <form className={styles.form}>
+                <h3>Edit Profile</h3>
                 <div className={styles.field}>
                   <label htmlFor="displayName">Display name</label>
                   <input

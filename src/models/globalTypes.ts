@@ -66,21 +66,14 @@ export enum ContentFormat {
 // Fields NOT in the Omit list are inherited from the DB type and
 // automatically updated when the schema changes.
 
-export type UserProfile = Omit<
-  Tables<"users">,
-  "age" | "first_name" | "last_name" | "role" | "disabled"
-> & {
+export type UserProfile = Omit<Tables<"users">, "age" | "first_name" | "role" | "disabled"> & {
   email: string;
   first_name: string;
-  last_name: string;
   role: UserRole | string;
   disabled: boolean;
 };
 
-export type Questionnaire = Omit<
-  Tables<"questionnaires">,
-  "title" | "description" | "frequency" | "is_active"
-> & {
+export type Questionnaire = Omit<Tables<"questionnaires">, "title" | "description" | "frequency" | "is_active"> & {
   title: string;
   description?: string;
   frequency: QuestionnaireFrequency;
@@ -113,20 +106,14 @@ export type QuestionnaireAssignment = Omit<
   users?: Pick<UserProfile, "id" | "first_name" | "last_name">;
 };
 
-export type Response = Omit<
-  Tables<"responses">,
-  "questionnaire_id" | "user_id" | "scores" | "submitted_at"
-> & {
+export type Response = Omit<Tables<"responses">, "questionnaire_id" | "user_id" | "scores" | "submitted_at"> & {
   questionnaire_id: string;
   user_id: string;
   scores: Record<string, unknown>;
   submitted_at: string;
 };
 
-export type Resource = Omit<
-  Tables<"resources">,
-  "title" | "category" | "type" | "is_published" | "updated_at"
-> & {
+export type Resource = Omit<Tables<"resources">, "title" | "category" | "type" | "is_published" | "updated_at"> & {
   title: string;
   category: string;
   type: ResourceType | string;
