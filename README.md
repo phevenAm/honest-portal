@@ -1,158 +1,72 @@
-# 🌿 WithMe — Counselling Client Portal
+# Abide
 
-A full-featured mental health counselling portal built in React.
+A client portal for mental health practitioners. Clients complete regular check-ins, track their progress over time, and access resources assigned by their practitioner. The admin side gives the practitioner a clear view of each client's progress and the tools to manage content and questionnaires.
+
+**Live demo:** https://honest-portal.vercel.app/
+
+## Tech stack
+
+- **React 19** + **TypeScript** — built with Vite
+- **Redux Toolkit** — app state (questionnaires, responses, resources, theme); RTK Query for external data
+- **Supabase** — authentication and database
+- **MUI v9** — component library _ custom react components
+- **SCSS modules** — component-level styles with a shared design token system
+- **Recharts** — progress charts
+- **Vitest** + **Testing Library** — unit and accessibility tests
+- **Biome** — linting and formatting
 
 ---
 
-### Demo credentials
-| Role   | Email                        | Password   |
-|--------|------------------------------|------------|
-| Admin  | admin@mindfulspace.com       | admin123   |
-| Client | sarah.chen@email.com         | client123  |
-| Client | marcus.j@email.com           | client123  |
+## Local development
 
----
-
-## 🗂 Project Structure
+Requires a Supabase project. Add a `.env` file at the root:
 
 ```
-src/
-├── App.jsx                    # Root: Provider, Router, ThemeWrapper, all Routes
-├── index.js                   # ReactDOM.createRoot entry point
-├── index.css                  # Design system (CSS custom properties, dark mode)
-│
-├── store/                     # 🔴 Redux
-│   ├── index.js               # configureStore — wires all slices together
-│   └── slices/
-│       ├── authSlice.js       # Login/logout, thunk, selectors
-│       ├── usersSlice.js      # Client list (add/remove)
-│       ├── questionnairesSlice.js
-│       ├── responsesSlice.js  # Client check-in submissions
-│       ├── resourcesSlice.js  # Articles & videos
-│       └── themeSlice.js      # Dark/light mode (persisted to localStorage)
-│
-├── data/
-│   └── mockData.js            # All demo data — replace with API calls
-│
-├── components/
-│   └── shared/
-│       ├── Navbar.jsx         # Responsive, accessible nav (admin/client aware)
-│       ├── ProtectedRoute.jsx # Route guard — redirects by auth + role
-│       ├── ProgressChart.jsx  # Toggleable line graph ↔ heatmap (Recharts)
-│       ├── Card.jsx           # Reusable card wrapper
-│       ├── Button.jsx         # Button with variants: primary/secondary/ghost/danger
-│       └── Avatar.jsx         # Initials avatar with colour theming
-│
-└── pages/
-    ├── LoginPage.jsx          # Public login form
-    ├── AdminDashboard.jsx     # Admin overview + quick actions
-    ├── admin/
-    │   ├── AdminClientsPage.jsx         # Add/remove clients, view progress, export PDF
-    │   ├── AdminQuestionnairesPage.jsx  # Build and manage check-in forms
-    │   └── AdminResourcesPage.jsx       # Create articles & add videos
-    └── client/
-        ├── ClientDashboard.jsx  # Progress stats + chart + assigned check-ins
-        ├── CheckInPage.jsx      # Step-by-step questionnaire form
-        └── ResourcesPage.jsx    # Browse published articles & videos
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
+
+```bash
+npm install
+npm run start       # dev server
+npm run build       # production build → dist/
+npm run test        # Vitest in watch mode
+npm run sync-tokens # sync SCSS $variables → CSS custom properties
 ```
 
 ---
 
-## 🧠 Architecture Explained
+## Features
 
-### Redux Flow
-```
-User interaction
-    → dispatch(action)         (e.g. dispatch(loginUser(email, pw)))
-    → reducer runs             (updates the slice's state)
-    → component re-renders     (because useSelector detects the change)
-```
+### Client portal
+- Progress dashboard showing check-in history, score trend, and improvement over time
+- Toggleable line graph and heatmap view (Recharts)
+- Step-by-step check-in form supporting scale and free-text question types
+- Resource library with articles and embedded videos, filtered by type
+- Age-appropriate content filtering based on client date of birth
+- Onboarding flow on first login (display name, avatar, focus keywords)
+- Settings page for profile management
 
-**Key Redux concepts used here:**
-- `createSlice` — bundles state + reducers + auto-generated action creators
-- Thunks — async logic before dispatching (see `loginUser` in authSlice)
-- Selectors — functions that extract shaped data from the store
-- `useSelector` — subscribes a component to a slice of state
-- `useDispatch` — lets a component fire actions
+### Admin panel
+- Client list with DOB, adult status, and inline progress chart per client
+- Questionnaire builder — add questions, set type (scale/text) and frequency, pause/activate
+- Resource manager — create articles, add YouTube videos, toggle publish/draft
+- PDF export of client data (generated in-browser)
 
-### Mock Auth Pattern
-`authSlice.js` simulates what a JWT auth flow would look like. When you add a real backend:
-1. Replace the `loginUser` thunk body with `await axios.post('/api/auth/login', ...)`
-2. Store the returned token: `state.token = action.payload.token`
-3. Add the token to an Axios interceptor for all subsequent requests
-
-### React Router v6
-- `<Routes>` + `<Route>` replace the old `<Switch>`
-- `<Navigate>` replaces `<Redirect>`
-- `useNavigate()` hook replaces `history.push()`
-- `<ProtectedRoute>` wraps private routes and checks Redux auth state
-
-### Dark Mode
-Implemented entirely with CSS custom properties. The `themeSlice` stores the preference, `ThemeWrapper` in `App.jsx` applies `class="dark"` to `<html>`, and all colours flip automatically via the `.dark {}` block in `index.css`. Zero JS colour logic needed.
+### UX
+- Dark/light mode, toggled via a class on `<html>` and persisted to localStorage
+- Mobile-responsive layout with collapsible navigation
+- Keyboard navigation, focus-visible styles, skip link, and `aria-live` regions throughout
+- `prefers-reduced-motion` respected in CSS
 
 ---
 
-## 📋 Features
+## Architecture
 
-### Client Portal
-- ✅ Progress dashboard with stats (latest score, weeks tracked, improvement)
-- ✅ Toggleable line graph / heatmap (Recharts + custom CSS grid)
-- ✅ Step-by-step check-in form with scale + free-text questions
-- ✅ Resource library with articles (expandable) and video embeds
-- ✅ Filter resources by type
+**Auth** uses a dual-layer approach. `AuthContext` (`src/context/AuthContext.tsx`) is the live source of truth — it holds the Supabase session, user profile, and role. Components consume this via `useAuth()`. Redux slices handle the rest of the app state independently.
 
-### Admin Panel
-- ✅ Overview dashboard with key metrics
-- ✅ Client management: add by name/email, remove, search
-- ✅ View any client's progress chart inline
-- ✅ Export client data to PDF (jsPDF — generates in-browser)
-- ✅ Questionnaire builder: add questions, set type (scale/text), frequency
-- ✅ Pause/activate questionnaires
-- ✅ Resource manager: create articles, add YouTube videos, publish/draft toggle
+**Routing** splits into two role-based trees in `App.tsx`. `ProtectedRoute` accepts a `requiredRole` prop and redirects if the signed-in user doesn't match — admins are always redirected away from client routes and vice versa.
 
-### UX & Accessibility
-- ✅ Full dark/light mode (persisted to localStorage)
-- ✅ Mobile-responsive with hamburger menu
-- ✅ ARIA labels, roles, and `aria-live` regions throughout
-- ✅ Skip-to-main-content link for keyboard users
-- ✅ Focus-visible styles for keyboard navigation
-- ✅ `prefers-reduced-motion` respected in CSS
+**Styling** uses SCSS design tokens (`src/styles/_colors.scss`, `_spacing.scss`, `_typography.scss`) exposed as CSS custom properties in `src/index.scss`. Dark mode is a `.dark` class on `<html>` — all colour changes are in CSS, no JS colour logic. Run `npm run sync-tokens` after editing token files.
 
----
-
-## 🔮 Next Steps (your learning roadmap)
-
-### Phase 1 — Solidify the frontend
-- [ ] Add form validation with `react-hook-form` + `zod`
-- [ ] Add loading skeletons with a library like `react-loading-skeleton`
-- [ ] Add toast notifications with `react-hot-toast`
-- [ ] Write unit tests with `@testing-library/react`
-
-### Phase 2 — Add a real backend
-- [ ] Set up Express.js or Next.js API routes
-- [ ] Replace mock credentials with JWT auth (`jsonwebtoken`)
-- [ ] Add a database (PostgreSQL + Prisma ORM is great for this)
-- [ ] Replace `MOCK_RESPONSES` with API calls using `createAsyncThunk`
-
-### Phase 3 — Production features
-- [ ] Email notifications when a check-in is due
-- [ ] Real-time updates with WebSockets (or Supabase Realtime)
-- [ ] Richer PDF reports with charts rendered server-side
-- [ ] Role-based questionnaire assignment (currently hardcoded)
-- [ ] Session notes for the admin alongside each client
-
----
-
-## 📦 Dependencies
-
-| Package              | Why                                      |
-|----------------------|------------------------------------------|
-| react-router-dom v6  | Client-side routing                      |
-| @reduxjs/toolkit     | Modern Redux (replaces legacy patterns)  |
-| react-redux          | React bindings for Redux                 |
-| recharts             | Line graph component                     |
-| jspdf                | PDF generation in-browser                |
-
----
-
-*Built with 🌿 care — a learning-first scaffold for junior frontend developers.*
+**Supabase** — client singleton at `src/lib/supabase.js`. Key tables are typed in `src/models/globalTypes.tsx`: `users`, `questionnaires`, `questions`, `questionnaire_assignments`, `responses`, `resources`.
