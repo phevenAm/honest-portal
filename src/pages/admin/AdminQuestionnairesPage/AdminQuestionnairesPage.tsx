@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import Button from "@components/shared/Button/Button";
-import Modal from "@components/shared/Modal/Modal";
 import Card from "@components/shared/Card/Card";
+import Modal from "@components/shared/Modal/Modal";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import {

@@ -2,16 +2,7 @@ import React from "react";
 
 import styles from "./Button.module.scss";
 
-type Variant =
-  | "primary"
-  | "secondary"
-  | "ghost"
-  | "danger"
-  | "ghost-danger"
-  | "dropdown"
-  | "ghost-dropdown"
-  | "link"
-  | "ghost-link";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "ghost-danger" | "link" | "ghost-link";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,19 +26,8 @@ export default function Button({
     .join(" ");
 
   return (
-    <button
-      type={type}
-      disabled={disabled}
-      className={classes}
-      aria-haspopup={variant === "dropdown" || variant === "ghost-dropdown" ? "menu" : undefined}
-      {...props}
-    >
+    <button type={type} disabled={disabled} className={classes} {...props}>
       {children}
-      {(variant === "dropdown" || variant === "ghost-dropdown") && (
-        <span className={styles.dropdownArrow} aria-hidden="true">
-          ▼
-        </span>
-      )}
     </button>
   );
 }

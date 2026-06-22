@@ -4,6 +4,7 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import SplitButton from "@components/shared/SplitButton/SplitButton";
 import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -216,6 +217,8 @@ export default function AdminClientsPage() {
               {allClients.length} active {allClients.length === 1 ? "client" : "clients"}
             </p>
           </div>
+
+          <SplitButton />
 
           <Button onClick={() => setShowTokenModal(true)}>Create access token</Button>
         </div>

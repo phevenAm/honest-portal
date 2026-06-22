@@ -69,6 +69,13 @@ export default function AdminDashboard() {
       color: "peach",
       to: "/admin/resources",
     },
+    {
+      label: "Scheduler",
+      value: null,
+      icon: <BookIcon />,
+      color: "peach",
+      to: "/admin/resources",
+    },
   ];
 
   const quickActions = [
