@@ -5,6 +5,7 @@ import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import SplitButton, { SplitButtonProps } from "@components/shared/SplitButton/SplitButton";
+import { supabase } from "@lib/supabase";
 import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -13,16 +14,29 @@ import { fetchAllResponses, selectResponsesByUser } from "@store/slices/response
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
 import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
+import CreateClientProfileModal from "./modals/CreateClientProfileModal/CreateClientProfileModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
 import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
+import SessionNotesModal from "./modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
 import styles from "./AdminClientsPage.module.scss";
+
+export type ClientStub = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string | null;
+  linked_user_id: string | null;
+  created_at: string;
+};
 
 const getQuestionnaireForResponse = (response: Response | undefined, questionnaires: Questionnaire[]) => {
   if (!response) return undefined;
   return questionnaires.find((questionnaire) => questionnaire.id === response.questionnaire_id);
 };
+
+// ── Client row (real users) ────────────────────────────────
 
 function ClientRow({ user }: { user: UserProfile }) {
   const allResponses = useAppSelector(selectResponsesByUser(user.id));
@@ -38,11 +52,13 @@ function ClientRow({ user }: { user: UserProfile }) {
 
   const latestResponse = allResponses[allResponses.length - 1];
   const latestQuestionnaire = getQuestionnaireForResponse(latestResponse, questionnaires);
+  const lastCheckIn = (latestResponse?.submitted_at ?? latestResponse?.created_at)?.split("T")[0] ?? "–";
 
   const [expanded, setExpanded] = useState(false);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
   const [exporting, setExporting] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isNotesOpen, setNotesOpen] = useState(false);
 
   useEffect(() => {
     if (!selectedQuestionnaireId && questionnaireOptions[0]?.id) {
@@ -95,6 +111,11 @@ function ClientRow({ user }: { user: UserProfile }) {
           <p className={styles.statLabel}>Check-ins</p>
         </div>
 
+        <div className={styles.statBlock}>
+          <p className={styles.statValueDate}>{lastCheckIn}</p>
+          <p className={styles.statLabel}>Last check-in</p>
+        </div>
+
         <div className={styles.rowActions}>
           <Button
             variant="secondary"
@@ -112,6 +133,10 @@ function ClientRow({ user }: { user: UserProfile }) {
             disabled={exporting || selectedResponses.length === 0}
           >
             {exporting ? "…" : "Export PDF"}
+          </Button>
+
+          <Button variant="ghost" size="sm" onClick={() => setNotesOpen(true)}>
+            Notes
           </Button>
 
           <Button
@@ -172,34 +197,184 @@ function ClientRow({ user }: { user: UserProfile }) {
           }
         />
       )}
+
+      {isNotesOpen && <SessionNotesModal user={user} onClose={() => setNotesOpen(false)} />}
     </>
   );
 }
+
+// ── Stub row (offline client profiles) ────────────────────
+
+function StubRow({
+  stub,
+  allUsers,
+  linkedUserIds,
+  onUpdated,
+  onDeleted,
+}: {
+  stub: ClientStub;
+  allUsers: UserProfile[];
+  linkedUserIds: Set<string>;
+  onUpdated: (stub: ClientStub) => void;
+  onDeleted: (id: string) => void;
+}) {
+  const [isNotesOpen, setNotesOpen] = useState(false);
+  const [linkMode, setLinkMode] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const linkedUser = stub.linked_user_id ? allUsers.find((u) => u.id === stub.linked_user_id) : null;
+  const availableToLink = allUsers.filter((u) => u.role !== "admin" && !linkedUserIds.has(u.id));
+
+  const handleLink = async () => {
+    if (!selectedUserId) return;
+    setSaving(true);
+    const { data, error } = await supabase
+      .from("client_stubs")
+      .update({ linked_user_id: selectedUserId })
+      .eq("id", stub.id)
+      .select("id, first_name, last_name, email, linked_user_id, created_at")
+      .single();
+    if (!error && data) {
+      onUpdated(data);
+      setLinkMode(false);
+      setSelectedUserId("");
+    }
+    setSaving(false);
+  };
+
+  const handleUnlink = async () => {
+    setSaving(true);
+    const { data, error } = await supabase
+      .from("client_stubs")
+      .update({ linked_user_id: null })
+      .eq("id", stub.id)
+      .select("id, first_name, last_name, email, linked_user_id, created_at")
+      .single();
+    if (!error && data) onUpdated(data);
+    setSaving(false);
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    const { error } = await supabase.from("client_stubs").delete().eq("id", stub.id);
+    if (!error) onDeleted(stub.id);
+    setDeleting(false);
+  };
+
+  return (
+    <>
+      <div className={styles.stubRow}>
+        <Avatar name={`${stub.first_name} ${stub.last_name}`} color="stone" size={40} />
+
+        <div className={styles.clientMeta}>
+          <p className={styles.clientName}>
+            {stub.first_name} {stub.last_name}
+          </p>
+          <p className={styles.clientEmail}>{stub.email ?? "–"}</p>
+        </div>
+
+        {stub.linked_user_id ? (
+          <span className={styles.badgeLinked}>
+            {linkedUser ? `${linkedUser.first_name} ${linkedUser.last_name}` : "Linked"}
+          </span>
+        ) : (
+          <span className={styles.badgeUnlinked}>No account</span>
+        )}
+
+        <div className={styles.rowActions}>
+          <Button variant="ghost" size="sm" onClick={() => setNotesOpen(true)}>
+            Notes
+          </Button>
+
+          {stub.linked_user_id ? (
+            <Button variant="ghost" size="sm" onClick={handleUnlink} disabled={saving}>
+              {saving ? "…" : "Unlink"}
+            </Button>
+          ) : linkMode ? (
+            <>
+              <select
+                className={styles.linkSelect}
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+              >
+                <option value="">Select client…</option>
+                {availableToLink.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name}
+                  </option>
+                ))}
+              </select>
+              <Button size="sm" onClick={handleLink} disabled={!selectedUserId || saving}>
+                {saving ? "…" : "Confirm"}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setLinkMode(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setLinkMode(true)}>
+              Link to client
+            </Button>
+          )}
+
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={handleDelete}
+            disabled={deleting}
+            aria-label={`Remove profile for ${stub.first_name} ${stub.last_name}`}
+          >
+            {deleting ? "…" : "Remove"}
+          </Button>
+        </div>
+      </div>
+
+      {isNotesOpen && (
+        <SessionNotesModal
+          stubId={stub.id}
+          stubName={`${stub.first_name} ${stub.last_name}`}
+          onClose={() => setNotesOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────
 
 export default function AdminClientsPage() {
   const dispatch = useAppDispatch();
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [manageTokensModal, setManageTokensModal] = useState(false);
+  const [createProfileModal, setCreateProfileModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [stubs, setStubs] = useState<ClientStub[]>([]);
 
   const userDirectoryStatus = useAppSelector((state: RootState) => state.userDirectory.status);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+
   useEffect(() => {
-    if (userDirectoryStatus === "idle") {
-      dispatch(fetchAllUsers());
-    }
+    if (userDirectoryStatus === "idle") dispatch(fetchAllUsers());
   }, [dispatch, userDirectoryStatus]);
 
   useEffect(() => {
-    if (questionnairesStatus === "idle") {
-      dispatch(fetchQuestionnaires());
-    }
+    if (questionnairesStatus === "idle") dispatch(fetchQuestionnaires());
   }, [dispatch, questionnairesStatus]);
 
   useEffect(() => {
     dispatch(fetchAllResponses());
   }, [dispatch]);
+
+  useEffect(() => {
+    supabase
+      .from("client_stubs")
+      .select("id, first_name, last_name, email, linked_user_id, created_at")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setStubs(data ?? []));
+  }, []);
 
   const allClients = allUsers.filter((user) => user.role !== "admin");
 
@@ -209,10 +384,18 @@ export default function AdminClientsPage() {
       user.email?.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const linkedUserIds = useMemo(
+    () => new Set(stubs.map((s) => s.linked_user_id).filter(Boolean) as string[]),
+    [stubs],
+  );
+
   const splitButtonObj: SplitButtonProps = {
     primaryLabel: "Create access token",
     primaryAction: () => setShowTokenModal(true),
-    options: [{ label: "Manage Tokens", onClick: () => setManageTokensModal(true) }],
+    options: [
+      { label: "Manage tokens", onClick: () => setManageTokensModal(true) },
+      { label: "Create client profile", onClick: () => setCreateProfileModal(true) },
+    ],
     secondaryLabel: "View more options",
   };
 
@@ -252,10 +435,37 @@ export default function AdminClientsPage() {
             filtered.map((user) => <ClientRow key={user.id} user={user} />)
           )}
         </Card>
+
+        {stubs.length > 0 && (
+          <div className={styles.stubsSection}>
+            <div className={styles.stubsSectionHeader}>
+              <h2>Client profiles</h2>
+              <p>Offline profiles — link to a real account once the client signs up.</p>
+            </div>
+            <Card>
+              {stubs.map((stub) => (
+                <StubRow
+                  key={stub.id}
+                  stub={stub}
+                  allUsers={allUsers}
+                  linkedUserIds={linkedUserIds}
+                  onUpdated={(updated) => setStubs((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))}
+                  onDeleted={(id) => setStubs((prev) => prev.filter((s) => s.id !== id))}
+                />
+              ))}
+            </Card>
+          </div>
+        )}
       </div>
 
       {showTokenModal && <AccessTokenModal onClose={() => setShowTokenModal(false)} />}
       {manageTokensModal && <ManageTokensModal onClose={() => setManageTokensModal(false)} />}
+      {createProfileModal && (
+        <CreateClientProfileModal
+          onClose={() => setCreateProfileModal(false)}
+          onCreated={(stub) => setStubs((prev) => [stub, ...prev])}
+        />
+      )}
     </div>
   );
 }

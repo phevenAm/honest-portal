@@ -333,6 +333,159 @@
   flex-shrink: 0;
 }
 
+// ── Stat value variant for dates ──────────────────────────
+.statValueDate {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1px;
+}
+
+// ── Session notes ──────────────────────────────────────────
+.notesAddForm {
+  margin-bottom: $sp-5;
+}
+
+.notesTextarea {
+  width: 100%;
+  padding: $sp-3 $sp-4;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--transition-base);
+
+  &:focus {
+    border-color: var(--border-focus);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.notesFormActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $sp-2;
+}
+
+.notesList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $sp-3;
+}
+
+.noteItem {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: $sp-4;
+  background: var(--bg-muted);
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $sp-2;
+}
+
+.noteDate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.noteContent {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+// ── Client profiles (stubs) section ───────────────────────
+.stubsSection {
+  margin-top: $sp-10;
+}
+
+.stubsSectionHeader {
+  margin-bottom: $sp-4;
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-1;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+  }
+}
+
+.stubRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-4;
+  padding: $sp-4 $sp-5;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.badgeLinked {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeUnlinked {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.linkSelect {
+  padding: $sp-2 $sp-3;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--border-focus);
+  }
+}
+
 // ── ────────────────────────────────────────────────────────
 .progressControls {
   display: flex;
