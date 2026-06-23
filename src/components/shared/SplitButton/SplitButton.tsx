@@ -3,26 +3,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "../Icons/Icons";
 
 import styles from "./SplitButton.module.scss";
+import { Size, Variant } from "@/constants/constants";
 
-type Variant =
-  | "primary"
-  | "secondary"
-  | "ghost"
-  | "danger"
-  | "ghost-danger"
-  | "dropdown"
-  | "ghost-dropdown"
-  | "link"
-  | "ghost-link";
-type Size = "sm" | "md" | "lg";
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface SplitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   primaryAction: () => void;
   options: { label: string; onClick: () => void }[];
   primaryLabel: string;
-  secondaryLabel: string;
+  secondaryLabel?: string;
 }
 
 const SplitButton = ({
@@ -32,12 +21,10 @@ const SplitButton = ({
   options = [
     { label: "Test Labeasd", onClick: () => console.log("hi") },
     { label: "Test Labaasdssdel", onClick: () => console.log("hi") },
-    { label: "Test Lasdabel", onClick: () => console.log("hi") },
-    { label: "Test Label", onClick: () => console.log("hi") },
   ],
   primaryLabel = "placeholder primary label",
   secondaryLabel = "Open more otions",
-}: ButtonProps) => {
+}: SplitButtonProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const classes = [styles.btn, styles[variant], styles[size]].filter(Boolean).join(" ");
   const wrapperRef = useRef<HTMLDivElement | null>(null);

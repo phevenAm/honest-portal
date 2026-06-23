@@ -15,3 +15,15 @@ export const KEYWORDS = [
   "gratitude",
   "resilience",
 ];
+
+export type Variant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "ghost-danger"
+  | "dropdown"
+  | "ghost-dropdown"
+  | "link"
+  | "ghost-link";
+export type Size = "sm" | "md" | "lg";
