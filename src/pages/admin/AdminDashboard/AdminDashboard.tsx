@@ -72,7 +72,13 @@ export default function AdminDashboard() {
     },
   ];
 
-  const schedulerMetric = { label: "Scheduler", value: null, icon: <BookIcon />, color: "peach", to: "/admin/scheduler" };
+  const schedulerMetric = {
+    label: "Scheduler",
+    value: null,
+    icon: <BookIcon />,
+    color: "peach",
+    to: "/admin/scheduler",
+  };
 
   const quickActions = [
     { to: "/admin/questionnaires", label: "New questionnaire", color: "teal" },

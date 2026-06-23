@@ -21,7 +21,7 @@ import {
 } from "@store/slices/questionnairesSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
-import type { Questionnaire, QuestionnaireFrequency, UserProfile } from "@/models/globalTypes";
+import type { Questionnaire, QuestionnaireFrequency, UserProfile } from "@models/globalTypes";
 
 import styles from "./AdminQuestionnairesPage.module.scss";
 
