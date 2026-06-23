@@ -17,7 +17,7 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  const [selectedTokens, setSelectedTokens] = useState<AccessToken[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -45,6 +45,11 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
       setError(error.message);
     } else {
       setAllTokens((prev) => prev.filter((item) => item.id !== id));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
     setDeletingId(null);
   };
@@ -61,6 +66,19 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
     setUpdatingId(null);
   };
 
+  const handleBatchDelete = async () => {
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from(TOKEN_TABLE_NAME).delete().in("id", ids);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    setAllTokens((prev) => prev.filter((token) => !selectedIds.has(token.id)));
+    setSelectedIds(new Set());
+  };
+
   let modalBody = null;
 
   if (loading) {
@@ -75,21 +93,21 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
             <input
               type="checkbox"
               id="selectAll"
-              checked={selectedTokens.length === allTokens.length}
+              checked={selectedIds.size === allTokens.length}
               onChange={() => {
-                if (selectedTokens.length === allTokens.length) setSelectedTokens([]);
-                else setSelectedTokens(allTokens.slice());
+                if (selectedIds.size === allTokens.length) setSelectedIds(new Set());
+                else setSelectedIds(new Set(allTokens.map((t) => t.id)));
               }}
             />
-            <span>{selectedTokens.length === allTokens.length ? "Deselect all" : "Select all"}</span>
+            <span>{selectedIds.size === allTokens.length ? "Deselect all" : "Select all"}</span>
           </label>
 
-          {selectedTokens.length > 0 && (
+          {selectedIds.size > 0 && (
             <div className={styles.bulkActions}>
               <Button variant="ghost" size="sm">
                 Renew selected
               </Button>
-              <Button variant="danger" size="sm">
+              <Button variant="danger" size="sm" onClick={handleBatchDelete}>
                 Delete selected
               </Button>
             </div>
@@ -102,11 +120,14 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
               <input
                 type="checkbox"
                 className={styles.tokenCheckbox}
-                checked={selectedTokens.some((st) => st.id === t.id)}
+                checked={selectedIds.has(t.id)}
                 onChange={() => {
-                  const exists = selectedTokens.some((st) => st.id === t.id);
-                  if (exists) setSelectedTokens(selectedTokens.filter((st) => st.id !== t.id));
-                  else setSelectedTokens([...selectedTokens, t]);
+                  setSelectedIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  });
                 }}
               />
               <div className={styles.tokenMeta}>
