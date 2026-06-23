@@ -1,0 +1,1 @@
+// client should be able to see future sessions, which the admin believes they have paid for. they can cancel any future days and move any dates. the days change sends and email to admin who can confirm that thats fine with them. it should really prompt a converation

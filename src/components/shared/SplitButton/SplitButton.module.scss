@@ -1,0 +1,171 @@
+@use '../../../styles/spacing' as *;
+
+.buttonWrapper {
+    display: inline-flex;
+    position: relative;
+
+    >button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: $sp-2;
+        font-family: var(--font-sans);
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        white-space: nowrap;
+        line-height: 1;
+
+        &:focus-visible {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 3px;
+        }
+
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        &:first-of-type {
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+        }
+
+        &:last-of-type {
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-left: 1.5px solid rgba(0, 0, 0, 0.15);
+            padding: 0 $sp-3;
+        }
+    }
+
+    &.dropdownOpen {
+        >button:first-of-type {
+            border-bottom-left-radius: 0;
+        }
+
+        >button:last-of-type {
+            border-bottom-right-radius: 0;
+        }
+    }
+
+    .secondaryDropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 100%;
+        z-index: 100;
+        opacity: 0;
+        transition: all 100ms 100ms;
+        height: 0px;
+
+        &.meh {
+            opacity: 1;
+            height: 100%;
+        }
+
+        ul {
+            background: var(--bg-card);
+            border: 1.5px solid var(--border);
+            border-top: 0 !important;
+            border-bottom-left-radius: var(--r-md);
+            border-bottom-right-radius: var(--r-md);
+            list-style: none;
+            padding: $sp-1 0;
+            margin: 0;
+
+
+            li {
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-family: var(--font-sans);
+                color: var(--text-primary);
+                white-space: nowrap;
+
+                &:hover {
+                    background: var(--bg-muted);
+                }
+
+                &:last-of-type {
+                    border-bottom-left-radius: var(--r-md);
+                    border-bottom-right-radius: var(--r-md);
+                }
+
+                button {
+                    width: 100%;
+                    padding: $sp-2 $sp-4;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    text-align: left;
+                    font-size: inherit;
+                    font-family: inherit;
+                    color: inherit;
+                }
+            }
+        }
+    }
+}
+
+// ── Sizes ──────────────────────────────────────────────────
+.sm {
+    padding: $sp-2 $sp-4;
+    font-size: 0.8rem;
+}
+
+.md {
+    padding: $sp-3 $sp-5;
+    font-size: 0.875rem;
+}
+
+.lg {
+    padding: $sp-4 $sp-7;
+    font-size: 1rem;
+}
+
+// ── Variants ───────────────────────────────────────────────
+.primary {
+    background: var(--accent);
+    color: var(--text-inverse);
+    border-color: var(--accent);
+
+    &:hover:not(:disabled) {
+        background: var(--accent-dark);
+        border-color: var(--accent-dark);
+    }
+}
+
+.secondary {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border-color: var(--accent-light);
+
+    &:hover:not(:disabled) {
+        background: var(--accent-subtle);
+        border-color: var(--border);
+    }
+}
+
+.ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border);
+
+    &:hover:not(:disabled) {
+        background: var(--bg-muted);
+        color: var(--text-primary);
+    }
+}
+
+.danger {
+    background: var(--danger-light);
+    color: var(--danger);
+    border-color: var(--danger-border);
+
+    &:hover:not(:disabled) {
+        background: var(--danger-border);
+    }
+}

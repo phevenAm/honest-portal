@@ -1,5 +1,6 @@
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 export const ArticleIcon = () => (
@@ -240,3 +241,5 @@ export const LinkIcon = () => <InsertLinkOutlinedIcon />;
 export const DocumentIcon = () => <ArticleOutlinedIcon />;
 
 export const Settingsicon = () => <SettingsIcon />;
+
+export const ChevronDown = () => <KeyboardArrowDownIcon />;

@@ -1,9 +1,22 @@
 // ResourcesPage.scss
 @use '../../../styles/spacing' as *;
 
-.header { margin-bottom: $sp-8;
-  h1 { font-family: var(--font-serif); font-size: 1.9rem; font-weight: 500; color: var(--text-primary); margin: 0 0 $sp-2; }
-  p  { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+.header {
+  margin-bottom: $sp-8;
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $sp-2;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
 }
 
 .filterRow {
@@ -25,8 +38,16 @@
   color: var(--text-secondary);
   transition: all var(--transition-base);
   text-transform: capitalize;
-  &:hover { background: var(--bg-muted); }
-  &:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--r-full); }
+
+  &:hover {
+    background: var(--bg-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: var(--r-full);
+  }
 }
 
 .filterBtnActive {
@@ -34,7 +55,10 @@
   background: var(--accent);
   color: var(--text-inverse);
   border-color: var(--accent);
-  &:hover { background: var(--accent-dark); }
+
+  &:hover {
+    background: var(--accent-dark);
+  }
 }
 
 .grid {
@@ -43,12 +67,20 @@
   gap: $sp-5;
 }
 
-.empty { text-align: center; padding: $sp-16 0; color: var(--text-muted); }
+.empty {
+  text-align: center;
+  padding: $sp-16 0;
+  color: var(--text-muted);
+}
 
 // ── Resource card ──────────────────────────────────────────
-.accentBar { height: 4px; }
+.accentBar {
+  height: 4px;
+}
 
-.cardBody { padding: $sp-5 $sp-5 $sp-4; }
+.cardBody {
+  padding: $sp-5 $sp-5 $sp-4;
+}
 
 .categoryBadge {
   display: inline-flex;
@@ -102,8 +134,16 @@
   font-family: var(--font-sans);
   padding: 0;
   transition: color var(--transition-base);
-  &:hover { color: var(--accent-dark); }
-  &:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: 2px; }
+
+  &:hover {
+    color: var(--accent-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 .expandedContent {
@@ -179,4 +219,31 @@
   white-space: pre-wrap;
   line-height: 1.8;
   color: var(--text-secondary);
+}
+
+//Search
+.searchWrap {
+  margin-bottom: $sp-5;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 360px;
+  padding: $sp-3 $sp-4;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-base);
+
+  &:focus {
+    border-color: var(--border-focus);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
 }

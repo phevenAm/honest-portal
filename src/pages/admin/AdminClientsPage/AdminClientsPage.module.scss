@@ -236,6 +236,104 @@
   word-break: break-word;
 }
 
+// ── Manage tokens modal ────────────────────────────────────
+.tokenTableWrap {
+  margin-top: $sp-2;
+}
+
+.tokenTableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $sp-2 0 $sp-3;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: $sp-1;
+  min-height: 65px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.bulkActions {
+  display: flex;
+  gap: $sp-2;
+}
+
+.tokenList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tokenRow {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  padding: $sp-3 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.tokenCheckbox {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.tokenMeta {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  flex: 1;
+  min-width: 0;
+}
+
+.tokenValue {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badgeAvailable {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeUsed {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tokenRowActions {
+  display: flex;
+  gap: $sp-2;
+  flex-shrink: 0;
+}
+
+// ── ────────────────────────────────────────────────────────
 .progressControls {
   display: flex;
   align-items: center;

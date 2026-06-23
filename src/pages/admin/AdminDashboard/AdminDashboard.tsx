@@ -4,6 +4,7 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import { BookIcon, CheckIcon, ClipboardIcon, PlusIcon, UsersIcon } from "@components/shared/Icons/Icons";
+import WIP from "@components/shared/WIP/WIP";
 import { useAuth } from "@context/AuthContext";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -71,10 +72,12 @@ export default function AdminDashboard() {
     },
   ];
 
+  const schedulerMetric = { label: "Scheduler", value: null, icon: <BookIcon />, color: "peach", to: "/admin/scheduler" };
+
   const quickActions = [
     { to: "/admin/questionnaires", label: "New questionnaire", color: "teal" },
     { to: "/admin/resources", label: "Create a new resource", color: "stone" },
-    { to: "/admin/clients", label: "Add a client", color: "warm" },
+    { to: "/admin/clients", label: "Create sign-up token", color: "warm" },
   ];
 
   return (
@@ -96,6 +99,15 @@ export default function AdminDashboard() {
               </Card>
             </Link>
           ))}
+          <WIP>
+            <Link to={schedulerMetric.to} style={{ textDecoration: "none" }}>
+              <Card className={styles.metricCard}>
+                <div className={`${styles.metricIcon} ${styles[schedulerMetric.color]}`}>{schedulerMetric.icon}</div>
+                <p className={styles.metricValue}>{schedulerMetric.value}</p>
+                <p className={styles.metricLabel}>{schedulerMetric.label}</p>
+              </Card>
+            </Link>
+          </WIP>
         </div>
 
         <div className={styles.bottomGrid}>
@@ -111,17 +123,24 @@ export default function AdminDashboard() {
                 </Link>
               </div>
               <div className={styles.clientList}>
-                {allClients.slice(0, 4).map((u) => (
-                  <div key={u.id} className={styles.clientRow}>
-                    <Avatar name={u?.display_name || ""} color="teal" size={36} />
-                    <div className={styles.clientInfo}>
-                      <p className={styles.clientName}>
-                        {u.first_name} {u.last_name}
-                      </p>
-                      <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
+                {allClients
+                  .filter((user) => user.role === "client")
+                  .slice(0, 4)
+                  .map((u) => (
+                    <div key={u.id} className={styles.clientRow}>
+                      <Avatar name={u?.display_name || ""} color="teal" size={36} />
+                      <div className={styles.clientInfo}>
+                        {/* //!TODO: include if they've paid or not */}
+                        <p className={styles.clientName}>
+                          {u.first_name} {u.last_name}
+                        </p>
+                        <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
+                      </div>
+
+                      <small>awaiting payment</small>
+                      {/* //!TODO: have a table of whos paid for next sessions / bulk as that is linked to the users profile and the scheduler table/page */}
                     </div>
-                  </div>
-                ))}
+                  ))}
                 {allClients.length === 0 && <p className={styles.empty}>No clients yet. Add one to get started.</p>}
               </div>
             </div>

@@ -4,6 +4,7 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import SplitButton, { SplitButtonProps } from "@components/shared/SplitButton/SplitButton";
 import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -13,6 +14,7 @@ import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice"
 
 import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
+import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
 import styles from "./AdminClientsPage.module.scss";
@@ -178,12 +180,11 @@ export default function AdminClientsPage() {
   const dispatch = useAppDispatch();
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const [showTokenModal, setShowTokenModal] = useState(false);
+  const [manageTokensModal, setManageTokensModal] = useState(false);
   const [search, setSearch] = useState("");
 
   const userDirectoryStatus = useAppSelector((state: RootState) => state.userDirectory.status);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
-  const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
-
   useEffect(() => {
     if (userDirectoryStatus === "idle") {
       dispatch(fetchAllUsers());
@@ -197,10 +198,8 @@ export default function AdminClientsPage() {
   }, [dispatch, questionnairesStatus]);
 
   useEffect(() => {
-    if (responsesStatus === "idle") {
-      dispatch(fetchAllResponses());
-    }
-  }, [dispatch, responsesStatus]);
+    dispatch(fetchAllResponses());
+  }, [dispatch]);
 
   const allClients = allUsers.filter((user) => user.role !== "admin");
 
@@ -209,6 +208,13 @@ export default function AdminClientsPage() {
       `${user.first_name} ${user.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
       user.email?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const splitButtonObj: SplitButtonProps = {
+    primaryLabel: "Create access token",
+    primaryAction: () => setShowTokenModal(true),
+    options: [{ label: "Manage Tokens", onClick: () => setManageTokensModal(true) }],
+    secondaryLabel: "View more options",
+  };
 
   return (
     <div className="page">
@@ -221,7 +227,7 @@ export default function AdminClientsPage() {
             </p>
           </div>
 
-          <Button onClick={() => setShowTokenModal(true)}>Create access token</Button>
+          <SplitButton {...splitButtonObj} />
         </div>
 
         <div className={styles.searchWrap}>
@@ -249,6 +255,7 @@ export default function AdminClientsPage() {
       </div>
 
       {showTokenModal && <AccessTokenModal onClose={() => setShowTokenModal(false)} />}
+      {manageTokensModal && <ManageTokensModal onClose={() => setManageTokensModal(false)} />}
     </div>
   );
 }

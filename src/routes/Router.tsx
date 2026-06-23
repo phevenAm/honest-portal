@@ -35,12 +35,13 @@ function RootRedirect() {
 }
 
 function AppLayout() {
-  const _location = useLocation();
+  const location = useLocation();
   const topRef = useRef<HTMLDivElement>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: location is the navigation trigger; not referenced in callback body by design
   useEffect(() => {
     topRef.current?.focus({ preventScroll: true });
-  }, []);
+  }, [location]);
 
   return (
     <>
