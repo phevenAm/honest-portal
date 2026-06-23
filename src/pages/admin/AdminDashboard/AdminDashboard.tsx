@@ -4,6 +4,7 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import { BookIcon, CheckIcon, ClipboardIcon, PlusIcon, UsersIcon } from "@components/shared/Icons/Icons";
+import WIP from "@components/shared/WIP/WIP";
 import { useAuth } from "@context/AuthContext";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -69,14 +70,9 @@ export default function AdminDashboard() {
       color: "peach",
       to: "/admin/resources",
     },
-    {
-      label: "Scheduler",
-      value: null,
-      icon: <BookIcon />,
-      color: "peach",
-      to: "/admin/resources",
-    },
   ];
+
+  const schedulerMetric = { label: "Scheduler", value: null, icon: <BookIcon />, color: "peach", to: "/admin/scheduler" };
 
   const quickActions = [
     { to: "/admin/questionnaires", label: "New questionnaire", color: "teal" },
@@ -103,6 +99,15 @@ export default function AdminDashboard() {
               </Card>
             </Link>
           ))}
+          <WIP>
+            <Link to={schedulerMetric.to} style={{ textDecoration: "none" }}>
+              <Card className={styles.metricCard}>
+                <div className={`${styles.metricIcon} ${styles[schedulerMetric.color]}`}>{schedulerMetric.icon}</div>
+                <p className={styles.metricValue}>{schedulerMetric.value}</p>
+                <p className={styles.metricLabel}>{schedulerMetric.label}</p>
+              </Card>
+            </Link>
+          </WIP>
         </div>
 
         <div className={styles.bottomGrid}>
