@@ -12,9 +12,9 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
+import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
 
 import styles from "./AdminClientsPage.module.scss";

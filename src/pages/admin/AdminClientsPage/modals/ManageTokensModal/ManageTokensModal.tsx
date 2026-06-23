@@ -7,7 +7,9 @@ import type { Database } from "@models/database.types";
 
 import styles from "../../AdminClientsPage.module.scss";
 
-type AccessToken = Database["public"]["Tables"]["platform_access_token"]["Row"];
+const TOKEN_TABLE_NAME = "platform_access_token";
+
+type AccessToken = Database["public"]["Tables"][TOKEN_TABLE_NAME]["Row"];
 
 export default function ManageTokensModal({ onClose }: { onClose: () => void }) {
   const [allTokens, setAllTokens] = useState<AccessToken[]>([]);
@@ -20,7 +22,7 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
   useEffect(() => {
     const fetchTokens = async () => {
       const { data, error } = await supabase
-        .from("platform_access_token")
+        .from(TOKEN_TABLE_NAME)
         .select("id, token, is_used, created_at, expires_at, used_at")
         .order("created_at", { ascending: false });
 
@@ -36,11 +38,27 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
   }, []);
 
   const handleDeleteToken = async (id: number) => {
-    // TODO
+    setDeletingId(id);
+    const { error } = await supabase.from(TOKEN_TABLE_NAME).delete().eq("id", id);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setAllTokens((prev) => prev.filter((item) => item.id !== id));
+    }
+    setDeletingId(null);
   };
 
   const handleUpdateToken = async (id: number) => {
-    // TODO
+    setUpdatingId(id);
+    const { error } = await supabase.from(TOKEN_TABLE_NAME).update({ is_used: false }).eq("id", id);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setAllTokens((prev) => prev.map((token) => (token.id === id ? { ...token, is_used: false } : token)));
+    }
+    setUpdatingId(null);
   };
 
   let modalBody = null;
@@ -69,7 +87,7 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
           {selectedTokens.length > 0 && (
             <div className={styles.bulkActions}>
               <Button variant="ghost" size="sm">
-                Refresh selected
+                Renew selected
               </Button>
               <Button variant="danger" size="sm">
                 Delete selected
@@ -102,9 +120,9 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
                   variant="ghost"
                   size="sm"
                   onClick={() => handleUpdateToken(t.id)}
-                  disabled={updatingId === t.id}
+                  disabled={updatingId === t.id || !t.is_used}
                 >
-                  {updatingId === t.id ? "..." : "Refresh"}
+                  {updatingId === t.id ? "..." : "Renew"}
                 </Button>
                 <Button
                   variant="danger"
@@ -120,12 +138,12 @@ export default function ManageTokensModal({ onClose }: { onClose: () => void }) 
         </ul>
       </div>
     );
-
-    return (
-      <Modal title="Manage Access Tokens" onClose={onClose} size="lg">
-        {error && <p className={styles.modalError}>{error}</p>}
-        {modalBody}
-      </Modal>
-    );
   }
+
+  return (
+    <Modal title="Manage Access Tokens" onClose={onClose} size="lg">
+      {error && <p className={styles.modalError}>{error}</p>}
+      {modalBody}
+    </Modal>
+  );
 }

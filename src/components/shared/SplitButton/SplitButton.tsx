@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import { Size, Variant } from "@/constants/constants";
 import { ChevronDown } from "../Icons/Icons";
 
 import styles from "./SplitButton.module.scss";
-import { Size, Variant } from "@/constants/constants";
 
 export interface SplitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
