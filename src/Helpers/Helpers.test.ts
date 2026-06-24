@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isQuestionnaireCheckInDue } from "./Helpers";
+import { getInitials, isQuestionnaireCheckInDue } from "./Helpers";
 
 describe("isQuestionnaireCheckInDue", () => {
   it("returns true when 1 day has passed", () => {
@@ -47,5 +47,23 @@ describe("isQuestionnaireCheckInDue", () => {
     date.setDate(date.getDate() - 15);
 
     expect(isQuestionnaireCheckInDue(date.toISOString(), "fortnightly")).toBe(true);
+  });
+});
+
+describe("getInitials", () => {
+  it("returns initials from a display name with two words", () => {
+    expect(getInitials("Stephen Missah", "", "")).toBe("SM");
+  });
+
+  it("returns a single initial when the display name has only one word", () => {
+    expect(getInitials("Stephen", "", "")).toBe("S");
+  });
+
+  it("falls back to first and last name when displayName is null", () => {
+    expect(getInitials(null, "Stephen", "Missah")).toBe("SM");
+  });
+
+  it("returns an empty string when everything is empty", () => {
+    expect(getInitials(null, "", "")).toBe("");
   });
 });
