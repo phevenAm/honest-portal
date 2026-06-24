@@ -24,7 +24,15 @@ export const fetchAllUsers = createAsyncThunk("userDirectory/fetchAllUsers", asy
 });
 
 export const deleteUser = createAsyncThunk("userDirectory/deleteUser", async (id: string, { rejectWithValue }) => {
-  const { error } = await supabase.from("users").delete().eq("id", id).select();
+  const { error } = await supabase.rpc("delete_user_by_id", { target_user_id: id });
+
+  if (error) return rejectWithValue(error.message);
+
+  return id;
+});
+
+export const deleteOwnAccount = createAsyncThunk("userDirectory/deleteOwnAccount", async (id: string, { rejectWithValue }) => {
+  const { error } = await supabase.rpc("delete_own_account");
 
   if (error) return rejectWithValue(error.message);
 
@@ -87,6 +95,13 @@ const userDirectorySlice = createSlice({
       .addCase(deleteUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(deleteOwnAccount.fulfilled, (state, action) => {
+        state.users = state.users.filter((u) => u.id !== action.payload);
+      })
+      .addCase(deleteOwnAccount.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
       });
   },
 });

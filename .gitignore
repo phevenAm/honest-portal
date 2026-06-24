@@ -10,5 +10,6 @@ coverage
 *.tmp
 *.swp
 *.swo
-*.swn			
+*.swn
 *.env
+supabase/.temp/

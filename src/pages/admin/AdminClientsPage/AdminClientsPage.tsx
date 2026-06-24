@@ -353,12 +353,11 @@ export default function AdminClientsPage() {
   const [search, setSearch] = useState("");
   const [stubs, setStubs] = useState<ClientStub[]>([]);
 
-  const userDirectoryStatus = useAppSelector((state: RootState) => state.userDirectory.status);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
 
   useEffect(() => {
-    if (userDirectoryStatus === "idle") dispatch(fetchAllUsers());
-  }, [dispatch, userDirectoryStatus]);
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     if (questionnairesStatus === "idle") dispatch(fetchQuestionnaires());

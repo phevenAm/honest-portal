@@ -10,13 +10,13 @@ import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchResources, selectAllResources } from "@store/slices/resourcesSlice";
-import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
+import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
 import styles from "./AdminDashboard.module.scss";
 
 export default function AdminDashboard() {
   const { userProfile } = useAuth();
-  const allClients = useAppSelector(selectAllUsers);
+  const allClients = useAppSelector(selectClientUsers);
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const resources = useAppSelector(selectAllResources);
 
