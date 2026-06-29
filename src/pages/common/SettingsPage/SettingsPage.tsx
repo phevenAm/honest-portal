@@ -55,7 +55,9 @@ const SettingsPage = () => {
               <form className={styles.form}>
                 <h3>Edit Profile</h3>
                 <div className={styles.field}>
-                  <label htmlFor="displayName">Display name <small>shown on your dashboard — use a nickname or short name</small></label>
+                  <label htmlFor="displayName">
+                    Display name <small>shown on your dashboard — use a nickname or short name</small>
+                  </label>
                   <input
                     id="displayName"
                     onChange={(e) => setName(e.target.value)}

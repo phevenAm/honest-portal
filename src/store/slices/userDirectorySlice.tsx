@@ -31,13 +31,16 @@ export const deleteUser = createAsyncThunk("userDirectory/deleteUser", async (id
   return id;
 });
 
-export const deleteOwnAccount = createAsyncThunk("userDirectory/deleteOwnAccount", async (id: string, { rejectWithValue }) => {
-  const { error } = await supabase.rpc("delete_own_account");
+export const deleteOwnAccount = createAsyncThunk(
+  "userDirectory/deleteOwnAccount",
+  async (id: string, { rejectWithValue }) => {
+    const { error } = await supabase.rpc("delete_own_account");
 
-  if (error) return rejectWithValue(error.message);
+    if (error) return rejectWithValue(error.message);
 
-  return id;
-});
+    return id;
+  },
+);
 
 const userDirectorySlice = createSlice({
   name: "userDirectory",

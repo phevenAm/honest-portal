@@ -94,14 +94,11 @@ export const updateQuestionnaire = createAsyncThunk<Questionnaire, UpdateQuestio
 export const updateQuestionTag = createAsyncThunk<
   { questionId: string; questionnaireId: string; tag_id: string | null; tag: { id: string; name: string } | null },
   { questionId: string; questionnaireId: string; tag_id: string | null; tag: { id: string; name: string } | null }
->(
-  "questionnaires/updateQuestionTag",
-  async ({ questionId, questionnaireId, tag_id, tag }, { rejectWithValue }) => {
-    const { error } = await supabase.from("questions").update({ tag_id }).eq("id", questionId);
-    if (error) return rejectWithValue(error.message);
-    return { questionId, questionnaireId, tag_id, tag };
-  },
-);
+>("questionnaires/updateQuestionTag", async ({ questionId, questionnaireId, tag_id, tag }, { rejectWithValue }) => {
+  const { error } = await supabase.from("questions").update({ tag_id }).eq("id", questionId);
+  if (error) return rejectWithValue(error.message);
+  return { questionId, questionnaireId, tag_id, tag };
+});
 
 export const deleteQuestionnaire = createAsyncThunk<string, string>(
   "questionnaires/deleteQuestionnaire",

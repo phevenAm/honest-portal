@@ -1,9 +1,11 @@
-import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 afterEach(cleanup);
-import ProgressChart, { buildTagChartData, getResponseDate } from "./ProgressChart";
+
 import type { Question, Response } from "@models/globalTypes";
+
+import ProgressChart, { buildTagChartData, getResponseDate } from "./ProgressChart";
 
 // ─── Fixtures ──────────────────────────────────────────────
 

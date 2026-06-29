@@ -3,13 +3,12 @@ import { useState } from "react";
 import { isAdultFromDob } from "@Helpers/Helpers";
 import Card from "@components/shared/Card/Card";
 import { ArticleIcon, VideoIcon } from "@components/shared/Icons/Icons";
+import { useAuth } from "@context/AuthContext";
 import type { Resource } from "@models/globalTypes";
+import { getResourceTypeLabel } from "@pages/admin/AdminResourcesPage/AdminResourcesPage";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchPublishedResources, selectPublishedResources } from "@store/slices/resourcesSlice";
-
-import { useAuth } from "@context/AuthContext";
-import { getResourceTypeLabel } from "@pages/admin/AdminResourcesPage/AdminResourcesPage";
 
 import styles from "./ResourcesPage.module.scss";
 

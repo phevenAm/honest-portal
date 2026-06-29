@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import Modal from "@components/shared/Modal/Modal";
+import SplitButton from "@components/shared/SplitButton/SplitButton";
+import type { Questionnaire, QuestionnaireFrequency, Tag, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import {
@@ -20,11 +22,8 @@ import {
   updateQuestionnaire,
   updateQuestionTag,
 } from "@store/slices/questionnairesSlice";
-import SplitButton from "@components/shared/SplitButton/SplitButton";
 import { createTag, deleteTag, fetchTags, selectAllTags, selectTagsStatus, updateTag } from "@store/slices/tagsSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
-
-import type { Questionnaire, QuestionnaireFrequency, Tag, UserProfile } from "@models/globalTypes";
 
 import styles from "./AdminQuestionnairesPage.module.scss";
 
@@ -517,7 +516,9 @@ export default function AdminQuestionnairesPage() {
         <div className={styles.pageHeader}>
           <div>
             <h1>Check-ins</h1>
-            <p>{questionnaires.length} check-in{questionnaires.length !== 1 ? "s" : ""} configured</p>
+            <p>
+              {questionnaires.length} check-in{questionnaires.length !== 1 ? "s" : ""} configured
+            </p>
           </div>
           <SplitButton
             primaryLabel="+ New check-in"
@@ -574,7 +575,9 @@ export default function AdminQuestionnairesPage() {
 
       {showBuilder && <QuestionnaireBuilder tags={tags} onSave={handleCreate} onClose={() => setShowBuilder(false)} />}
 
-      {editingQ && <QuestionnaireBuilder tags={tags} initial={editingQ} onSave={handleEdit} onClose={() => setEditingQ(null)} />}
+      {editingQ && (
+        <QuestionnaireBuilder tags={tags} initial={editingQ} onSave={handleEdit} onClose={() => setEditingQ(null)} />
+      )}
 
       {isAssigningQ && (
         <AssignModal questionnaire={isAssigningQ} clients={clients} onClose={() => setIsAssigningQ(null)} />

@@ -5,15 +5,14 @@ import { getResponseDate, isQuestionnaireCheckInDue } from "@Helpers/Helpers";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import Spinner from "@components/shared/Spinner/Spinner";
 import { useAuth } from "@context/AuthContext";
+import type { Response } from "@models/globalTypes";
 import { useGetQuotesByTagQuery } from "@services/inspirationalQuotesApi";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectActiveQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchResponsesByUser, selectUserResponses } from "@store/slices/responsesSlice";
-
-import Spinner from "@components/shared/Spinner/Spinner";
-import type { Response } from "@models/globalTypes";
 
 import styles from "./ClientDashboard.module.scss";
 

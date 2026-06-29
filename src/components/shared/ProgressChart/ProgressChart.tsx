@@ -1,15 +1,6 @@
 import { useMemo } from "react";
 
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import type { Question, Response } from "../../../models/globalTypes";
 import Card from "../Card/Card";
@@ -75,10 +66,7 @@ const buildTagLookup = (questions: Question[]): Map<string, TagRef> => {
 
 // For each response, averages scale scores across all questions that share the same tag.
 // Returns an array of chart data points: [{ label, index, [tagId]: avg, ... }]
-export const buildTagChartData = (
-  responses: Response[],
-  questions: Question[],
-): Record<string, string | number>[] => {
+export const buildTagChartData = (responses: Response[], questions: Question[]): Record<string, string | number>[] => {
   const tagByQuestion = buildTagLookup(questions);
 
   return responses.map((response, index) => {
@@ -253,9 +241,7 @@ export default function ProgressChart({ responses, questions, title = "Your Prog
   const chartData = usingTags
     ? buildTagChartData(responses, questions)
     : buildQuestionChartData(responses, scaleQuestions);
-  const lines: LineKey[] = usingTags
-    ? tags
-    : scaleQuestions.map((q) => ({ id: q.id, name: q.text }));
+  const lines: LineKey[] = usingTags ? tags : scaleQuestions.map((q) => ({ id: q.id, name: q.text }));
 
   return (
     <Card className={styles.card}>

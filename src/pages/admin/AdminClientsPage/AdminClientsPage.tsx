@@ -383,10 +383,7 @@ export default function AdminClientsPage() {
       user.email?.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const linkedUserIds = useMemo(
-    () => new Set(stubs.map((s) => s.linked_user_id).filter(Boolean) as string[]),
-    [stubs],
-  );
+  const linkedUserIds = useMemo(() => new Set(stubs.map((s) => s.linked_user_id).filter(Boolean) as string[]), [stubs]);
 
   const splitButtonObj: SplitButtonProps = {
     primaryLabel: "Create access token",
