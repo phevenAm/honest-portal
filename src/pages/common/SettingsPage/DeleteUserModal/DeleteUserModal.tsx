@@ -1,30 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 import { useAuth } from "@context/AuthContext";
 import { useAppDispatch } from "@store/hooks";
-import { deleteUser } from "@store/slices/userDirectorySlice";
+import { deleteOwnAccount } from "@store/slices/userDirectorySlice";
 
-type DelteUserModalProps = {
+type DeleteUserModalProps = {
   onClose: () => void;
-  // bodyText: React.ReactNode;
-  // modalTitle: string;
-  // idToDelete: string;
 };
 
-export default function DeleteUserModal({ onClose }: DelteUserModalProps) {
+export default function DeleteUserModal({ onClose }: DeleteUserModalProps) {
   const dispatch = useAppDispatch();
   const { signOut, userProfile } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   const handleDeletion = async () => {
     try {
-      await dispatch(deleteUser(userProfile?.id ?? "")).unwrap();
+      await dispatch(deleteOwnAccount(userProfile?.id ?? "")).unwrap();
       await signOut();
-    } catch (error) {
-      console.error("Failed to delete user", error);
-      // deletion failed — stay on page, user still exists
-      onClose();
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -45,6 +42,7 @@ export default function DeleteUserModal({ onClose }: DelteUserModalProps) {
       }
     >
       <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+      {error && <p style={{ color: "var(--error)", marginTop: "0.5rem" }}>{error}</p>}
     </Modal>
   );
 }

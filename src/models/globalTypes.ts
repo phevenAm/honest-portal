@@ -66,6 +66,10 @@ export enum ContentFormat {
 // Fields NOT in the Omit list are inherited from the DB type and
 // automatically updated when the schema changes.
 
+// Hand-typed until `npm run "update types"` is run after the tags migration.
+// After: replace with Omit<Tables<"tags">, never> or just Tables<"tags">.
+export type Tag = Tables<"tags">;
+
 export type UserProfile = Omit<Tables<"users">, "age" | "first_name" | "role" | "disabled"> & {
   email: string;
   first_name: string;
@@ -92,6 +96,10 @@ export type Question = Omit<
   type: QuestionType | "scale" | "text";
   order_index: number;
   is_required: boolean;
+  // tag_id will be inherited from Tables<"questions"> after the migration + type regen.
+  // Declared here so the rest of the app can use it before that step.
+  tag_id: string | null;
+  tag?: Pick<Tag, "id" | "name">;
 };
 
 export type QuestionnaireAssignment = Omit<
@@ -137,6 +145,6 @@ export type UpdateResource = Partial<Omit<Resource, "id" | "created_at">> & {
 
 export interface ProgressChartProps {
   responses: Response[];
-  questionnaire: Questionnaire | null;
+  questions: Question[];
   title?: string;
 }

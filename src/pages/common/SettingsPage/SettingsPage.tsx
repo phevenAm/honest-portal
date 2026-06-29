@@ -55,12 +55,15 @@ const SettingsPage = () => {
               <form className={styles.form}>
                 <h3>Edit Profile</h3>
                 <div className={styles.field}>
-                  <label htmlFor="displayName">Display name</label>
+                  <label htmlFor="displayName">
+                    Display name <small>shown on your dashboard — use a nickname or short name</small>
+                  </label>
                   <input
                     id="displayName"
                     onChange={(e) => setName(e.target.value)}
                     maxLength={40}
                     value={name}
+                    placeholder="e.g. Alex"
                     name="display name"
                   />
                 </div>

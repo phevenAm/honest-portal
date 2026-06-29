@@ -334,3 +334,140 @@
   padding: $sp-4 0;
   text-align: center;
 }
+
+// ── Tag field in question builder ──────────────────────────
+.tagField {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-1;
+  flex: 1;
+  min-width: 150px;
+
+  > span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  select {
+    padding: $sp-2 $sp-3;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    outline: none;
+    box-sizing: border-box;
+    width: 100%;
+
+    &:focus { border-color: var(--border-focus); }
+  }
+}
+
+.newTagInline {
+  display: flex;
+  gap: $sp-2;
+  align-items: center;
+
+  input {
+    flex: 1;
+    padding: $sp-2 $sp-3;
+    border: 1.5px solid var(--border-focus);
+    border-radius: var(--r-md);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  button {
+    flex-shrink: 0;
+    padding: $sp-2 $sp-3;
+    border-radius: var(--r-md);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: opacity var(--transition-base);
+
+    &:first-of-type {
+      background: var(--accent);
+      color: #fff;
+      &:hover { opacity: 0.88; }
+    }
+
+    &:last-of-type {
+      background: var(--bg-muted);
+      color: var(--text-secondary);
+      &:hover { background: var(--border); }
+    }
+  }
+}
+
+// ── Manage tags modal ──────────────────────────────────────
+.tagList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 $sp-5;
+  display: flex;
+  flex-direction: column;
+  gap: $sp-2;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.tagItem {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
+  padding: $sp-2 $sp-3;
+  border-radius: var(--r-md);
+  background: var(--bg-muted);
+}
+
+.tagItemName {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.tagEditInput {
+  flex: 1;
+  padding: $sp-2 $sp-3;
+  border: 1.5px solid var(--border-focus);
+  border-radius: var(--r-md);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.tagAddRow {
+  display: flex;
+  gap: $sp-3;
+  margin-bottom: $sp-2;
+
+  input {
+    flex: 1;
+    padding: $sp-3 $sp-4;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: var(--border-focus); }
+  }
+}
