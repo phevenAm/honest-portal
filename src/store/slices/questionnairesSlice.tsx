@@ -20,7 +20,7 @@ export const fetchQuestionnaires = createAsyncThunk<Questionnaire[], void>(
   async (_, { rejectWithValue }) => {
     const { data, error } = await supabase.from("questionnaires").select(`
       *,
-      questions (*),
+      questions (*, tag:tags (id, name)),
       questionnaire_assignments (user_id)
     `);
     if (error) return rejectWithValue(error.message);
@@ -55,6 +55,7 @@ export const createQuestionnaire = createAsyncThunk<Questionnaire, Questionnaire
       questionnaire_id: questionnaire.id,
       text: question.text,
       type: question.type,
+      tag_id: question.type === "scale" ? (question.tag_id ?? null) : null,
       min_value: question.type === "scale" ? (question.min_value ?? 1) : null,
       max_value: question.type === "scale" ? (question.max_value ?? 10) : null,
       min_label: question.type === "scale" ? (question.min_label ?? null) : null,
@@ -78,7 +79,7 @@ export const updateQuestionnaire = createAsyncThunk<Questionnaire, UpdateQuestio
       .from("questionnaires")
       .update(fields)
       .eq("id", id)
-      .select("*, questions(*), questionnaire_assignments(user_id)")
+      .select("*, questions(*, tag:tags(id, name)), questionnaire_assignments(user_id)")
       .single();
 
     if (error) return rejectWithValue(error.message);
@@ -87,6 +88,18 @@ export const updateQuestionnaire = createAsyncThunk<Questionnaire, UpdateQuestio
       // biome-ignore lint/suspicious/noExplicitAny: Supabase joined query result shape isn't typed by the client
       assignedTo: (data.questionnaire_assignments ?? []).map((a: any) => a.user_id),
     };
+  },
+);
+
+export const updateQuestionTag = createAsyncThunk<
+  { questionId: string; questionnaireId: string; tag_id: string | null; tag: { id: string; name: string } | null },
+  { questionId: string; questionnaireId: string; tag_id: string | null; tag: { id: string; name: string } | null }
+>(
+  "questionnaires/updateQuestionTag",
+  async ({ questionId, questionnaireId, tag_id, tag }, { rejectWithValue }) => {
+    const { error } = await supabase.from("questions").update({ tag_id }).eq("id", questionId);
+    if (error) return rejectWithValue(error.message);
+    return { questionId, questionnaireId, tag_id, tag };
   },
 );
 
@@ -166,6 +179,17 @@ const questionnairesSlice = createSlice({
         if (q) q.is_active = action.payload.is_active;
       })
       .addCase(pauseQuestionnaire.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(updateQuestionTag.fulfilled, (state, action) => {
+        const questionnaire = state.questionnaires.find((q) => q.id === action.payload.questionnaireId);
+        if (!questionnaire) return;
+        const question = questionnaire.questions?.find((q) => q.id === action.payload.questionId);
+        if (!question) return;
+        question.tag_id = action.payload.tag_id;
+        question.tag = action.payload.tag ?? undefined;
+      })
+      .addCase(updateQuestionTag.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

@@ -46,6 +46,6 @@
     "format": "biome format --write .",
     "lint:fix": "biome check --write .",
     "ci:check": "biome check .",
-    "update types": "npx supabase gen types typescript --project-id mxyfdvfbdrusbjiozuzx --schema public > src/models/database.types.ts --debug"
+    "update-types": "npx supabase gen types typescript --project-id mxyfdvfbdrusbjiozuzx --schema public > src/models/database.types.ts --debug"
   }
 }

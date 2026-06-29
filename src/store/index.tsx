@@ -15,6 +15,7 @@ import assignmentsReducer from "./slices/questionnaireAssignmentsSlice";
 import questionnairesReducer from "./slices/questionnairesSlice";
 import resourcesReducer from "./slices/resourcesSlice";
 import responsesReducer from "./slices/responsesSlice";
+import tagsReducer from "./slices/tagsSlice";
 import themeReducer from "./slices/themeSlice";
 import userDirectoryReducer from "./slices/userDirectorySlice";
 
@@ -25,6 +26,7 @@ export const store = configureStore({
     assignments: assignmentsReducer,
     responses: responsesReducer,
     resources: resourcesReducer,
+    tags: tagsReducer,
     theme: themeReducer,
     [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },

@@ -10,14 +10,10 @@ import { useGetQuotesByTagQuery } from "@services/inspirationalQuotesApi";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectActiveQuestionnaires } from "@store/slices/questionnairesSlice";
-import {
-  fetchResponsesByUser,
-  selectUserQuestionnaireResponses,
-  selectUserResponses,
-} from "@store/slices/responsesSlice";
+import { fetchResponsesByUser, selectUserResponses } from "@store/slices/responsesSlice";
 
-import Spinner from "../../../components/shared/Spinner/Spinner";
-import type { Response } from "../../../models/globalTypes";
+import Spinner from "@components/shared/Spinner/Spinner";
+import type { Response } from "@models/globalTypes";
 
 import styles from "./ClientDashboard.module.scss";
 
@@ -58,9 +54,15 @@ export default function ClientDashboard() {
     return isQuestionnaireCheckInDue(getResponseDate(latestResponse), q.frequency);
   });
 
-  const questionnaire = assignedQs[0] ?? null;
+  // All responses across every assigned questionnaire, sorted oldest → newest for the chart
+  const assignedQIds = new Set(assignedQs.map((q) => q.id));
+  const chartResponses = allUserResponses
+    .filter((r) => assignedQIds.has(r.questionnaire_id))
+    .slice()
+    .sort((a, b) => new Date(getResponseDate(a)).getTime() - new Date(getResponseDate(b)).getTime());
 
-  const responses = useAppSelector(selectUserQuestionnaireResponses(authUser?.id ?? "", questionnaire?.id ?? ""));
+  // All questions from all assigned questionnaires, flattened (tags joined in by the fetch query)
+  const allAssignedQuestions = assignedQs.flatMap((q) => q.questions ?? []);
 
   useFetchOnIdle(
     (state: RootState) => state.questionnaires.status,
@@ -74,12 +76,12 @@ export default function ClientDashboard() {
     "Failed to fetch user responses",
   );
 
-  const latestResponse = responses[responses.length - 1] ?? null;
+  const latestResponse = chartResponses[chartResponses.length - 1] ?? null;
 
   const scaleAverage = (response: typeof latestResponse) => {
     if (!response) return null;
 
-    const scaleQuestions = questionnaire?.questions.filter((q) => q.type === "scale") ?? [];
+    const scaleQuestions = allAssignedQuestions.filter((q) => q.type === "scale");
 
     if (scaleQuestions.length === 0) return null;
 
@@ -89,7 +91,7 @@ export default function ClientDashboard() {
   };
 
   const avgScore = scaleAverage(latestResponse) ?? "–";
-  const firstAvg = scaleAverage(responses[0] ?? null);
+  const firstAvg = scaleAverage(chartResponses[0] ?? null);
 
   const improvement =
     firstAvg && latestResponse ? (parseFloat(avgScore as string) - parseFloat(firstAvg)).toFixed(1) : null;
@@ -109,7 +111,7 @@ export default function ClientDashboard() {
     },
     {
       label: "Weeks tracked",
-      value: responses.length,
+      value: chartResponses.length,
       sub: "Total check-ins",
       color: "stone",
     },
@@ -168,7 +170,7 @@ export default function ClientDashboard() {
         {/* //!show upcomiing sessions and if they user hasnt paid yet / they need to cancel. user should be emailed 4 days in advance */}
 
         <div className={styles.chartWrap}>
-          <ProgressChart responses={responses} questionnaire={questionnaire} title="Your Wellbeing Over Time" />
+          <ProgressChart responses={chartResponses} questions={allAssignedQuestions} title="Your Wellbeing Over Time" />
           {/* //!TODO: questons should really have categories like sleep, selfcare, love-tank etc etc, for each question thats made, it should map to a category. and its these cats. that will be plotted and not the long winded questions. assignment to cat. is required */}
         </div>
 

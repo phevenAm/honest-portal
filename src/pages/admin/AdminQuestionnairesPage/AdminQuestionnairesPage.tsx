@@ -18,10 +18,13 @@ import {
   pauseQuestionnaire,
   selectAllQuestionnaires,
   updateQuestionnaire,
+  updateQuestionTag,
 } from "@store/slices/questionnairesSlice";
+import SplitButton from "@components/shared/SplitButton/SplitButton";
+import { createTag, deleteTag, fetchTags, selectAllTags, selectTagsStatus, updateTag } from "@store/slices/tagsSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
-import type { Questionnaire, QuestionnaireFrequency, UserProfile } from "@models/globalTypes";
+import type { Questionnaire, QuestionnaireFrequency, Tag, UserProfile } from "@models/globalTypes";
 
 import styles from "./AdminQuestionnairesPage.module.scss";
 
@@ -35,6 +38,7 @@ type QuestionDraft = {
   maxLabel: string;
   orderIndex: number;
   is_required: boolean;
+  tag_id: string | null;
 };
 
 type QuestionnaireFormData = {
@@ -50,13 +54,16 @@ const QUESTION_TYPES = ["scale", "text"];
 
 function QuestionnaireBuilder({
   initial,
+  tags,
   onSave,
   onClose,
 }: {
   initial?: Questionnaire | null;
+  tags: Tag[];
   onSave: (data: QuestionnaireFormData) => void;
   onClose: () => void;
 }) {
+  const dispatch = useAppDispatch();
   const isEdit = !!initial;
 
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -73,6 +80,7 @@ function QuestionnaireBuilder({
       maxLabel: q.max_label ?? "",
       orderIndex: q.order_index,
       is_required: q.is_required,
+      tag_id: q.tag_id ?? null,
     })) ?? [
       {
         id: `nq-${Date.now()}`,
@@ -84,9 +92,13 @@ function QuestionnaireBuilder({
         maxLabel: "",
         orderIndex: 1,
         is_required: true,
+        tag_id: null,
       },
     ],
   );
+
+  const [creatingTagFor, setCreatingTagFor] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState("");
 
   const addQuestion = () =>
     setQuestions((qs) => [
@@ -101,13 +113,24 @@ function QuestionnaireBuilder({
         maxLabel: "",
         orderIndex: qs.length + 1,
         is_required: true,
+        tag_id: null,
       },
     ]);
 
   const removeQuestion = (id: string) => setQuestions((qs) => qs.filter((q) => q.id !== id));
 
-  const updateQuestion = (id: string, field: string, value: string) =>
+  const updateQuestion = (id: string, field: string, value: string | null) =>
     setQuestions((qs) => qs.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
+
+  const handleCreateTag = async (questionId: string) => {
+    if (!newTagName.trim()) return;
+    const result = await dispatch(createTag({ name: newTagName.trim() }));
+    if (createTag.fulfilled.match(result)) {
+      updateQuestion(questionId, "tag_id", result.payload.id);
+    }
+    setCreatingTagFor(null);
+    setNewTagName("");
+  };
 
   const handleSave = () => {
     if (!title.trim() || questions.some((q) => !q.text.trim())) {
@@ -119,13 +142,13 @@ function QuestionnaireBuilder({
   };
 
   const modalObj = {
-    title: isEdit ? "Edit questionnaire" : "New questionnaire",
+    title: isEdit ? "Edit check-in" : "New check-in",
     actions: (
       <div className={styles.modalActions}>
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save questionnaire"}</Button>
+        <Button onClick={handleSave}>{isEdit ? "Save changes" : "Save check-in"}</Button>
       </div>
     ),
     onClose,
@@ -211,6 +234,46 @@ function QuestionnaireBuilder({
                     onChange={(e) => updateQuestion(q.id, "maxLabel", e.target.value)}
                     placeholder="High label"
                   />
+                  <div className={styles.tagField}>
+                    <span>Chart tag</span>
+                    {creatingTagFor === q.id ? (
+                      <div className={styles.newTagInline}>
+                        <input
+                          // biome-ignore lint/a11y/noAutofocus: intentional focus when user requests new tag
+                          autoFocus
+                          value={newTagName}
+                          onChange={(e) => setNewTagName(e.target.value)}
+                          placeholder="Tag name (e.g. Sleep)"
+                          onKeyDown={(e) => e.key === "Enter" && handleCreateTag(q.id)}
+                        />
+                        <button type="button" onClick={() => handleCreateTag(q.id)}>
+                          Add
+                        </button>
+                        <button type="button" onClick={() => setCreatingTagFor(null)}>
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <select
+                        value={q.tag_id ?? ""}
+                        onChange={(e) => {
+                          if (e.target.value === "__new__") {
+                            setCreatingTagFor(q.id);
+                          } else {
+                            updateQuestion(q.id, "tag_id", e.target.value || null);
+                          }
+                        }}
+                      >
+                        <option value="">No tag</option>
+                        {tags.map((tag) => (
+                          <option key={tag.id} value={tag.id}>
+                            {tag.name}
+                          </option>
+                        ))}
+                        <option value="__new__">+ Create new tag…</option>
+                      </select>
+                    )}
+                  </div>
                 </>
               )}
             </div>
@@ -297,16 +360,108 @@ function AssignModal({
   );
 }
 
+// ─── Tags modal ─────────────────────────────────────────────
+
+function TagsModal({ tags, onClose }: { tags: Tag[]; onClose: () => void }) {
+  const dispatch = useAppDispatch();
+  const [newName, setNewName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    await dispatch(createTag({ name: newName.trim() }));
+    setNewName("");
+  };
+
+  const handleRename = async (tag: Tag) => {
+    if (!editName.trim()) return;
+    await dispatch(updateTag({ id: tag.id, name: editName.trim() }));
+    setEditingId(null);
+  };
+
+  return (
+    <Modal title="Manage tags" onClose={onClose}>
+      <p className={styles.assignSubtitle}>
+        Tags group scale questions on the progress chart — e.g. <strong>Sleep</strong>, <strong>Mood</strong>,{" "}
+        <strong>Relationships</strong>.
+      </p>
+
+      {tags.length === 0 ? (
+        <p className={styles.emptyText}>No tags yet. Add your first one below.</p>
+      ) : (
+        <ul className={styles.tagList}>
+          {tags.map((tag) => (
+            <li key={tag.id} className={styles.tagItem}>
+              {editingId === tag.id ? (
+                <>
+                  <input
+                    // biome-ignore lint/a11y/noAutofocus: intentional focus for inline rename
+                    autoFocus
+                    className={styles.tagEditInput}
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRename(tag)}
+                  />
+                  <Button size="sm" onClick={() => handleRename(tag)}>
+                    Save
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <span className={styles.tagItemName}>{tag.name}</span>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      setEditingId(tag.id);
+                      setEditName(tag.name);
+                    }}
+                  >
+                    Rename
+                  </Button>
+                  <Button size="sm" variant="danger" onClick={() => dispatch(deleteTag(tag.id))}>
+                    Delete
+                  </Button>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className={styles.tagAddRow}>
+        <input
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          placeholder="New tag (e.g. Mood)"
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+        />
+        <Button onClick={handleAdd}>Add tag</Button>
+      </div>
+
+      <div className={styles.modalActions}>
+        <Button onClick={onClose}>Done</Button>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── Page ───────────────────────────────────────────────────
 
 export default function AdminQuestionnairesPage() {
   const dispatch = useAppDispatch();
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const clients = useAppSelector(selectClientUsers);
+  const tags = useAppSelector(selectAllTags);
 
   const [showBuilder, setShowBuilder] = useState(false);
   const [editingQ, setEditingQ] = useState<Questionnaire | null>(null);
   const [isAssigningQ, setIsAssigningQ] = useState<Questionnaire | null>(null);
+  const [showTagsModal, setShowTagsModal] = useState(false);
 
   useFetchOnIdle(
     (state: RootState) => state.questionnaires.status,
@@ -320,6 +475,12 @@ export default function AdminQuestionnairesPage() {
     "Failed to fetch users:",
   );
 
+  useFetchOnIdle(
+    (state: RootState) => state.tags.status,
+    () => fetchTags(),
+    "Failed to fetch tags:",
+  );
+
   // When assign modal opens, fetch latest assignments for that questionnaire
   useEffect(() => {
     if (isAssigningQ) {
@@ -329,9 +490,25 @@ export default function AdminQuestionnairesPage() {
 
   const handleCreate = (data: QuestionnaireFormData) => dispatch(createQuestionnaire(data as unknown as Questionnaire));
 
-  const handleEdit = ({ questions: _, ...fields }: QuestionnaireFormData) => {
+  const handleEdit = async ({ questions, ...fields }: QuestionnaireFormData) => {
     if (!editingQ) return;
-    dispatch(updateQuestionnaire({ id: editingQ.id, ...fields }));
+    await dispatch(updateQuestionnaire({ id: editingQ.id, ...fields }));
+
+    for (const q of questions) {
+      if (q.id.startsWith("nq-")) continue; // not yet saved to DB
+      const original = editingQ.questions?.find((oq) => oq.id === q.id);
+      if (original && original.tag_id !== q.tag_id) {
+        const tagObj = q.tag_id ? (tags.find((t) => t.id === q.tag_id) ?? null) : null;
+        dispatch(
+          updateQuestionTag({
+            questionId: q.id,
+            questionnaireId: editingQ.id,
+            tag_id: q.tag_id,
+            tag: tagObj ? { id: tagObj.id, name: tagObj.name } : null,
+          }),
+        );
+      }
+    }
   };
 
   return (
@@ -339,10 +516,15 @@ export default function AdminQuestionnairesPage() {
       <div className="inner">
         <div className={styles.pageHeader}>
           <div>
-            <h1>Questionnaires</h1>
-            <p>{questionnaires.length} check-ins configured</p>
+            <h1>Check-ins</h1>
+            <p>{questionnaires.length} check-in{questionnaires.length !== 1 ? "s" : ""} configured</p>
           </div>
-          <Button onClick={() => setShowBuilder(true)}>+ New questionnaire</Button>
+          <SplitButton
+            primaryLabel="+ New check-in"
+            primaryAction={() => setShowBuilder(true)}
+            options={[{ label: "Manage tags", onClick: () => setShowTagsModal(true) }]}
+            secondaryLabel="More options"
+          />
         </div>
 
         <div className={styles.list}>
@@ -390,13 +572,15 @@ export default function AdminQuestionnairesPage() {
         </div>
       </div>
 
-      {showBuilder && <QuestionnaireBuilder onSave={handleCreate} onClose={() => setShowBuilder(false)} />}
+      {showBuilder && <QuestionnaireBuilder tags={tags} onSave={handleCreate} onClose={() => setShowBuilder(false)} />}
 
-      {editingQ && <QuestionnaireBuilder initial={editingQ} onSave={handleEdit} onClose={() => setEditingQ(null)} />}
+      {editingQ && <QuestionnaireBuilder tags={tags} initial={editingQ} onSave={handleEdit} onClose={() => setEditingQ(null)} />}
 
       {isAssigningQ && (
         <AssignModal questionnaire={isAssigningQ} clients={clients} onClose={() => setIsAssigningQ(null)} />
       )}
+
+      {showTagsModal && <TagsModal tags={tags} onClose={() => setShowTagsModal(false)} />}
     </div>
   );
 }
