@@ -1,29 +1,24 @@
-import React, { useState } from "react";
+import { useMemo } from "react";
 
 import {
   CartesianGrid,
   Legend,
   Line,
   LineChart,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
+import type { Question, Response } from "../../../models/globalTypes";
 import Card from "../Card/Card";
 
 import styles from "./ProgressChart.module.scss";
 
 const LINE_COLORS = ["#2d7264", "#5a8a6a", "#3a7fa8", "#8a6a2d", "#a8633a", "#6a2d8a"];
 
-const scoreToHeatColor = (score: number) => {
+export const scoreToHeatColor = (score: number) => {
   if (!score) return "var(--bg-muted)";
 
   const stops = [
@@ -45,7 +40,7 @@ const scoreToHeatColor = (score: number) => {
   )}, ${Math.round(a[2] + (b[2] - a[2]) * f)})`;
 };
 
-const formatDate = (iso?: string) => {
+export const formatDate = (iso?: string) => {
   if (!iso) return "Unknown";
   const date = new Date(iso);
 
@@ -56,7 +51,7 @@ const formatDate = (iso?: string) => {
 
 export const getResponseDate = (response: Response) => response.submitted_at ?? response.created_at ?? "";
 
-const getScore = (response: Response, questionId: string) => {
+export const getScore = (response: Response, questionId: string) => {
   const scores = response.scores as Record<string, number | string>;
   const raw = scores?.[questionId];
 
@@ -65,19 +60,52 @@ const getScore = (response: Response, questionId: string) => {
   return Number(raw);
 };
 
-const buildChartData = (responses: Response[], scaleQuestions: Question[]) =>
-  responses.map((response, index) => {
+type TagRef = { id: string; name: string };
+
+// Builds a questionId → tag lookup for scale questions that have a tag assigned.
+const buildTagLookup = (questions: Question[]): Map<string, TagRef> => {
+  const map = new Map<string, TagRef>();
+  for (const q of questions) {
+    if (q.type === "scale" && q.tag_id && q.tag) {
+      map.set(q.id, { id: q.tag_id, name: q.tag.name });
+    }
+  }
+  return map;
+};
+
+// For each response, averages scale scores across all questions that share the same tag.
+// Returns an array of chart data points: [{ label, index, [tagId]: avg, ... }]
+export const buildTagChartData = (
+  responses: Response[],
+  questions: Question[],
+): Record<string, string | number>[] => {
+  const tagByQuestion = buildTagLookup(questions);
+
+  return responses.map((response, index) => {
     const point: Record<string, string | number> = {
       label: formatDate(getResponseDate(response)),
       index: index + 1,
     };
 
-    scaleQuestions.forEach((question) => {
-      point[question.id] = getScore(response, question.id);
-    });
+    const accum = new Map<string, { total: number; count: number }>();
+    const scores = response.scores as Record<string, number | string>;
+
+    for (const [questionId, rawScore] of Object.entries(scores)) {
+      const tag = tagByQuestion.get(questionId);
+      if (!tag) continue;
+      const score = Number(rawScore);
+      if (!score) continue; // skip 0 / empty
+      const prev = accum.get(tag.id) ?? { total: 0, count: 0 };
+      accum.set(tag.id, { total: prev.total + score, count: prev.count + 1 });
+    }
+
+    for (const [tagId, { total, count }] of accum.entries()) {
+      point[tagId] = Math.round((total / count) * 10) / 10;
+    }
 
     return point;
   });
+};
 
 type TooltipEntry = { name: string; value: number; color: string };
 type CustomTooltipProps = { active?: boolean; payload?: TooltipEntry[]; label?: string };
@@ -122,9 +150,11 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   );
 };
 
-function LineView({ data, scaleQuestions }: { data: Record<string, string | number>[]; scaleQuestions: Question[] }) {
+type LineKey = { id: string; name: string };
+
+function LineView({ data, lines }: { data: Record<string, string | number>[]; lines: LineKey[] }) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={300} data-testid="line-chart">
       <LineChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
 
@@ -148,12 +178,12 @@ function LineView({ data, scaleQuestions }: { data: Record<string, string | numb
           }}
         />
 
-        {scaleQuestions.map((question, index) => (
+        {lines.map((line, index) => (
           <Line
-            key={question.id}
+            key={line.id}
             type="monotone"
-            dataKey={question.id}
-            name={question.text}
+            dataKey={line.id}
+            name={line.name}
             stroke={LINE_COLORS[index % LINE_COLORS.length]}
             strokeWidth={2.5}
             dot={{
@@ -169,87 +199,38 @@ function LineView({ data, scaleQuestions }: { data: Record<string, string | numb
   );
 }
 
-function _HeatView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
-  const cols = responses.length;
-
-  return (
-    <div className={styles.heatmapWrap}>
-      <div className={styles.heatmapGrid} style={{ gridTemplateColumns: `120px repeat(${cols}, 1fr)` }}>
-        <div />
-
-        {responses.map((response) => (
-          <div key={response.id} className={styles.heatmapWeekLabel}>
-            {formatDate(getResponseDate(response))}
-          </div>
-        ))}
-
-        {scaleQuestions.map((question) => (
-          <React.Fragment key={question.id}>
-            <div className={styles.heatmapRowLabel} title={question.text}>
-              {question.text.length > 18 ? `${question.text.slice(0, 18)}…` : question.text}
-            </div>
-
-            {responses.map((response) => {
-              const score = getScore(response, question.id);
-
-              return (
-                <div
-                  key={`${response.id}-${question.id}`}
-                  role="img"
-                  aria-label={`${question.text} on ${formatDate(getResponseDate(response))}: ${score}/10`}
-                  title={`${question.text} — ${formatDate(getResponseDate(response))}: ${score}/10`}
-                  className={styles.heatCell}
-                  style={{ background: scoreToHeatColor(score) }}
-                />
-              );
-            })}
-          </React.Fragment>
-        ))}
-      </div>
-
-      <div className={styles.heatLegend}>
-        <span>Low</span>
-        {[1, 3, 5, 7, 9].map((score) => (
-          <div key={score} className={styles.heatLegendSwatch} style={{ background: scoreToHeatColor(score) }} />
-        ))}
-        <span>High</span>
-      </div>
-    </div>
-  );
-}
-
-function RadarView({ responses, scaleQuestions }: { responses: Response[]; scaleQuestions: Question[] }) {
-  const latestResponse = responses[responses.length - 1];
-
-  const data = scaleQuestions.map((question) => ({
-    question: question.text.length > 22 ? `${question.text.slice(0, 22)}…` : question.text,
-    score: getScore(latestResponse, question.id),
-    fullMark: 10,
-  }));
-
-  return (
-    <ResponsiveContainer width="100%" height={360}>
-      <RadarChart data={data} margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
-        <PolarGrid stroke="var(--border)" />
-        <PolarAngleAxis dataKey="question" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-        <PolarRadiusAxis angle={90} domain={[0, 10]} tickCount={6} tick={{ fill: "var(--text-muted)", fontSize: 10 }} />
-        <Radar name="Latest check-in" dataKey="score" stroke="#2d7264" fill="#2d7264" fillOpacity={0.35} />
-        <Tooltip content={<CustomTooltip />} />
-      </RadarChart>
-    </ResponsiveContainer>
-  );
-}
+// Fallback used when no questions have tags assigned yet — plots raw scale questions.
+const buildQuestionChartData = (responses: Response[], scaleQuestions: Question[]) =>
+  responses.map((response, index) => {
+    const point: Record<string, string | number> = {
+      label: formatDate(getResponseDate(response)),
+      index: index + 1,
+    };
+    for (const q of scaleQuestions) {
+      point[q.id] = getScore(response, q.id);
+    }
+    return point;
+  });
 
 interface ProgressChartProps {
   responses: Response[];
-  questionnaire: Questionnaire | null;
+  questions: Question[];
   title?: string;
 }
 
-export default function ProgressChart({ responses, questionnaire, title = "Your Progress" }: ProgressChartProps) {
-  const [view, setView] = useState<"line" | "radar">("line");
-
-  const scaleQuestions = questionnaire?.questions?.filter((question) => question.type === "scale") ?? [];
+export default function ProgressChart({ responses, questions, title = "Your Progress" }: ProgressChartProps) {
+  const { tags, scaleQuestions } = useMemo(() => {
+    const seen = new Map<string, TagRef>();
+    const scale: Question[] = [];
+    for (const q of questions) {
+      if (q.type !== "scale") continue;
+      scale.push(q);
+      if (q.tag_id && q.tag && !seen.has(q.tag_id)) {
+        seen.set(q.tag_id, { id: q.tag_id, name: q.tag.name });
+      }
+    }
+    return { tags: Array.from(seen.values()), scaleQuestions: scale };
+  }, [questions]);
 
   if (!responses || responses.length === 0) {
     return (
@@ -267,7 +248,14 @@ export default function ProgressChart({ responses, questionnaire, title = "Your 
     );
   }
 
-  const chartData = buildChartData(responses, scaleQuestions);
+  // Tag-based chart when tags are set up; falls back to per-question lines until then
+  const usingTags = tags.length > 0;
+  const chartData = usingTags
+    ? buildTagChartData(responses, questions)
+    : buildQuestionChartData(responses, scaleQuestions);
+  const lines: LineKey[] = usingTags
+    ? tags
+    : scaleQuestions.map((q) => ({ id: q.id, name: q.text }));
 
   return (
     <Card className={styles.card}>
@@ -278,27 +266,9 @@ export default function ProgressChart({ responses, questionnaire, title = "Your 
             {responses.length} check-in{responses.length !== 1 ? "s" : ""} tracked
           </p>
         </div>
-        {/* //!TODO: fix radar not working */}
-        {/* <div role="group" aria-label="Chart type" className={styles.toggle}>
-          {(["line", "radar"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setView(value)}
-              aria-pressed={view === value}
-              className={view === value ? styles.toggleBtnActive : styles.toggleBtn}
-            >
-              {value === "line" ? "Line graph" : "Radar"}
-            </button>
-          ))}
-        </div> */}
       </div>
 
-      {view === "line" ? (
-        <LineView data={chartData} scaleQuestions={scaleQuestions} />
-      ) : (
-        <RadarView responses={responses} scaleQuestions={scaleQuestions} />
-      )}
+      <LineView data={chartData} lines={lines} />
     </Card>
   );
 }

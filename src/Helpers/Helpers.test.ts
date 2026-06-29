@@ -50,6 +50,15 @@ describe("isQuestionnaireCheckInDue", () => {
   });
 });
 
+//!function for reference
+// export const getInitials = (displayName: string | null, firstName = "", lastName = ""): string => {
+//   const name = displayName?.trim() || `${firstName} ${lastName}`.trim();
+//   const parts = name.split(" ").filter(Boolean);
+//   const first = parts[0]?.[0] ?? "";
+//   const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
+//   return (first + last).toUpperCase();
+// };
+
 describe("getInitials", () => {
   it("returns initials from a display name with two words", () => {
     expect(getInitials("Stephen Missah", "", "")).toBe("SM");
