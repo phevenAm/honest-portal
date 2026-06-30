@@ -1,0 +1,73 @@
+@use '../../../styles/spacing' as *;
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: $sp-4;
+  margin-bottom: $sp-6;
+
+  h1 { font-family: var(--font-serif); font-size: 1.9rem; font-weight: 500; color: var(--text-primary); margin: 0 0 $sp-1; }
+  p  { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+}
+
+.filterRow {
+  display: flex;
+  gap: $sp-2;
+  flex-wrap: wrap;
+  margin-bottom: $sp-6;
+}
+
+.filterBtn {
+  padding: $sp-2 $sp-4;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+  &:hover { background: var(--bg-muted); }
+  &:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+}
+
+.filterBtnActive {
+  @extend .filterBtn;
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+  &:hover { background: var(--accent-dark); }
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+}
+
+.entry {
+  padding: $sp-4 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.5;
+
+  &:last-child { border-bottom: none; }
+}
+
+.message {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.time {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.empty {
+  text-align: center;
+  padding: $sp-16;
+  color: var(--text-muted);
+}

@@ -6,6 +6,7 @@ import Footer from "../components/shared/Footer/Footer";
 import Navbar from "../components/shared/Navbar/Navbar";
 import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
+import AdminAuditLogsPage from "../pages/admin/AdminAuditLogsPage/AdminAuditLogsPage";
 import AdminClientsPage from "../pages/admin/AdminClientsPage/AdminClientsPage";
 import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
 import AdminQuestionnairesPage from "../pages/admin/AdminQuestionnairesPage/AdminQuestionnairesPage";
@@ -113,6 +114,7 @@ export default function AppRoutes() {
             <Route path="/admin/clients" element={<AdminClientsPage />} />
             <Route path="/admin/questionnaires" element={<AdminQuestionnairesPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
+            <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
           </Route>
 
           <Route path="/" element={<RootRedirect />} />

@@ -148,3 +148,15 @@ export interface ProgressChartProps {
   questions: Question[];
   title?: string;
 }
+
+export type AuditLog = {
+  id: string;
+  created_at: string;
+  actor_id: string | null;
+  action: "INSERT" | "UPDATE" | "DELETE";
+  table_name: string;
+  record_id: string | null;
+  old_data: Record<string, unknown> | null;
+  new_data: Record<string, unknown> | null;
+  actor?: Pick<UserProfile, "first_name" | "last_name"> | null;
+};

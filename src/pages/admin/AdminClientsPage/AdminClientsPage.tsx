@@ -172,7 +172,7 @@ function ClientRow({ user }: { user: UserProfile }) {
           {selectedQuestionnaire ? (
             <ProgressChart
               responses={selectedResponses}
-              questionnaire={selectedQuestionnaire}
+              questions={selectedQuestionnaire.questions ?? []}
               title={`${user.first_name}'s Progress`}
             />
           ) : (
