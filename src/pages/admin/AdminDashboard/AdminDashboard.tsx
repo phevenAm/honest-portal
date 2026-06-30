@@ -100,7 +100,7 @@ export default function AdminDashboard() {
             <Link key={m.label} to={m.to} style={{ textDecoration: "none" }}>
               <Card className={styles.metricCard}>
                 <div className={`${styles.metricIcon} ${styles[m.color]}`}>{m.icon}</div>
-                <p className={styles.metricValue}>{m.value}</p>
+                <p className={styles.metricValue}>{m.value ?? 0}</p>
                 <p className={styles.metricLabel}>{m.label}</p>
               </Card>
             </Link>
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
             <Link to={schedulerMetric.to} style={{ textDecoration: "none" }}>
               <Card className={styles.metricCard}>
                 <div className={`${styles.metricIcon} ${styles[schedulerMetric.color]}`}>{schedulerMetric.icon}</div>
-                <p className={styles.metricValue}>{schedulerMetric.value}</p>
+                <p className={styles.metricValue}>{schedulerMetric.value ?? 0}</p>
                 <p className={styles.metricLabel}>{schedulerMetric.label}</p>
               </Card>
             </Link>
