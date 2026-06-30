@@ -2,11 +2,12 @@ import { useMemo, useState } from "react";
 
 import { KEYWORDS } from "@constants/constants";
 
-import { AVATAR_COLORS, type AvatarColor, getInitials, pickColor } from "@Helpers/Helpers";
+import { pickColor } from "@Helpers/Helpers";
 
 import { useAuth } from "../../context/AuthContext";
 import Avatar from "../shared/Avatar/Avatar";
 import Button from "../shared/Button/Button";
+import UploadAndDisplayImage from "../shared/UploadAndDisplayImage/UploadAndDisplayImage";
 
 import styles from "./OnboardingModal.module.scss";
 
@@ -74,16 +75,13 @@ export default function OnboardingModal({ onComplete }: Props) {
               />
             </label>
 
-            <label className={styles.label}>
-              Profile picture URL <span className={styles.optional}>(optional)</span>
-              <input
-                className={styles.input}
-                type="url"
-                placeholder="https://..."
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
+            <div className={styles.label}>
+              Profile picture <span className={styles.optional}>(optional)</span>
+              <UploadAndDisplayImage
+                userId={userProfile?.id ?? ""}
+                onUpload={(url) => setAvatarUrl(url)}
               />
-            </label>
+            </div>
           </div>
 
           {isAdmin && saveError && <p className={styles.error}>{saveError}</p>}

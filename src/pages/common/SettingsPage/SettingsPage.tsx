@@ -6,6 +6,7 @@ import { pickColor } from "@Helpers/Helpers";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
+import UploadAndDisplayImage from "@components/shared/UploadAndDisplayImage/UploadAndDisplayImage";
 import { useAuth } from "@context/AuthContext";
 
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
@@ -68,12 +69,10 @@ const SettingsPage = () => {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label htmlFor="profilePicture">Profile picture URL</label>
-                  <input
-                    id="profilePicture"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    name="profile picture URL"
+                  <label>Profile picture</label>
+                  <UploadAndDisplayImage
+                    userId={userProfile?.id ?? ""}
+                    onUpload={(url) => setImageUrl(url)}
                   />
                 </div>
               </form>
