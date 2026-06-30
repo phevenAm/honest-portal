@@ -11,6 +11,7 @@ import { configureStore, Middleware } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import { inspirationalQuotesApi } from "../services/inspirationalQuotesApi";
+import auditLogsReducer from "./slices/auditLogsSlice";
 import assignmentsReducer from "./slices/questionnaireAssignmentsSlice";
 import questionnairesReducer from "./slices/questionnairesSlice";
 import resourcesReducer from "./slices/resourcesSlice";
@@ -28,6 +29,7 @@ export const store = configureStore({
     resources: resourcesReducer,
     tags: tagsReducer,
     theme: themeReducer,
+    auditLogs: auditLogsReducer,
     [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(inspirationalQuotesApi.middleware as Middleware),
