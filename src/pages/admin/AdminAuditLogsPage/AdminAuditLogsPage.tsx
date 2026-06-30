@@ -4,7 +4,12 @@ import Button from "@components/shared/Button/Button";
 import type { AuditLog } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
-import { fetchAuditLogs, resetAuditLogs, selectAllAuditLogs, selectAuditLogsStatus } from "@store/slices/auditLogsSlice";
+import {
+  fetchAuditLogs,
+  resetAuditLogs,
+  selectAllAuditLogs,
+  selectAuditLogsStatus,
+} from "@store/slices/auditLogsSlice";
 
 import styles from "./AdminAuditLogsPage.module.scss";
 
@@ -40,9 +45,7 @@ function getResourceName(log: AuditLog): string | null {
 }
 
 function formatMessage(log: AuditLog): string {
-  const actor = log.actor
-    ? [log.actor.first_name, log.actor.last_name].filter(Boolean).join(" ")
-    : "System";
+  const actor = log.actor ? [log.actor.first_name, log.actor.last_name].filter(Boolean).join(" ") : "System";
   const name = getResourceName(log);
   const q = name ? ` '${name}'` : "";
 
@@ -88,11 +91,11 @@ function formatMessage(log: AuditLog): string {
 // ─── Filters ───────────────────────────────────────────────
 
 const FILTERS = [
-  { label: "All",        tables: null },
-  { label: "Clients",    tables: ["users", "client_stubs", "session_notes"] },
-  { label: "Check-ins",  tables: ["questionnaires", "questionnaire_assignments"] },
-  { label: "Resources",  tables: ["resources"] },
-  { label: "Tags",       tables: ["tags"] },
+  { label: "All", tables: null },
+  { label: "Clients", tables: ["users", "client_stubs", "session_notes"] },
+  { label: "Check-ins", tables: ["questionnaires", "questionnaire_assignments"] },
+  { label: "Resources", tables: ["resources"] },
+  { label: "Tags", tables: ["tags"] },
 ] as const;
 
 type FilterLabel = (typeof FILTERS)[number]["label"];
@@ -128,7 +131,9 @@ export default function AdminAuditLogsPage() {
         <div className={styles.pageHeader}>
           <div>
             <h1>Activity</h1>
-            <p>{filtered.length} {filtered.length === 1 ? "entry" : "entries"}</p>
+            <p>
+              {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
+            </p>
           </div>
           <Button
             variant="secondary"
@@ -161,9 +166,7 @@ export default function AdminAuditLogsPage() {
             </div>
           ))}
 
-          {filtered.length === 0 && status !== "loading" && (
-            <p className={styles.empty}>No activity yet.</p>
-          )}
+          {filtered.length === 0 && status !== "loading" && <p className={styles.empty}>No activity yet.</p>}
         </div>
       </div>
     </div>
