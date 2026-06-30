@@ -7,21 +7,16 @@
   flex-wrap: wrap;
   gap: $sp-4;
   margin-bottom: $sp-6;
+
   h1 { font-family: var(--font-serif); font-size: 1.9rem; font-weight: 500; color: var(--text-primary); margin: 0 0 $sp-1; }
   p  { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
-}
-
-.filterSection {
-  display: flex;
-  flex-direction: column;
-  gap: $sp-2;
-  margin-bottom: $sp-6;
 }
 
 .filterRow {
   display: flex;
   gap: $sp-2;
   flex-wrap: wrap;
+  margin-bottom: $sp-6;
 }
 
 .filterBtn {
@@ -47,53 +42,32 @@
   &:hover { background: var(--accent-dark); }
 }
 
-.list { display: flex; flex-direction: column; gap: $sp-2; }
-
-.logRow {
+.feed {
   display: flex;
-  align-items: center;
-  gap: $sp-4;
-  padding: $sp-3 $sp-5;
+  flex-direction: column;
 }
 
-.logInfo { flex: 1; }
-
-.logMain {
+.entry {
+  padding: $sp-4 0;
+  border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
-  font-weight: 500;
+  line-height: 1.5;
+
+  &:last-child { border-bottom: none; }
+}
+
+.message {
   color: var(--text-primary);
-  margin: 0 0 2px;
+  font-weight: 500;
 }
 
-.recordId {
+.time {
+  color: var(--text-muted);
   font-weight: 400;
+}
+
+.empty {
+  text-align: center;
+  padding: $sp-16;
   color: var(--text-muted);
-  font-family: monospace;
-  font-size: 0.8rem;
 }
-
-.logMeta {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 2px 9px;
-  border-radius: var(--r-full);
-  flex-shrink: 0;
-  width: 56px;
-  justify-content: center;
-
-  &.insert { background: #d1fae5; color: #065f46; }
-  &.update { background: #fef3c7; color: #92400e; }
-  &.delete { background: #fee2e2; color: #991b1b; }
-}
-
-.empty { text-align: center; padding: $sp-16; color: var(--text-muted); }
