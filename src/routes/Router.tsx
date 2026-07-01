@@ -14,6 +14,7 @@ import AdminResourcesPage from "../pages/admin/AdminResourcesPage/AdminResources
 import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
+import AdminScheduler from "../pages/admin/AdminScheduler/AdminScheduler";
 import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
 import SettingsPage from "../pages/common/SettingsPage/SettingsPage";
 import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
@@ -112,9 +113,12 @@ export default function AppRoutes() {
           >
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/clients" element={<AdminClientsPage />} />
+            <Route path="/"
             <Route path="/admin/questionnaires" element={<AdminQuestionnairesPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
             <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+            <Route path="/admin/scheduler" element={<AdminScheduler />} />
+            {/* //! make admin/schedule/userSchedule route */}
           </Route>
 
           <Route path="/" element={<RootRedirect />} />
