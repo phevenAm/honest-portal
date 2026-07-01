@@ -29,10 +29,6 @@ type CreateSessionPayload = {
   created_by: string;
 };
 
-//? Admin side:
-
-//? Create a new session from the modal → createSession
-
 export const createSession = createAsyncThunk<SessionWithStub, CreateSessionPayload>(
   "sessions/createSession",
   async (payload, { rejectWithValue }) => {
@@ -48,10 +44,6 @@ export const createSession = createAsyncThunk<SessionWithStub, CreateSessionPayl
     return data;
   },
 );
-//? Update a session (mark paid, change status, reschedule) → updateSession
-
-//? Client side:
-
 export const fetchSessionsByClientId = createAsyncThunk<SessionWithStub[], string>(
   "sessions/fetchSessionsByClientId",
   async (clientIdPayload, { rejectWithValue }) => {
@@ -59,21 +51,25 @@ export const fetchSessionsByClientId = createAsyncThunk<SessionWithStub[], strin
 
     if (error) return rejectWithValue(error.message ?? "Failed to get your sessions, sorry!");
 
-    return data ?? [];
+    return (data ?? []).map((session) => ({ ...session, client_stubs: null }));
   },
 );
 
-//? Load their own upcoming sessions → fetchSessionsByClient
-//? Cancel a session → that's just updateSession with status: "cancelled", no separate thunk needed
+export const updateSession = createAsyncThunk<
+  SessionWithStub,
+  { id: string } & Partial<Pick<Session, "status" | "paid" | "notes" | "scheduled_at">>
+>("sessions/updateSession", async (sessionToUpdate, { rejectWithValue }) => {
+  const { id, ...fields } = sessionToUpdate;
+  const { data, error } = await supabase
+    .from("sessions")
+    .update(fields)
+    .eq("id", id)
+    .select("*, client_stubs(first_name, last_name)")
+    .single();
 
-//? So 4 thunks total: fetchAllSessions, fetchSessionsByClient, createSession, updateSession.
-
-//? The payloads to think about before you write them:
-
-//? createSession needs: stub_id, scheduled_at, duration_minutes (optional, default 50), created_by (the admin's uid)
-//? updateSession needs: id + any subset of status, paid, notes, scheduled_at
-
-//? Load all sessions to populate the calendar → fetchAllSessions - done
+  if (error) return rejectWithValue(error.message || "Failed to update session. Please try again later");
+  return data;
+});
 
 export const fetchAllSessions = createAsyncThunk<SessionWithStub[], void, { rejectValue: string }>(
   "sessions/fetchAllSessions",
@@ -97,8 +93,8 @@ const sessionsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    //-----fetch sessions
     builder
+      //-----fetch all sessions
       .addCase(fetchAllSessions.pending, (state) => {
         state.status = "loading";
       })
@@ -110,23 +106,52 @@ const sessionsSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as string;
       })
+      //-----fetch sessions by client
+      .addCase(fetchSessionsByClientId.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchSessionsByClientId.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.sessions = action.payload.sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
+      })
+      .addCase(fetchSessionsByClientId.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
       //-----create session
       .addCase(createSession.pending, (state) => {
         state.status = "loading";
       })
       .addCase(createSession.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.sessions.push(action.payload);
         state.sessions.sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
       })
       .addCase(createSession.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.payload as string;
       })
-      // ---------clientsessionfetch
-      .addCase(fetchSessionsByClientId.pending, (state) => (state.status = "loading"))
-      .addCase(fetchSessionsByClientId.fulfilled, (state, action) => {
-        state.sessions = action.payload.sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
+      //-----update session
+      .addCase(updateSession.pending, (state) => {
+        state.status = "loading";
       })
-      .addCase(fetchSessionsByClientId.rejected, (state, action) => (state.error = action.payload as string));
+      .addCase(updateSession.fulfilled, (state, action) => {
+        state.status = "succeeded";
+
+        const { id, ...rest } = action.payload;
+
+        const targetIndex = state.sessions.indexOf(id);
+
+        if (targetIndex !== -1) {
+          state.sessions[targetIndex] = action.payload;
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(updateSession.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      });
   },
 });
 
