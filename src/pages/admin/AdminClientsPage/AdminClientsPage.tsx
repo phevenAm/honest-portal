@@ -19,6 +19,7 @@ import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
 import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import SessionNotesModal from "./modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./AdminClientsPage.module.scss";
 
@@ -59,6 +60,7 @@ function ClientRow({ user }: { user: UserProfile }) {
   const [exporting, setExporting] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isNotesOpen, setNotesOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!selectedQuestionnaireId && questionnaireOptions[0]?.id) {
@@ -76,20 +78,20 @@ function ClientRow({ user }: { user: UserProfile }) {
 
   const avgScore = getScoreAverage(latestResponse, latestQuestionnaire);
 
-  const handleExport = async () => {
-    setExporting(true);
-    await exportClientPDF({
-      user,
-      responses: selectedResponses,
-      questionnaire: selectedQuestionnaire,
-    });
-    setExporting(false);
-  };
+  // const handleExport = async () => {
+  //   setExporting(true);
+  //   await exportClientPDF({
+  //     user,
+  //     responses: selectedResponses,
+  //     questionnaire: selectedQuestionnaire,
+  //   });
+  //   setExporting(false);
+  // };
 
   return (
     <>
       <div className={styles.clientRow}>
-        <Avatar name={user?.display_name || ""} color="teal" size={40} />
+        <Avatar name={`${user.first_name} ${user.last_name}`} imageSrc={user.avatar_url ?? ""} size={40} />
 
         <div className={styles.clientMeta}>
           <p className={styles.clientName}>
@@ -117,28 +119,28 @@ function ClientRow({ user }: { user: UserProfile }) {
         </div>
 
         <div className={styles.rowActions}>
-          <Button
+          {/* <Button
             variant="secondary"
             size="sm"
             onClick={() => setExpanded(!expanded)}
             disabled={allResponses.length === 0}
           >
             {expanded ? "Hide" : "View"} progress
-          </Button>
-
-          <Button
+          </Button> */}
+          {/* <Button
             variant="ghost"
             size="sm"
             onClick={handleExport}
             disabled={exporting || selectedResponses.length === 0}
           >
             {exporting ? "…" : "Export PDF"}
-          </Button>
-
-          <Button variant="ghost" size="sm" onClick={() => setNotesOpen(true)}>
+          </Button> */}
+          {/* <Button variant="ghost" size="sm" onClick={() => setNotesOpen(true)}>
             Notes
-          </Button>
-
+          </Button> */}
+          <Button onClick={() => navigate(`/admin/clients/${user.id}`)}>Manage</Button>
+          {/* //! use a split button, secondary options are delete (which should open a confirmation
+          modal), view notes and export pdf */}
           <Button
             variant="danger"
             size="sm"
@@ -352,7 +354,6 @@ export default function AdminClientsPage() {
   const [createProfileModal, setCreateProfileModal] = useState(false);
   const [search, setSearch] = useState("");
   const [stubs, setStubs] = useState<ClientStub[]>([]);
-
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
 
   useEffect(() => {
