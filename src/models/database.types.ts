@@ -8,6 +8,47 @@ export type Database = {
   };
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          created_at: string;
+          id: string;
+          new_data: Json | null;
+          old_data: Json | null;
+          record_id: string | null;
+          table_name: string;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          created_at?: string;
+          id?: string;
+          new_data?: Json | null;
+          old_data?: Json | null;
+          record_id?: string | null;
+          table_name: string;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          created_at?: string;
+          id?: string;
+          new_data?: Json | null;
+          old_data?: Json | null;
+          record_id?: string | null;
+          table_name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       client_stubs: {
         Row: {
           created_at: string;
@@ -313,6 +354,53 @@ export type Database = {
           },
         ];
       };
+      sessions: {
+        Row: {
+          client_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          duration_minutes: number;
+          id: string;
+          notes: string | null;
+          paid: boolean;
+          scheduled_at: string;
+          status: Database["public"]["Enums"]["session_status"];
+          stub_id: string | null;
+        };
+        Insert: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          duration_minutes?: number;
+          id?: string;
+          notes?: string | null;
+          paid?: boolean;
+          scheduled_at: string;
+          status?: Database["public"]["Enums"]["session_status"];
+          stub_id?: string | null;
+        };
+        Update: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          duration_minutes?: number;
+          id?: string;
+          notes?: string | null;
+          paid?: boolean;
+          scheduled_at?: string;
+          status?: Database["public"]["Enums"]["session_status"];
+          stub_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sessions_stub_id_fkey";
+            columns: ["stub_id"];
+            isOneToOne: false;
+            referencedRelation: "client_stubs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       tags: {
         Row: {
           created_at: string;
@@ -397,7 +485,7 @@ export type Database = {
       get_my_role: { Args: never; Returns: string };
     };
     Enums: {
-      [_ in never]: never;
+      session_status: "scheduled" | "completed" | "cancelled" | "no_show";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -516,6 +604,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      session_status: ["scheduled", "completed", "cancelled", "no_show"],
+    },
   },
 } as const;
