@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { supabase } from "@/lib/supabase.js";
-import type { Session, AuthUser, SessionStatus } from "@/models/globalTypes.js";
+import type { Session, SessionStatus } from "@/models/globalTypes.js";
 
 // Admin fetches join client_stubs so the calendar can show a client name.
 // Client fetches skip the join (RLS blocks client_stubs reads for non-admins).

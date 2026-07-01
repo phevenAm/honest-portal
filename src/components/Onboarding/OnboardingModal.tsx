@@ -77,10 +77,7 @@ export default function OnboardingModal({ onComplete }: Props) {
 
             <div className={styles.label}>
               Profile picture <span className={styles.optional}>(optional)</span>
-              <UploadAndDisplayImage
-                userId={userProfile?.id ?? ""}
-                onUpload={(url) => setAvatarUrl(url)}
-              />
+              <UploadAndDisplayImage userId={userProfile?.id ?? ""} onUpload={(url) => setAvatarUrl(url)} />
             </div>
           </div>
 
