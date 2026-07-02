@@ -136,11 +136,7 @@ const sessionsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(updateSession.fulfilled, (state, action) => {
-        state.status = "succeeded";
-
-        const { id, ...rest } = action.payload;
-
-        const targetIndex = state.sessions.indexOf(id);
+        const targetIndex = state.sessions.findIndex((s) => s.id === action.payload.id);
 
         if (targetIndex !== -1) {
           state.sessions[targetIndex] = action.payload;
