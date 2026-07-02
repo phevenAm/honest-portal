@@ -14,8 +14,7 @@ import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice"
 
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
-import { exportClientPDF, getScoreAverage } from "./utils/AdminClientsPageUtils";
-
+import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
 import styles from "./AdminClientsPageDetailed.module.scss";
 
 export default function AdminClientsPageDetailed() {
@@ -32,6 +31,7 @@ export default function AdminClientsPageDetailed() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
+  const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllUsers());

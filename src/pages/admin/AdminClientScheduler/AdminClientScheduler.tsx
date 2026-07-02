@@ -2,12 +2,12 @@
 //TODO: should show a calender where admin can allocate date and time to a client. admin should be able to click on a user and view a list of their future sessions. there should be action byttions next to each session and checkbox to bulk edit. actions include canceling and moving dates altogther. cancellination and date change should always fire an email over to the client
 // maybe here or in cleints page, admin should be able to get how often client has attended, paid late, cancelled and what dates these occoured.
 
-const AdminScheduler = () => {
+const AdminClientScheduler = () => {
   return (
     <div>
-      <h1>AdminScheduler</h1>
+      <h1>AdminClientScheduler</h1>
     </div>
   );
 };
 
-export default AdminScheduler;
+export default AdminClientScheduler;

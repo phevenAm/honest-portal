@@ -3,14 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { supabase } from "@/lib/supabase.js";
 import type { Session, SessionStatus } from "@/models/globalTypes.js";
 
-// Admin fetches join client_stubs so the calendar can show a client name.
-// Client fetches skip the join (RLS blocks client_stubs reads for non-admins).
-export type SessionWithStub = Session & {
-  client_stubs: { first_name: string; last_name: string } | null;
-};
-
 type SessionsState = {
-  sessions: SessionWithStub[];
+  sessions: Session[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 };
@@ -22,20 +16,20 @@ const initialState: SessionsState = {
 };
 
 type CreateSessionPayload = {
-  stub_id: string;
+  client_id: string;
   scheduled_at: string;
   duration_minutes?: number;
   notes?: string;
   created_by: string;
 };
 
-export const createSession = createAsyncThunk<SessionWithStub, CreateSessionPayload>(
+export const createSession = createAsyncThunk<Session, CreateSessionPayload>(
   "sessions/createSession",
   async (payload, { rejectWithValue }) => {
     const { data, error } = await supabase
       .from("sessions")
       .insert({ ...payload })
-      .select("*, client_stubs(first_name, last_name)")
+      .select("*")
       .single();
 
     if (error) {
@@ -44,40 +38,32 @@ export const createSession = createAsyncThunk<SessionWithStub, CreateSessionPayl
     return data;
   },
 );
-export const fetchSessionsByClientId = createAsyncThunk<SessionWithStub[], string>(
+export const fetchSessionsByClientId = createAsyncThunk<Session[], string>(
   "sessions/fetchSessionsByClientId",
   async (clientIdPayload, { rejectWithValue }) => {
     const { data, error } = await supabase.from("sessions").select("*").eq("client_id", clientIdPayload);
 
     if (error) return rejectWithValue(error.message ?? "Failed to get your sessions, sorry!");
 
-    return (data ?? []).map((session) => ({ ...session, client_stubs: null }));
+    return data ?? [];
   },
 );
 
 export const updateSession = createAsyncThunk<
-  SessionWithStub,
+  Session,
   { id: string } & Partial<Pick<Session, "status" | "paid" | "notes" | "scheduled_at">>
 >("sessions/updateSession", async (sessionToUpdate, { rejectWithValue }) => {
   const { id, ...fields } = sessionToUpdate;
-  const { data, error } = await supabase
-    .from("sessions")
-    .update(fields)
-    .eq("id", id)
-    .select("*, client_stubs(first_name, last_name)")
-    .single();
+  const { data, error } = await supabase.from("sessions").update(fields).eq("id", id).select("*").single();
 
   if (error) return rejectWithValue(error.message || "Failed to update session. Please try again later");
   return data;
 });
 
-export const fetchAllSessions = createAsyncThunk<SessionWithStub[], void, { rejectValue: string }>(
+export const fetchAllSessions = createAsyncThunk<Session[], void, { rejectValue: string }>(
   "sessions/fetchAllSessions",
   async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase
-      .from("sessions")
-      .select("*, client_stubs(first_name, last_name)")
-      .order("scheduled_at", { ascending: false });
+    const { data, error } = await supabase.from("sessions").select("*").order("scheduled_at", { ascending: false });
     if (error) return rejectWithValue(error?.message ?? "Something went wrong, could not get sessions!");
 
     return data ?? [];

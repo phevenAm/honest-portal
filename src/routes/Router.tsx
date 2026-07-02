@@ -8,6 +8,7 @@ import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import AdminAuditLogsPage from "../pages/admin/AdminAuditLogsPage/AdminAuditLogsPage";
 import AdminClientsPage from "../pages/admin/AdminClientsPage/AdminClientsPage";
+import AdminClientsPageDetailed from "../pages/admin/AdminClientsPageDetailed/AdminClientsPageDetailed";
 import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
 import AdminQuestionnairesPage from "../pages/admin/AdminQuestionnairesPage/AdminQuestionnairesPage";
 import AdminResourcesPage from "../pages/admin/AdminResourcesPage/AdminResourcesPage";
@@ -15,6 +16,7 @@ import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
 import AdminScheduler from "../pages/admin/AdminScheduler/AdminScheduler";
+import AdminClientScheduler from "../pages/admin/AdminClientScheduler/AdminClientScheduler";
 import ResourcesPage from "../pages/client/ResourcesPage/ResourcesPage";
 import SettingsPage from "../pages/common/SettingsPage/SettingsPage";
 import SignUpPage from "../pages/common/SignUpPage/SignUpPage";
@@ -113,11 +115,12 @@ export default function AppRoutes() {
           >
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/clients" element={<AdminClientsPage />} />
-            <Route path="/"
+            <Route path="/admin/clients/:clientId" element={<AdminClientsPageDetailed />} />
             <Route path="/admin/questionnaires" element={<AdminQuestionnairesPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
             <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
             <Route path="/admin/scheduler" element={<AdminScheduler />} />
+            <Route path="/admin/scheduler/:clientId" element={<AdminClientScheduler />} />
             {/* //! make admin/schedule/userSchedule route */}
           </Route>
 

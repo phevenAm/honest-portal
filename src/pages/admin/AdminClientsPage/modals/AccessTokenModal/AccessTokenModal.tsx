@@ -5,7 +5,7 @@ import Modal from "@components/shared/Modal/Modal";
 import { supabase } from "@lib/supabase";
 
 import styles from "../../AdminClientsPage.module.scss";
-import { generateAccessToken } from "../../utils/AdminClientsPageUtils";
+import { generateAccessToken } from "../../../utils/AdminClientsPageUtils";
 
 export default function AccessTokenModal({ onClose }: { onClose: () => void }) {
   const [token, setToken] = useState(generateAccessToken());
