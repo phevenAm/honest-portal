@@ -50,7 +50,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "sync-tokens": "node sync-tokens.js",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "lint:fix": "biome check --write .",
