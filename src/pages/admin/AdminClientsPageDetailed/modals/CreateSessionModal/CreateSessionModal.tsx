@@ -26,6 +26,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringWeeks, setRecurringWeeks] = useState(3);
   const [sessionDuration, setSessionDuration] = useState(50);
+  const [isPrepaid, setIsPrepaid] = useState(false);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
 
@@ -52,6 +53,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
           createSession({
             client_id: id,
             scheduled_at: date.toISOString(),
+            paid: isPrepaid,
             duration_minutes: sessionDuration,
             notes: notes.trim() || undefined,
             created_by: authUser.id,
@@ -152,6 +154,18 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
+
+          <div className={styles.prepaidGroup}>
+            <input
+              id="prepaidBlock"
+              type="checkbox"
+              checked={isPrepaid}
+              onChange={(e) => setIsPrepaid(e.target.checked)}
+            />
+            <label htmlFor="prepaidBlock" className={styles.checkboxLabel}>
+              Prepaid block of sessions?
+            </label>
+          </div>
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

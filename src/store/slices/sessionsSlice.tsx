@@ -15,13 +15,7 @@ const initialState: SessionsState = {
   error: null,
 };
 
-type CreateSessionPayload = {
-  client_id: string; // UUID — users.id
-  scheduled_at: string; // ISO 8601
-  duration_minutes?: number;
-  notes?: string;
-  created_by: string; // UUID — users.id (the admin)
-};
+type CreateSessionPayload = Omit<Session, "id" | "created_at" | "status">;
 
 export const createSession = createAsyncThunk<Session, CreateSessionPayload>(
   "sessions/createSession",

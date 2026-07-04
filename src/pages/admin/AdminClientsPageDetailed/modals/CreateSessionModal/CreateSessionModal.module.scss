@@ -49,6 +49,12 @@
   gap: $sp-3;
 }
 
+.prepaidGroup {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+}
+
 .checkboxLabel {
   font-size: 0.9rem;
   color: var(--text-primary);
