@@ -15,13 +15,14 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
+import SplitButton from "@/components/shared/SplitButton/SplitButton";
+import WIP from "@/components/shared/WIP/WIP";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
+import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
-import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
-import SplitButton from "@/components/shared/SplitButton/SplitButton";
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
@@ -204,20 +205,22 @@ export default function AdminClientsPageDetailed() {
           )}
         </div>
 
-        {/* Sessions placeholder */}
-        <Card className={[styles.section, styles.session].join(" ")}>
-          <div className={styles.sessionHeading}>
-            <h2 className={styles.sectionTitle}>Sessions</h2>
+        <WIP>
+          {/* //!Sessions section TODO */}
+          <Card className={[styles.section, styles.session].join(" ")}>
+            <div className={styles.sessionHeading}>
+              <h2 className={styles.sectionTitle}>Sessions</h2>
 
-            <SplitButton
-              primaryLabel="+ Create new session"
-              size="sm"
-              primaryAction={() => setIsScheduleEditorOpen(true)}
-              options={[{ label: "Manage sessions", onClick: () => setIsManageSessionsModal(true) }]}
-            />
-          </div>
-          <p className={styles.placeholder}>Session scheduling coming soon.</p>
-        </Card>
+              <SplitButton
+                primaryLabel="+ Create new session"
+                size="sm"
+                primaryAction={() => setIsScheduleEditorOpen(true)}
+                options={[{ label: "Manage sessions", onClick: () => setIsManageSessionsModal(true) }]}
+              />
+            </div>
+            <p className={styles.placeholder}>Session scheduling coming soon.</p>
+          </Card>
+        </WIP>
 
         {/* Danger zone */}
         <div className={styles.dangerZone}>
