@@ -24,7 +24,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
   const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringWeeks, setRecurringWeeks] = useState(4);
+  const [recurringWeeks, setRecurringWeeks] = useState(3);
   const [sessionDuration, setSessionDuration] = useState(50);
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
@@ -34,17 +34,35 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
     setIsSaving(true);
     setError("");
 
-    const result = await dispatch(
-      createSession({
-        client_id: id,
-        scheduled_at: scheduledAt.toISOString(),
-        duration_minutes: sessionDuration,
-        notes: notes.trim() || undefined,
-        created_by: authUser.id,
+    const repeatingDatesArry = [scheduledAt];
+
+    //     const dates = isRecurring
+    //   ? Array.from({ length: recurringWeeks + 1 }, (_, i) => scheduledAt.add(i, 'week'))
+    //   : [scheduledAt];
+
+    if (isRecurring) {
+      for (let i = 1; i <= recurringWeeks; i++) {
+        repeatingDatesArry.push(scheduledAt.add(i, "week"));
+      }
+    }
+
+    const result = await Promise.all(
+      repeatingDatesArry.map((date) => {
+        return dispatch(
+          createSession({
+            client_id: id,
+            scheduled_at: date.toISOString(),
+            duration_minutes: sessionDuration,
+            notes: notes.trim() || undefined,
+            created_by: authUser.id,
+          }),
+        );
       }),
     );
 
-    if (result.meta.requestStatus === "fulfilled") {
+    const allSuccess = result.every((i) => i?.meta.requestStatus === "fulfilled");
+
+    if (allSuccess) {
       onClose();
     } else {
       setError("Failed to schedule session. Please try again.");
@@ -108,14 +126,14 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
         {isRecurring && (
           <div className={styles.fieldGroup}>
             <label className={styles.label} htmlFor="recurring-weeks">
-              Number of weeks (max 4)
+              Number of weeks (max 3 to total 4 sessions)
             </label>
             <input
               id="recurring-weeks"
               className={styles.input}
               type="number"
               min={1}
-              max={4}
+              max={3}
               value={recurringWeeks}
               onChange={(e) => setRecurringWeeks(Number(e.target.value))}
             />

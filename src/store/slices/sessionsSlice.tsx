@@ -40,8 +40,8 @@ export const createSession = createAsyncThunk<Session, CreateSessionPayload>(
 );
 export const fetchSessionsByClientId = createAsyncThunk<Session[], string>(
   "sessions/fetchSessionsByClientId",
-  async (clientIdPayload, { rejectWithValue }) => {
-    const { data, error } = await supabase.from("sessions").select("*").eq("client_id", clientIdPayload);
+  async (clientId, { rejectWithValue }) => {
+    const { data, error } = await supabase.from("sessions").select("*").eq("client_id", clientId);
 
     if (error) return rejectWithValue(error.message ?? "Failed to get your sessions, sorry!");
 
