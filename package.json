@@ -14,7 +14,6 @@
     "@supabase/supabase-js": "^2.99.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vercel/speed-insights": "^2.0.0",
     "dayjs": "^1.11.21",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",

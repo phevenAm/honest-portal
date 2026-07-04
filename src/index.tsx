@@ -1,8 +1,6 @@
 import ReactDOM from "react-dom/client";
 import "./index.scss";
 
-import { SpeedInsights } from "@vercel/speed-insights/react";
-
 import App from "./App";
 
 if (import.meta.env.DEV) {
@@ -18,7 +16,6 @@ root.render(
   // <React.StrictMode>
   <>
     <App />
-    <SpeedInsights />
   </>,
   // </React.StrictMode>
 );
