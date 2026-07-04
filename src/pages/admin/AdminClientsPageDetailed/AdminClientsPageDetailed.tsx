@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: <explanation> */
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -204,7 +205,7 @@ export default function AdminClientsPageDetailed() {
         </div>
 
         {/* Sessions placeholder */}
-        <Card className={[styles.section, styles.session].filter(Boolean).join("")}>
+        <Card className={[styles.section, styles.session].join(" ")}>
           <div className={styles.sessionHeading}>
             <h2 className={styles.sectionTitle}>Sessions</h2>
 
@@ -253,10 +254,9 @@ export default function AdminClientsPageDetailed() {
       )}
 
       {isManageSessionsModal && <div>Manage sessions modal</div>}
-      {/** biome-ignore lint/style/noNonNullAssertion: <explanation> */}
       {isScheduleEditorOpen && (
         <CreateSessionModal
-          clientName={client.display_name}
+          clientName={client.display_name || client.first_name}
           id={clientId!}
           onClose={() => setIsScheduleEditorOpen(false)}
         />
