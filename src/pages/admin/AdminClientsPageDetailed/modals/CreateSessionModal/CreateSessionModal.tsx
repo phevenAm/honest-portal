@@ -35,21 +35,16 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
     setIsSaving(true);
     setError("");
 
-    const repeatingDatesArry = [scheduledAt];
-
-    //     const dates = isRecurring
-    //   ? Array.from({ length: recurringWeeks + 1 }, (_, i) => scheduledAt.add(i, 'week'))
-    //   : [scheduledAt];
-
+    const dates = [scheduledAt];
     if (isRecurring) {
       for (let i = 1; i <= recurringWeeks; i++) {
-        repeatingDatesArry.push(scheduledAt.add(i, "week"));
+        dates.push(scheduledAt.add(i, "week"));
       }
     }
 
     const result = await Promise.all(
-      repeatingDatesArry.map((date) => {
-        return dispatch(
+      dates.map((date) =>
+        dispatch(
           createSession({
             client_id: id,
             scheduled_at: date.toISOString(),
@@ -58,8 +53,8 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
             notes: notes.trim() || undefined,
             created_by: authUser.id,
           }),
-        );
-      }),
+        ),
+      ),
     );
 
     const allSuccess = result.every((i) => i?.meta.requestStatus === "fulfilled");
@@ -100,17 +95,19 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
 
         <div className={styles.fieldGroup}>
           <label className={styles.label} htmlFor="session-duration">
-            Duration (minutes)
+            Session duration
           </label>
-          <input
-            id="session-duration"
-            className={styles.input}
-            type="number"
-            min={10}
-            max={90}
-            value={sessionDuration}
-            onChange={(e) => setSessionDuration(Number(e.target.value))}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="session-duration"
+              className={styles.input}
+              type="number"
+              min={10}
+              max={90}
+              value={sessionDuration}
+              onChange={(e) => setSessionDuration(Number(e.target.value))}
+            />
+          </div>
         </div>
 
         <div className={styles.checkboxGroup}>
@@ -128,7 +125,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
         {isRecurring && (
           <div className={styles.fieldGroup}>
             <label className={styles.label} htmlFor="recurring-weeks">
-              Number of weeks (max 3 to total 4 sessions)
+              Additional weeks
             </label>
             <input
               id="recurring-weeks"
@@ -142,6 +139,20 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
           </div>
         )}
 
+        <fieldset className={styles.fieldGroup}>
+          <legend className={styles.label}>Payment</legend>
+          <div className={styles.radioGroup}>
+            <label className={styles.radioLabel}>
+              <input type="radio" name="payment" checked={!isPrepaid} onChange={() => setIsPrepaid(false)} />
+              Invoice after session
+            </label>
+            <label className={styles.radioLabel}>
+              <input type="radio" name="payment" checked={isPrepaid} onChange={() => setIsPrepaid(true)} />
+              Prepaid
+            </label>
+          </div>
+        </fieldset>
+
         <div className={styles.fieldGroup}>
           <label className={styles.label} htmlFor="session-notes">
             Notes <span className={styles.optional}>(optional)</span>
@@ -154,18 +165,6 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
-
-          <div className={styles.prepaidGroup}>
-            <input
-              id="prepaidBlock"
-              type="checkbox"
-              checked={isPrepaid}
-              onChange={(e) => setIsPrepaid(e.target.checked)}
-            />
-            <label htmlFor="prepaidBlock" className={styles.checkboxLabel}>
-              Prepaid block of sessions?
-            </label>
-          </div>
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
