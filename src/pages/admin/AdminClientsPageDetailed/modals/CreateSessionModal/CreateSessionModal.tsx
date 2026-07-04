@@ -78,7 +78,8 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!scheduledAt || isSaving}>
-            {isSaving ? "Scheduling…" : "Schedule session"}
+            {/** biome-ignore lint/style/noNestedTernary: <explanation> */}
+            {isSaving ? "Scheduling…" : isRecurring ? "Schedule sessions" : "Schedule session"}
           </Button>
         </div>
       }
