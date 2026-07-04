@@ -144,7 +144,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
           <div className={styles.radioGroup}>
             <label className={styles.radioLabel}>
               <input type="radio" name="payment" checked={!isPrepaid} onChange={() => setIsPrepaid(false)} />
-              Invoice after session
+              Payment pending
             </label>
             <label className={styles.radioLabel}>
               <input type="radio" name="payment" checked={isPrepaid} onChange={() => setIsPrepaid(true)} />
