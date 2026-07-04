@@ -24,7 +24,7 @@ const SplitButton = ({
     { label: "Test Labaasdssdel", onClick: () => console.log("hi") },
   ],
   primaryLabel = "placeholder primary label",
-  secondaryLabel = "Open more otions",
+  secondaryLabel = "Show more options",
 }: SplitButtonProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const classes = [styles.btn, styles[variant], styles[size]].filter(Boolean).join(" ");

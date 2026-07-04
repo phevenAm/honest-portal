@@ -16,11 +16,11 @@ const initialState: SessionsState = {
 };
 
 type CreateSessionPayload = {
-  client_id: string;
-  scheduled_at: string;
+  client_id: string; // UUID — users.id
+  scheduled_at: string; // ISO 8601
   duration_minutes?: number;
   notes?: string;
-  created_by: string;
+  created_by: string; // UUID — users.id (the admin)
 };
 
 export const createSession = createAsyncThunk<Session, CreateSessionPayload>(

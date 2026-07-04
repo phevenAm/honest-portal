@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import dayjs from "dayjs";
+
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
@@ -42,7 +44,9 @@ function ClientRow({ user }: { user: UserProfile }) {
 
   const latestResponse = allResponses[allResponses.length - 1];
   const latestQuestionnaire = getQuestionnaireForResponse(latestResponse, questionnaires);
-  const lastCheckIn = (latestResponse?.submitted_at ?? latestResponse?.created_at)?.split("T")[0] ?? "–";
+  const lastCheckIn = latestResponse
+    ? dayjs(latestResponse.submitted_at ?? latestResponse.created_at).format("D MMM YYYY")
+    : "–";
 
   const [expanded, setExpanded] = useState(false);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import dayjs from "dayjs";
+
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
@@ -15,7 +17,10 @@ import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice"
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
+
 import styles from "./AdminClientsPageDetailed.module.scss";
+import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
+import SplitButton from "@/components/shared/SplitButton/SplitButton";
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
@@ -32,6 +37,7 @@ export default function AdminClientsPageDetailed() {
   const [exporting, setExporting] = useState(false);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
   const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
+  const [isManageSessionsModal, setIsManageSessionsModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllUsers());
@@ -68,7 +74,7 @@ export default function AdminClientsPageDetailed() {
   const latestQuestionnaire = questionnaires.find((q) => q.id === latestResponse?.questionnaire_id);
   const avgScore = latestResponse ? getScoreAverage(latestResponse, latestQuestionnaire) : null;
   const lastCheckIn = latestResponse
-    ? ((latestResponse.submitted_at ?? latestResponse.created_at)?.split("T")[0] ?? "—")
+    ? dayjs(latestResponse.submitted_at ?? latestResponse.created_at).format("D MMM YYYY")
     : "—";
 
   const handleExport = async () => {
@@ -160,7 +166,6 @@ export default function AdminClientsPageDetailed() {
         {/* Progress chart — ProgressChart renders its own Card, so no outer wrapper */}
         <div className={styles.progressSection}>
           <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>Progress</h2>
             {questionnaireOptions.length > 1 && (
               <div className={styles.progressControls}>
                 <label htmlFor="q-select">Questionnaire</label>
@@ -199,8 +204,17 @@ export default function AdminClientsPageDetailed() {
         </div>
 
         {/* Sessions placeholder */}
-        <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>Sessions</h2>
+        <Card className={[styles.section, styles.session].filter(Boolean).join("")}>
+          <div className={styles.sessionHeading}>
+            <h2 className={styles.sectionTitle}>Sessions</h2>
+
+            <SplitButton
+              primaryLabel="+ Create new session"
+              size="sm"
+              primaryAction={() => setIsScheduleEditorOpen(true)}
+              options={[{ label: "Manage sessions", onClick: () => setIsManageSessionsModal(true) }]}
+            />
+          </div>
           <p className={styles.placeholder}>Session scheduling coming soon.</p>
         </Card>
 
@@ -235,6 +249,16 @@ export default function AdminClientsPageDetailed() {
               ? This cannot be undone.
             </>
           }
+        />
+      )}
+
+      {isManageSessionsModal && <div>Manage sessions modal</div>}
+      {/** biome-ignore lint/style/noNonNullAssertion: <explanation> */}
+      {isScheduleEditorOpen && (
+        <CreateSessionModal
+          clientName={client.display_name}
+          id={clientId!}
+          onClose={() => setIsScheduleEditorOpen(false)}
         />
       )}
     </div>
