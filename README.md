@@ -72,6 +72,14 @@ Create and manage check-ins with configurable questions (free text or 1–10 sca
 
 ---
 
+### Admin — Resource manager
+
+Publish and manage curated resources by type (websites, documents, articles, videos) with sensitivity flags.
+
+![Admin resources](docs/screenshots/admin-resources.png)
+
+---
+
 ### Admin — Activity log
 
 Filterable audit trail of all actions across clients, check-ins, resources, and tags.
@@ -87,6 +95,8 @@ Personalised greeting, an inspirational quote shaped by focus keywords, wellbein
 ![Client dashboard — light mode](docs/screenshots/client-dashboard-light.png)
 
 ![Client dashboard — dark mode](docs/screenshots/client-dashboard-dark.png)
+
+![Client dashboard — dark mode, check-ins complete](docs/screenshots/client-dashboard-dark-completed.png)
 
 ---
 
