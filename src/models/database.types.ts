@@ -8,35 +8,46 @@ export type Database = {
   };
   public: {
     Tables: {
-      client_stubs: {
+      audit_logs: {
         Row: {
+          action: string;
+          actor_id: string | null;
           created_at: string;
-          created_by: string;
-          email: string | null;
-          first_name: string;
           id: string;
-          last_name: string;
-          linked_user_id: string | null;
+          new_data: Json | null;
+          old_data: Json | null;
+          record_id: string | null;
+          table_name: string;
         };
         Insert: {
+          action: string;
+          actor_id?: string | null;
           created_at?: string;
-          created_by: string;
-          email?: string | null;
-          first_name: string;
           id?: string;
-          last_name: string;
-          linked_user_id?: string | null;
+          new_data?: Json | null;
+          old_data?: Json | null;
+          record_id?: string | null;
+          table_name: string;
         };
         Update: {
+          action?: string;
+          actor_id?: string | null;
           created_at?: string;
-          created_by?: string;
-          email?: string | null;
-          first_name?: string;
           id?: string;
-          last_name?: string;
-          linked_user_id?: string | null;
+          new_data?: Json | null;
+          old_data?: Json | null;
+          record_id?: string | null;
+          table_name?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       platform_access_token: {
         Row: {
@@ -284,7 +295,6 @@ export type Database = {
           content: string;
           created_at: string;
           id: string;
-          stub_id: string | null;
           user_id: string | null;
         };
         Insert: {
@@ -292,7 +302,6 @@ export type Database = {
           content: string;
           created_at?: string;
           id?: string;
-          stub_id?: string | null;
           user_id?: string | null;
         };
         Update: {
@@ -300,18 +309,53 @@ export type Database = {
           content?: string;
           created_at?: string;
           id?: string;
-          stub_id?: string | null;
           user_id?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: "session_notes_stub_id_fkey";
-            columns: ["stub_id"];
+            foreignKeyName: "session_notes_user_id_fkey";
+            columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "client_stubs";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
+      };
+      sessions: {
+        Row: {
+          client_id: string | null;
+          created_at: string;
+          created_by: string | null;
+          duration_minutes: number;
+          id: string;
+          notes: string | null;
+          paid: boolean;
+          scheduled_at: string;
+          status: Database["public"]["Enums"]["session_status"];
+        };
+        Insert: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          duration_minutes?: number;
+          id?: string;
+          notes?: string | null;
+          paid?: boolean;
+          scheduled_at: string;
+          status?: Database["public"]["Enums"]["session_status"];
+        };
+        Update: {
+          client_id?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          duration_minutes?: number;
+          id?: string;
+          notes?: string | null;
+          paid?: boolean;
+          scheduled_at?: string;
+          status?: Database["public"]["Enums"]["session_status"];
+        };
+        Relationships: [];
       };
       tags: {
         Row: {
@@ -336,6 +380,7 @@ export type Database = {
           age: number | null;
           avatar_url: string | null;
           created_at: string;
+          deleted_at: string | null;
           disabled: boolean | null;
           display_name: string | null;
           dob: string | null;
@@ -350,6 +395,7 @@ export type Database = {
           age?: number | null;
           avatar_url?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           disabled?: boolean | null;
           display_name?: string | null;
           dob?: string | null;
@@ -364,6 +410,7 @@ export type Database = {
           age?: number | null;
           avatar_url?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           disabled?: boolean | null;
           display_name?: string | null;
           dob?: string | null;
@@ -397,7 +444,7 @@ export type Database = {
       get_my_role: { Args: never; Returns: string };
     };
     Enums: {
-      [_ in never]: never;
+      session_status: "scheduled" | "completed" | "cancelled" | "no_show";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -516,6 +563,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      session_status: ["scheduled", "completed", "cancelled", "no_show"],
+    },
   },
 } as const;

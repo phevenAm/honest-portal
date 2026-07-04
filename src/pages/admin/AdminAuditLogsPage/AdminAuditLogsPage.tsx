@@ -74,11 +74,6 @@ function formatMessage(log: AuditLog): string {
       if (log.action === "UPDATE") return `${actor} updated tag${q}`;
       if (log.action === "DELETE") return `${actor} deleted tag${q}`;
       break;
-    case "client_stubs":
-      if (log.action === "INSERT") return `${actor} added offline client${q}`;
-      if (log.action === "UPDATE") return `${actor} updated offline client${q}`;
-      if (log.action === "DELETE") return `${actor} deleted offline client${q}`;
-      break;
     case "session_notes":
       if (log.action === "INSERT") return `${actor} added a session note`;
       if (log.action === "UPDATE") return `${actor} updated a session note`;
@@ -92,7 +87,7 @@ function formatMessage(log: AuditLog): string {
 
 const FILTERS = [
   { label: "All", tables: null },
-  { label: "Clients", tables: ["users", "client_stubs", "session_notes"] },
+  { label: "Clients", tables: ["users", "session_notes"] },
   { label: "Check-ins", tables: ["questionnaires", "questionnaire_assignments"] },
   { label: "Resources", tables: ["resources"] },
   { label: "Tags", tables: ["tags"] },

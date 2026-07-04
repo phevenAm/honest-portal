@@ -14,11 +14,12 @@ type SessionNote = {
   created_at: string;
 };
 
-type Props =
-  | { user: UserProfile; stubId?: never; stubName?: never; onClose: () => void }
-  | { user?: never; stubId: string; stubName: string; onClose: () => void };
+type Props = {
+  user: UserProfile;
+  onClose: () => void;
+};
 
-export default function SessionNotesModal({ user, stubId, stubName, onClose }: Props) {
+export default function SessionNotesModal({ user, onClose }: Props) {
   const { userProfile } = useAuth();
   const [notes, setNotes] = useState<SessionNote[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,16 +28,13 @@ export default function SessionNotesModal({ user, stubId, stubName, onClose }: P
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const displayName = user ? `${user.first_name} ${user.last_name}` : stubName;
-
   useEffect(() => {
     const fetchNotes = async () => {
-      const query = supabase
+      const { data, error } = await supabase
         .from("session_notes")
         .select("id, content, created_at")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-
-      const { data, error } = await (user ? query.eq("user_id", user.id) : query.eq("stub_id", stubId));
 
       if (error) setError(error.message);
       else setNotes(data ?? []);
@@ -44,19 +42,15 @@ export default function SessionNotesModal({ user, stubId, stubName, onClose }: P
     };
 
     fetchNotes();
-  }, [user, stubId]);
+  }, [user.id]);
 
   const handleAdd = async () => {
     if (!content.trim() || !userProfile) return;
     setSaving(true);
 
-    const payload: Record<string, string> = { admin_id: userProfile.id, content: content.trim() };
-    if (user) payload.user_id = user.id;
-    else payload.stub_id = stubId as string;
-
     const { data, error } = await supabase
       .from("session_notes")
-      .insert(payload)
+      .insert({ admin_id: userProfile.id, user_id: user.id, content: content.trim() })
       .select("id, content, created_at")
       .single();
 
@@ -115,7 +109,7 @@ export default function SessionNotesModal({ user, stubId, stubName, onClose }: P
   }
 
   return (
-    <Modal title={`Notes — ${displayName}`} onClose={onClose} size="md">
+    <Modal title={`Notes — ${user.first_name} ${user.last_name}`} onClose={onClose} size="md">
       {error && <p className={styles.modalError}>{error}</p>}
 
       <div className={styles.notesAddForm}>

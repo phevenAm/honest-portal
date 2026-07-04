@@ -20,9 +20,7 @@ export default function UploadAndDisplayImage({ userId, onUpload }: Props) {
     try {
       const ext = file.name.split(".").pop() ?? "jpg";
       const path = `${userId}/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(path, file);
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file);
       if (uploadError) throw uploadError;
       const { data } = supabase.storage.from("avatars").getPublicUrl(path);
       onUpload(data.publicUrl);
@@ -35,12 +33,7 @@ export default function UploadAndDisplayImage({ userId, onUpload }: Props) {
 
   return (
     <div className={styles.wrapper}>
-      <button
-        type="button"
-        className={styles.btn}
-        disabled={uploading}
-        onClick={() => inputRef.current?.click()}
-      >
+      <button type="button" className={styles.btn} disabled={uploading} onClick={() => inputRef.current?.click()}>
         {uploading ? "Uploading…" : "Upload photo"}
       </button>
       <input

@@ -70,10 +70,7 @@ const SettingsPage = () => {
                 </div>
                 <div className={styles.field}>
                   <label>Profile picture</label>
-                  <UploadAndDisplayImage
-                    userId={userProfile?.id ?? ""}
-                    onUpload={(url) => setImageUrl(url)}
-                  />
+                  <UploadAndDisplayImage userId={userProfile?.id ?? ""} onUpload={(url) => setImageUrl(url)} />
                 </div>
               </form>
             </section>

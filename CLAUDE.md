@@ -8,7 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run start        # dev server (Vite)
 npm run build        # production build → dist/
 npm run test         # run Vitest in watch mode
-npm run sync-tokens  # sync SCSS $variables → CSS custom properties in index.scss
 ```
 
 Run a single test file:

@@ -145,6 +145,16 @@ export default function Navbar() {
               );
             })}
           </ul>
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              handleLogout();
+            }}
+            className={styles.mobileSignOut}
+          >
+            Sign out
+          </button>
         </div>
       )}
     </header>
