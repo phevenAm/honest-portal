@@ -1,7 +1,9 @@
 import ReactDOM from "react-dom/client";
 import "./index.scss";
+
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 import App from "./App";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 if (import.meta.env.DEV) {
   const { default: axe } = await import("@axe-core/react");
