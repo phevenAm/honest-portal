@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import OnboardingModal from "../components/Onboarding/OnboardingModal";
+import DemoBanner from "../components/shared/DemoBanner/DemoBanner";
 import Footer from "../components/shared/Footer/Footer";
 import Navbar from "../components/shared/Navbar/Navbar";
 import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
@@ -51,6 +52,7 @@ function AppLayout() {
     <>
       <div ref={topRef} tabIndex={-1} aria-hidden="true" />
       <Navbar />
+      <DemoBanner />
       <main id="main-content" tabIndex={-1}>
         <div className="page-content">
           <Outlet />

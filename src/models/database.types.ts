@@ -387,6 +387,7 @@ export type Database = {
           first_name: string | null;
           focus_keywords: string[] | null;
           id: string;
+          is_demo: boolean;
           last_name: string | null;
           onboarding_completed: boolean;
           role: string | null;
@@ -402,6 +403,7 @@ export type Database = {
           first_name?: string | null;
           focus_keywords?: string[] | null;
           id?: string;
+          is_demo?: boolean;
           last_name?: string | null;
           onboarding_completed?: boolean;
           role?: string | null;
@@ -417,6 +419,7 @@ export type Database = {
           first_name?: string | null;
           focus_keywords?: string[] | null;
           id?: string;
+          is_demo?: boolean;
           last_name?: string | null;
           onboarding_completed?: boolean;
           role?: string | null;

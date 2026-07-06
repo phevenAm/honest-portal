@@ -4,6 +4,8 @@ import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import { ArticleIcon, DocumentIcon, LinkIcon, VideoIcon } from "@components/shared/Icons/Icons";
 import Modal from "@components/shared/Modal/Modal";
+import { useAuth } from "@context/AuthContext";
+import { useToast } from "@context/ToastContext";
 import type { Resource } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -52,6 +54,8 @@ const getResourceIcon = (type: Resource["type"]) => {
 
 export default function AdminResourcesPage() {
   const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
+  const { showToast } = useToast();
   const resources: Resource[] = useAppSelector(selectAllResources);
 
   const [showForm, setShowForm] = useState(false);
@@ -80,7 +84,17 @@ export default function AdminResourcesPage() {
             </p>
           </div>
 
-          <Button onClick={() => setShowForm(true)}>+ Add resource</Button>
+          <Button
+            onClick={() => {
+              if (isDemo) {
+                showToast("Demo mode — changes are not saved.");
+                return;
+              }
+              setShowForm(true);
+            }}
+          >
+            + Add resource
+          </Button>
         </div>
 
         <div className={styles.filterRow}>
@@ -120,23 +134,37 @@ export default function AdminResourcesPage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() =>
-                      dispatch(
-                        togglePublished({
-                          id: resource.id,
-                          is_published: !resource.is_published,
-                        }),
-                      )
-                    }
+                    onClick={() => {
+                      if (isDemo) {
+                        showToast("Demo mode — changes are not saved.");
+                        return;
+                      }
+                      dispatch(togglePublished({ id: resource.id, is_published: !resource.is_published }));
+                    }}
                   >
                     {resource.is_published ? "Unpublish" : "Publish"}
                   </Button>
 
-                  <Button variant="primary" size="sm" onClick={() => setEditingResource(resource)}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                      if (isDemo) {
+                        showToast("Demo mode — changes are not saved.");
+                        return;
+                      }
+                      setEditingResource(resource);
+                    }}
+                  >
                     Edit
                   </Button>
 
-                  <Button variant="danger" size="sm" onClick={() => dispatch(deleteResource(resource.id))}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    disabled={isDemo}
+                    onClick={() => dispatch(deleteResource(resource.id))}
+                  >
                     Delete
                   </Button>
                 </div>
