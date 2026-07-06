@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 import Avatar from "@components/shared/Avatar/Avatar";
-import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import SplitButton from "@components/shared/SplitButton/SplitButton";
