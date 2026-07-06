@@ -1,0 +1,409 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: <explanation> */
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+import dayjs from "dayjs";
+
+import Avatar from "@components/shared/Avatar/Avatar";
+import Button from "@components/shared/Button/Button";
+import Card from "@components/shared/Card/Card";
+import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import type { Session, UserProfile } from "@models/globalTypes";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
+import type { RootState } from "@store/index";
+import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
+import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
+import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
+
+import { useAuth } from "@/context/AuthContext";
+import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
+import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
+import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
+import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
+import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
+
+import styles from "./AdminClientsPageDetailed.module.scss";
+
+function getStatusClass(status: string) {
+  switch (status) {
+    case "completed":
+      return styles.statusCompleted;
+    case "no_show":
+      return styles.statusNoShow;
+    case "cancelled":
+      return styles.statusCancelled;
+    default:
+      return styles.statusScheduled;
+  }
+}
+
+function SessionCard({ session, isDemo }: { session: Session; isDemo: boolean }) {
+  return (
+    <div className={styles.sessionItem}>
+      <div className={styles.sessionItemHeader}>
+        <span className={styles.sessionItemDate}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</span>
+        <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
+        <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status)}`}>
+          {session.status.replace("_", " ")}
+        </span>
+        <span
+          className={session.paid ? styles.paidPill : styles.unpaidPill}
+          title={session.paid ? "Paid" : "Payment pending"}
+        >
+          {session.paid ? "✓" : "£"}
+        </span>
+      </div>
+
+      {session.notes ? (
+        <p className={styles.sessionNotes}>{session.notes}</p>
+      ) : (
+        <p className={styles.sessionNoNotes}>No notes added.</p>
+      )}
+
+      <div className={styles.sessionActions}>
+        <Button variant="ghost" size="sm">
+          No-show
+        </Button>
+        <Button variant="secondary" size="sm">
+          Reschedule
+        </Button>
+        <Button variant="danger" size="sm" disabled={isDemo}>
+          Delete
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminClientsPageDetailed() {
+  const { clientId } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
+
+  const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
+  const questionnaires = useAppSelector(selectAllQuestionnaires);
+  const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const clientResponses = useAppSelector(selectResponsesByUser(clientId ?? ""));
+
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
+  const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
+  const [isManageSessionsModal, setIsManageSessionsModal] = useState(false);
+  const [sessionPageNumber, setSessionPageNumber] = useState<null | number>(1);
+
+  const [sessionsDateTab, setSessopmsDateTab] = useState<"upcoming" | "past">("upcoming");
+
+  useFetchOnIdle(
+    (state: RootState) => state.sessions.status,
+    () => fetchSessionsByClientId(clientId!),
+    "Failed to fetch questionnaires:",
+  );
+
+  useEffect(() => {
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchAllResponses());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (questionnairesStatus === "idle") dispatch(fetchQuestionnaires());
+  }, [dispatch, questionnairesStatus]);
+
+  const client = allUsers.find((u) => u.id === clientId);
+
+  const questionnaireOptions = useMemo(
+    () => questionnaires.filter((q) => clientResponses.some((r) => r.questionnaire_id === q.id)),
+    [questionnaires, clientResponses],
+  );
+
+  //! is there a selector for this? nah, i shuld just fetch sessions by id. i have a THUNK for that
+  const clientSessions = useAppSelector((state) => state.sessions.sessions);
+
+  useEffect(() => {
+    if (!selectedQuestionnaireId && questionnaireOptions[0]) {
+      setSelectedQuestionnaireId(questionnaireOptions[0].id);
+    }
+  }, [questionnaireOptions, selectedQuestionnaireId]);
+
+  const selectedQuestionnaire = questionnaires.find((q) => q.id === selectedQuestionnaireId) ?? questionnaireOptions[0];
+
+  const selectedResponses = selectedQuestionnaire
+    ? clientResponses.filter((r) => r.questionnaire_id === selectedQuestionnaire.id)
+    : [];
+
+  const latestResponse = clientResponses.at(-1);
+  const latestQuestionnaire = questionnaires.find((q) => q.id === latestResponse?.questionnaire_id);
+  const avgScore = latestResponse ? getScoreAverage(latestResponse, latestQuestionnaire) : null;
+  const lastCheckIn = latestResponse
+    ? dayjs(latestResponse.submitted_at ?? latestResponse.created_at).format("D MMM YYYY")
+    : "—";
+
+  const handleExport = async () => {
+    if (!client) return;
+    setExporting(true);
+    await exportClientPDF({
+      user: client,
+      responses: selectedResponses,
+      questionnaire: selectedQuestionnaire,
+    });
+    setExporting(false);
+  };
+
+  const now = new Date();
+
+  const groupPastandUpcomingSessions = () => {
+    if (sessionsDateTab === "upcoming") {
+      const upcomingSessions = clientSessions.filter((s) => new Date(s.scheduled_at) >= now);
+      return upcomingSessions;
+    } else {
+      const pastSessions = clientSessions.filter((s) => new Date(s.scheduled_at) < now);
+      return pastSessions;
+    }
+  };
+
+  const paginateSessions = (array: Session[], currentPage: number, pageSize: number) => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return array.slice(startIndex, endIndex);
+  };
+
+  const maxPageSize = 4;
+
+  if (!client) {
+    return (
+      <div className="page">
+        <div className="inner">
+          <div className={styles.notFound}>
+            <span className={styles.notFoundIcon}>👤</span>
+            <h2>Client not found</h2>
+            <p>This client may have been removed or the link is incorrect.</p>
+            <Button variant="secondary" onClick={() => navigate("/admin/clients")}>
+              ← Back to clients
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const clientSince = client.created_at?.split("T")[0];
+
+  return (
+    <div className="page">
+      <div className="inner">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/clients")}>
+          ← Back to clients
+        </Button>
+
+        {/* Profile hero */}
+        <div className={styles.hero}>
+          <div className={styles.heroLeft}>
+            <Avatar name={`${client.first_name} ${client.last_name}`} imageSrc={client.avatar_url ?? ""} size={80} />
+            <div>
+              <h1 className={styles.heroName}>
+                {client.first_name} {client.last_name}
+              </h1>
+              <p className={styles.heroEmail}>{client.email}</p>
+              {clientSince && <p className={styles.heroSince}>Client since {clientSince}</p>}
+            </div>
+          </div>
+
+          <div className={styles.heroActions}>
+            <Button variant="secondary" size="sm" onClick={() => setNotesOpen(true)}>
+              Notes
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExport}
+              disabled={exporting || selectedResponses.length === 0}
+            >
+              {exporting ? "Exporting…" : "Export PDF"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats bar */}
+        <div className={styles.statsRow}>
+          <div className={styles.statBlock}>
+            <p className={styles.statValue}>
+              {avgScore ?? "—"}
+              {avgScore && <span>/10</span>}
+            </p>
+            <p className={styles.statLabel}>Latest score</p>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.statBlock}>
+            <p className={styles.statValue}>{clientResponses.length}</p>
+            <p className={styles.statLabel}>Check-ins</p>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.statBlock}>
+            <p className={styles.statValue}>{lastCheckIn}</p>
+            <p className={styles.statLabel}>Last check-in</p>
+          </div>
+        </div>
+
+        {/* Progress chart — ProgressChart renders its own Card, so no outer wrapper */}
+        <div className={styles.progressSection}>
+          <div className={styles.sectionHead}>
+            {questionnaireOptions.length > 1 && (
+              <div className={styles.progressControls}>
+                <label htmlFor="q-select">Questionnaire</label>
+                <select
+                  id="q-select"
+                  value={selectedQuestionnaire?.id ?? ""}
+                  onChange={(e) => setSelectedQuestionnaireId(e.target.value)}
+                >
+                  {questionnaireOptions.map((q) => (
+                    <option key={q.id} value={q.id}>
+                      {q.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {selectedQuestionnaire ? (
+            <ProgressChart
+              responses={selectedResponses}
+              questions={
+                (
+                  selectedQuestionnaire as typeof selectedQuestionnaire & {
+                    questions?: [];
+                  }
+                ).questions ?? []
+              }
+              title={`${client.first_name}'s Progress`}
+            />
+          ) : (
+            <Card>
+              <p className={styles.emptyState}>No check-in data yet.</p>
+            </Card>
+          )}
+        </div>
+
+        <Card className={[styles.section, styles.session].join(" ")}>
+          <div className={styles.sessionHeading}>
+            <h2 className={styles.sectionTitle}>Sessions</h2>
+            <Button size="sm" onClick={() => setIsScheduleEditorOpen(true)}>
+              + New session
+            </Button>
+          </div>
+
+          <div className={styles.sessionTabs}>
+            <button
+              type="button"
+              className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
+              onClick={() => {
+                setSessopmsDateTab("upcoming");
+                setSessionPageNumber(1);
+              }}
+            >
+              Upcoming
+            </button>
+            <button
+              type="button"
+              className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
+              onClick={() => {
+                setSessopmsDateTab("past");
+                setSessionPageNumber(1);
+              }}
+            >
+              Past
+            </button>
+          </div>
+
+          <div className={styles.sessionList}>
+            {clientSessions.length === 0 ? (
+              <p className={styles.sessionEmpty}>No sessions yet.</p>
+            ) : (
+              paginateSessions(groupPastandUpcomingSessions(), sessionPageNumber ?? 1, maxPageSize).map((s) => (
+                <SessionCard key={s.id} session={s} isDemo={isDemo} />
+              ))
+            )}
+
+            <div className={styles.sessionPagination}>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) - 1)}
+                disabled={(sessionPageNumber ?? 1) <= 1}
+              >
+                ← Prev
+              </Button>
+              <span>
+                {Array.from({ length: Math.ceil(groupPastandUpcomingSessions().length / 4) }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    variant={sessionPageNumber === i + 1 ? "primary" : "ghost"}
+                    size="sm"
+                    onClick={() => setSessionPageNumber(i + 1)}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </span>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) + 1)}
+                disabled={(sessionPageNumber ?? 1) >= Math.ceil(groupPastandUpcomingSessions().length / maxPageSize)}
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Danger zone */}
+        <div className={styles.dangerZone}>
+          <div>
+            <p className={styles.dangerTitle}>Remove client</p>
+            <p className={styles.dangerDesc}>Permanently deletes this client account and all associated data.</p>
+          </div>
+          <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setDeleteOpen(true)}>
+            Delete client
+          </Button>
+        </div>
+      </div>
+
+      {notesOpen && <SessionNotesModal user={client} onClose={() => setNotesOpen(false)} />}
+
+      {deleteOpen && (
+        <DeleteClientModal
+          id={client.id}
+          onClose={() => {
+            setDeleteOpen(false);
+            navigate("/admin/clients");
+          }}
+          modalTitle="Delete client"
+          bodyText={
+            <>
+              Are you sure you want to delete{" "}
+              <strong>
+                {client.first_name} {client.last_name}
+              </strong>
+              ? This cannot be undone.
+            </>
+          }
+        />
+      )}
+
+      {isManageSessionsModal && <div>Manage sessions modal</div>}
+      {isScheduleEditorOpen && (
+        <CreateSessionModal
+          clientName={client.display_name || client.first_name}
+          id={clientId!}
+          onClose={() => setIsScheduleEditorOpen(false)}
+        />
+      )}
+    </div>
+  );
+}

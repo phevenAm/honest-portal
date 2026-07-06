@@ -23,7 +23,7 @@
 // ── Metric cards grid ──────────────────────────────────────
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, auto));
   gap: $sp-4;
   margin-bottom: $sp-8;
 }
@@ -52,14 +52,17 @@
     background: var(--accent-light);
     color: var(--accent-dark);
   }
+
   &.stone {
     background: var(--bg-muted);
     color: var(--text-secondary);
   }
+
   &.sky {
     background: var(--accent-subtle);
     color: var(--accent-dark);
   }
+
   &.peach {
     background: var(--warning-light);
     color: var(--warning);
@@ -191,9 +194,11 @@
   &.teal {
     background: var(--accent-light);
   }
+
   &.stone {
     background: var(--bg-muted);
   }
+
   &.warm {
     background: var(--warning-light);
   }

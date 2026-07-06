@@ -8,13 +8,15 @@ import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import UploadAndDisplayImage from "@components/shared/UploadAndDisplayImage/UploadAndDisplayImage";
 import { useAuth } from "@context/AuthContext";
+import { useToast } from "@context/ToastContext";
 
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
 
 const SettingsPage = () => {
-  const { userProfile, updateProfile, isAdmin } = useAuth();
+  const { userProfile, updateProfile, isAdmin, isDemo } = useAuth();
+  const { showToast } = useToast();
   const [name, setName] = useState(userProfile?.display_name ?? "");
   const [imageUrl, setImageUrl] = useState(userProfile?.avatar_url ?? "");
   const [keywords, setKeywords] = useState<string[]>(userProfile?.focus_keywords ?? []);
@@ -33,6 +35,10 @@ const SettingsPage = () => {
     setKeywords((prev) => (prev.includes(kw) ? prev.filter((k) => k !== kw) : [...prev, kw]));
 
   const handleUpdateProfile = async () => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     setSaving(true);
     await updateProfile({
       display_name: name,
@@ -70,10 +76,7 @@ const SettingsPage = () => {
                 </div>
                 <div className={styles.field}>
                   <label>Profile picture</label>
-                  <UploadAndDisplayImage
-                    userId={userProfile?.id ?? ""}
-                    onUpload={(url) => setImageUrl(url)}
-                  />
+                  <UploadAndDisplayImage userId={userProfile?.id ?? ""} onUpload={(url) => setImageUrl(url)} />
                 </div>
               </form>
             </section>
@@ -116,7 +119,7 @@ const SettingsPage = () => {
             >
               {saving ? "Updating profile..." : "Update profile"}
             </Button>
-            {!isAdmin && (
+            {!isAdmin && !isDemo && (
               <div className={styles.deleteAccountBlock}>
                 <Button variant="ghost-danger" size="sm" onClick={() => setIsDeleteModalOpen(true)}>
                   Delete account

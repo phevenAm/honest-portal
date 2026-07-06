@@ -1,4 +1,4 @@
-import type { Tables } from "./database.types";
+import type { Database, Tables } from "./database.types";
 
 export type Role = "admin" | "client";
 
@@ -160,3 +160,7 @@ export type AuditLog = {
   new_data: Record<string, unknown> | null;
   actor?: Pick<UserProfile, "first_name" | "last_name"> | null;
 };
+
+export type SessionStatus = Database["public"]["Enums"]["session_status"];
+
+export type Session = Tables<"sessions">;

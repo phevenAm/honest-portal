@@ -1,0 +1,408 @@
+@use "../../../styles/spacing" as *;
+
+// ── Not found ────────────────────────────────────────────────
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: $sp-20 0;
+  gap: $sp-3;
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+.notFoundIcon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: $sp-2;
+}
+
+// ── Profile hero ─────────────────────────────────────────────
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $sp-6;
+  margin: $sp-6 0 $sp-8;
+  flex-wrap: wrap;
+}
+
+.heroLeft {
+  display: flex;
+  align-items: center;
+  gap: $sp-5;
+}
+
+.heroName {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 $sp-1;
+  line-height: 1.2;
+}
+
+.heroEmail {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 $sp-1;
+}
+
+.heroSince {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
+  flex-shrink: 0;
+  padding-top: $sp-2;
+}
+
+// ── Stats bar ────────────────────────────────────────────────
+.statsRow {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: $sp-5 $sp-8;
+  margin-bottom: $sp-6;
+}
+
+.statBlock {
+  flex: 1;
+  text-align: center;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 $sp-1;
+  line-height: 1.2;
+
+  span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 1px;
+  }
+}
+
+.statLabel {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ── Sections ─────────────────────────────────────────────────
+
+// Applied to Card wrappers — adds inner padding + bottom margin
+.section {
+  padding: $sp-6;
+  margin-bottom: $sp-6;
+}
+
+// Progress section has no outer Card (ProgressChart renders its own)
+.progressSection {
+  margin-bottom: $sp-6;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $sp-3;
+  margin-bottom: $sp-5;
+}
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.progressControls {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  select {
+    min-width: 200px;
+    padding: $sp-2 $sp-3;
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--bg-muted);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+
+    &:focus {
+      border-color: var(--border-focus);
+    }
+  }
+}
+
+.emptyState {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: $sp-10 0;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: $sp-10 0;
+}
+
+
+// ── Sessions ──────────────────────────────────────────────────
+
+.sessionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $sp-5;
+}
+
+.sessionTabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-muted);
+  border-radius: var(--r-md);
+  padding: 3px;
+  width: fit-content;
+  margin-bottom: $sp-5;
+}
+
+.sessionTab {
+  padding: $sp-2 $sp-5;
+  border-radius: calc(var(--r-md) - 1px);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.sessionTabActive {
+  padding: $sp-2 $sp-5;
+  border-radius: calc(var(--r-md) - 1px);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border: none;
+  background: var(--bg-card);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-3;
+}
+
+.sessionItem {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: $sp-4 $sp-5;
+  background: var(--bg-page);
+}
+
+.sessionItemHeader {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  flex-wrap: wrap;
+}
+
+.sessionItemDate {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.sessionItemMeta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.sessionStatusBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: var(--r-full);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.statusScheduled {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+.statusCompleted {
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+  color: #16a34a;
+}
+
+.statusNoShow {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.statusCancelled {
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+  color: var(--text-muted);
+}
+
+.paidPill {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #16a34a;
+}
+
+.unpaidPill {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-full);
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--bg-muted);
+  color: var(--text-muted);
+}
+
+.sessionNotes {
+  margin-top: $sp-4;
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.sessionNoNotes {
+  margin-top: $sp-4;
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0;
+}
+
+.sessionActions {
+  display: flex;
+  gap: $sp-2;
+  margin-top: $sp-4;
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sessionPagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-2;
+  margin-top: $sp-5;
+  padding-top: $sp-4;
+  border-top: 1px solid var(--border);
+}
+
+.sessionEmpty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  padding: $sp-8 0;
+  margin: 0;
+}
+
+// ── Danger zone ──────────────────────────────────────────────
+.dangerZone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-4;
+  margin-top: $sp-8;
+  padding: $sp-6;
+  border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
+  border-radius: var(--r-lg);
+  flex-wrap: wrap;
+}
+
+.dangerTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--danger);
+  margin: 0 0 $sp-1;
+}
+
+.dangerDesc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}

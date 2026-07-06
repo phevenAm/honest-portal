@@ -184,6 +184,10 @@
     outline-offset: 3px;
     border-radius: var(--r-full);
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 // ── Mobile menu button ─────────────────────────────────────
@@ -238,6 +242,32 @@
     color: var(--accent-dark);
     background: var(--accent-light);
     font-weight: 600;
+  }
+}
+
+.mobileSignOut {
+  display: block;
+  width: 100%;
+  margin-top: $sp-3;
+  padding: $sp-3 $sp-4;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-base);
+
+  &:hover {
+    background: var(--bg-muted);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 3px;
   }
 }
 

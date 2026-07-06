@@ -2,15 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import OnboardingModal from "../components/Onboarding/OnboardingModal";
+import DemoBanner from "../components/shared/DemoBanner/DemoBanner";
 import Footer from "../components/shared/Footer/Footer";
 import Navbar from "../components/shared/Navbar/Navbar";
 import ProtectedRoute from "../components/shared/ProtectedRoute/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
 import AdminAuditLogsPage from "../pages/admin/AdminAuditLogsPage/AdminAuditLogsPage";
+import AdminClientScheduler from "../pages/admin/AdminClientScheduler/AdminClientScheduler";
 import AdminClientsPage from "../pages/admin/AdminClientsPage/AdminClientsPage";
+import AdminClientsPageDetailed from "../pages/admin/AdminClientsPageDetailed/AdminClientsPageDetailed";
 import AdminDashboard from "../pages/admin/AdminDashboard/AdminDashboard";
 import AdminQuestionnairesPage from "../pages/admin/AdminQuestionnairesPage/AdminQuestionnairesPage";
 import AdminResourcesPage from "../pages/admin/AdminResourcesPage/AdminResourcesPage";
+import AdminScheduler from "../pages/admin/AdminScheduler/AdminScheduler";
 import CheckInPage from "../pages/client/CheckInPage/CheckInPage";
 import ClientDashboard from "../pages/client/ClientDashboard/ClientDashboard";
 import LoginPage from "../pages/client/LoginPage/LoginPage";
@@ -48,6 +52,7 @@ function AppLayout() {
     <>
       <div ref={topRef} tabIndex={-1} aria-hidden="true" />
       <Navbar />
+      <DemoBanner />
       <main id="main-content" tabIndex={-1}>
         <div className="page-content">
           <Outlet />
@@ -112,9 +117,13 @@ export default function AppRoutes() {
           >
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/clients" element={<AdminClientsPage />} />
+            <Route path="/admin/clients/:clientId" element={<AdminClientsPageDetailed />} />
             <Route path="/admin/questionnaires" element={<AdminQuestionnairesPage />} />
             <Route path="/admin/resources" element={<AdminResourcesPage />} />
             <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+            <Route path="/admin/scheduler" element={<AdminScheduler />} />
+            <Route path="/admin/scheduler/:clientId" element={<AdminClientScheduler />} />
+            {/* //! make admin/schedule/userSchedule route */}
           </Route>
 
           <Route path="/" element={<RootRedirect />} />

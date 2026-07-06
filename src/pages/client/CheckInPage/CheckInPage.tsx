@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../../components/shared/Button/Button";
 import Card from "../../../components/shared/Card/Card";
 import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
 import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
@@ -82,7 +83,8 @@ function ScaleQuestion({
 export default function CheckInPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { authUser, userProfile } = useAuth();
+  const { authUser, userProfile, isDemo } = useAuth();
+  const { showToast } = useToast();
 
   const assignments = useAppSelector(selectAllAssignments) as AssignmentWithQuestionnaire[];
 
@@ -159,6 +161,12 @@ export default function CheckInPage() {
   const handleNext = () => {
     if (!isLast) {
       setCurrentStep((step) => step + 1);
+      return;
+    }
+
+    if (isDemo) {
+      showToast("Demo mode — check-ins are not saved.");
+      setSubmitted(true);
       return;
     }
 

@@ -1,4 +1,4 @@
-import { Questionnaire, Response, UserProfile } from "../../../../models/globalTypes";
+import { Questionnaire, Response, UserProfile } from "../../../models/globalTypes";
 
 export const generateAccessToken = () => {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

@@ -36,6 +36,94 @@ npm run sync-tokens # sync SCSS $variables → CSS custom properties
 
 ---
 
+## Screenshots
+
+### Sign in
+
+![Sign in](docs/screenshots/sign-in.png)
+
+---
+
+### Admin — Dashboard
+
+At a glance: active clients, check-ins, resources, and quick actions to create questionnaires, resources, or sign-up tokens.
+
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+---
+
+### Admin — Client detail & session scheduling
+
+Full client profile with a live wellbeing progress chart. Schedule one-off or recurring sessions with duration, payment status, and prep notes.
+
+![Client detail with schedule modal](docs/screenshots/admin-client-schedule.png)
+
+---
+
+### Admin — Check-in management
+
+Create and manage check-ins with configurable questions (free text or 1–10 scale with chart tags). Assign check-ins to specific clients.
+
+![Check-ins page](docs/screenshots/admin-checkins.png)
+
+![Edit check-in](docs/screenshots/admin-checkin-edit.png)
+
+![Assign clients](docs/screenshots/admin-checkin-assign.png)
+
+---
+
+### Admin — Resource manager
+
+Publish and manage curated resources by type (websites, documents, articles, videos) with sensitivity flags.
+
+![Admin resources](docs/screenshots/admin-resources.png)
+
+---
+
+### Admin — Activity log
+
+Filterable audit trail of all actions across clients, check-ins, resources, and tags.
+
+![Activity log](docs/screenshots/admin-activity.png)
+
+---
+
+### Client — Dashboard (light & dark mode)
+
+Personalised greeting, an inspirational quote shaped by focus keywords, wellbeing stats, progress chart, and quick access to pending check-ins and resources.
+
+![Client dashboard — light mode](docs/screenshots/client-dashboard-light.png)
+
+![Client dashboard — dark mode](docs/screenshots/client-dashboard-dark.png)
+
+![Client dashboard — dark mode, check-ins complete](docs/screenshots/client-dashboard-dark-completed.png)
+
+---
+
+### Client — Check-in flow
+
+Step-by-step guided check-in with a progress bar and 1–10 scale or free-text questions.
+
+![Check-in flow](docs/screenshots/client-checkin-flow.png)
+
+---
+
+### Client — Resources
+
+Practitioner-curated resources filtered by type (websites, documents, articles, videos).
+
+![Resources](docs/screenshots/client-resources.png)
+
+---
+
+### Client — Settings
+
+Update display name, profile photo, and focus keywords — the keyword selection shapes the inspirational quotes shown on the dashboard.
+
+![Settings](docs/screenshots/client-settings.png)
+
+---
+
 ## Features
 
 ### Client portal

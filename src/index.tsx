@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import "./index.scss";
+
 import App from "./App";
 
 if (import.meta.env.DEV) {
@@ -13,6 +14,8 @@ if (!rootElement) throw new Error("Root element #root not found in DOM");
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   // <React.StrictMode>
-  <App />,
+  <>
+    <App />
+  </>,
   // </React.StrictMode>
 );
