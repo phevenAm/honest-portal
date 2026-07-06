@@ -8,15 +8,16 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
-import type { UserProfile } from "@models/globalTypes";
-import { useAppDispatch, useAppSelector } from "@store/hooks";
+import type { Session, UserProfile } from "@models/globalTypes";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
 import SplitButton from "@/components/shared/SplitButton/SplitButton";
-import WIP from "@/components/shared/WIP/WIP";
+import { useAuth } from "@/context/AuthContext";
+import { fetchAllSessions } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
@@ -24,10 +25,74 @@ import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
 
+function getStatusClass(status: string) {
+  switch (status) {
+    case "completed":
+      return styles.statusCompleted;
+    case "no_show":
+      return styles.statusNoShow;
+    case "cancelled":
+      return styles.statusCancelled;
+    default:
+      return styles.statusScheduled;
+  }
+}
+
+function formatSessionDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+}
+
+function formatSessionTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
+function SessionCard({ session, isDemo }: { session: Session; isDemo: boolean }) {
+  return (
+    <div className={styles.sessionItem}>
+      <div className={styles.sessionItemHeader}>
+        <span className={styles.sessionItemDate}>
+          {formatSessionDate(session.scheduled_at)} · {formatSessionTime(session.scheduled_at)}
+        </span>
+        <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
+        <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status)}`}>
+          {session.status.replace("_", " ")}
+        </span>
+        <span
+          className={session.paid ? styles.paidPill : styles.unpaidPill}
+          title={session.paid ? "Paid" : "Payment pending"}
+        >
+          {session.paid ? "✓" : "£"}
+        </span>
+      </div>
+
+      {session.notes ? (
+        <p className={styles.sessionNotes}>{session.notes}</p>
+      ) : (
+        <p className={styles.sessionNoNotes}>No notes added.</p>
+      )}
+
+      <div className={styles.sessionActions}>
+        <Button variant="ghost" size="sm">
+          No-show
+        </Button>
+        <Button variant="secondary" size="sm">
+          Reschedule
+        </Button>
+        <Button variant="danger" size="sm" disabled={isDemo}>
+          Delete
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
 
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const questionnaires = useAppSelector(selectAllQuestionnaires);
@@ -40,6 +105,12 @@ export default function AdminClientsPageDetailed() {
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
   const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
   const [isManageSessionsModal, setIsManageSessionsModal] = useState(false);
+
+  useFetchOnIdle(
+    (state: RootState) => state.sessions.status,
+    () => fetchAllSessions(),
+    "Failed to fetch questionnaires:",
+  );
 
   useEffect(() => {
     dispatch(fetchAllUsers());
@@ -58,6 +129,11 @@ export default function AdminClientsPageDetailed() {
   const questionnaireOptions = useMemo(
     () => questionnaires.filter((q) => clientResponses.some((r) => r.questionnaire_id === q.id)),
     [questionnaires, clientResponses],
+  );
+
+  //! is there a selector for this? nah, i shuld just fetch sessions by id. i have a THUNK for that
+  const clientSessions = useAppSelector((state) =>
+    state.sessions.sessions.filter((session) => session.client_id === clientId),
   );
 
   useEffect(() => {
@@ -205,22 +281,31 @@ export default function AdminClientsPageDetailed() {
           )}
         </div>
 
-        <WIP>
-          {/* //!Sessions section TODO */}
-          <Card className={[styles.section, styles.session].join(" ")}>
-            <div className={styles.sessionHeading}>
-              <h2 className={styles.sectionTitle}>Sessions</h2>
+        <Card className={[styles.section, styles.session].join(" ")}>
+          <div className={styles.sessionHeading}>
+            <h2 className={styles.sectionTitle}>Sessions</h2>
+            <Button size="sm" onClick={() => setIsScheduleEditorOpen(true)}>
+              + New session
+            </Button>
+          </div>
 
-              <SplitButton
-                primaryLabel="+ Create new session"
-                size="sm"
-                primaryAction={() => setIsScheduleEditorOpen(true)}
-                options={[{ label: "Manage sessions", onClick: () => setIsManageSessionsModal(true) }]}
-              />
-            </div>
-            <p className={styles.placeholder}>Session scheduling coming soon.</p>
-          </Card>
-        </WIP>
+          <div className={styles.sessionTabs}>
+            <button type="button" className={styles.sessionTabActive}>
+              Upcoming
+            </button>
+            <button type="button" className={styles.sessionTab}>
+              Past
+            </button>
+          </div>
+
+          <div className={styles.sessionList}>
+            {clientSessions.length === 0 ? (
+              <p className={styles.sessionEmpty}>No sessions yet.</p>
+            ) : (
+              clientSessions.map((s) => <SessionCard key={s.id} session={s} isDemo={isDemo} />)
+            )}
+          </div>
+        </Card>
 
         {/* Danger zone */}
         <div className={styles.dangerZone}>
@@ -228,7 +313,7 @@ export default function AdminClientsPageDetailed() {
             <p className={styles.dangerTitle}>Remove client</p>
             <p className={styles.dangerDesc}>Permanently deletes this client account and all associated data.</p>
           </div>
-          <Button variant="danger" size="sm" onClick={() => setDeleteOpen(true)}>
+          <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setDeleteOpen(true)}>
             Delete client
           </Button>
         </div>

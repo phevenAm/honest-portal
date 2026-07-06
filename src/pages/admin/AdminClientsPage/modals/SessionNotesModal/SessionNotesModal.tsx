@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 import { useAuth } from "@context/AuthContext";
+import { useToast } from "@context/ToastContext";
 import { supabase } from "@lib/supabase";
 import type { UserProfile } from "@models/globalTypes";
 
@@ -20,7 +21,8 @@ type Props = {
 };
 
 export default function SessionNotesModal({ user, onClose }: Props) {
-  const { userProfile } = useAuth();
+  const { userProfile, isDemo } = useAuth();
+  const { showToast } = useToast();
   const [notes, setNotes] = useState<SessionNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
@@ -45,6 +47,10 @@ export default function SessionNotesModal({ user, onClose }: Props) {
   }, [user.id]);
 
   const handleAdd = async () => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     if (!content.trim() || !userProfile) return;
     setSaving(true);
 
@@ -63,6 +69,10 @@ export default function SessionNotesModal({ user, onClose }: Props) {
   };
 
   const handleDelete = async (id: string) => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     setDeletingId(id);
     const { error } = await supabase.from("session_notes").delete().eq("id", id);
     if (error) setError(error.message);
@@ -95,7 +105,7 @@ export default function SessionNotesModal({ user, onClose }: Props) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleDelete(note.id)}
-                disabled={deletingId === note.id}
+                disabled={isDemo || deletingId === note.id}
                 aria-label="Delete note"
               >
                 {deletingId === note.id ? "…" : "Delete"}

@@ -4,6 +4,8 @@ import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import Modal from "@components/shared/Modal/Modal";
 import SplitButton from "@components/shared/SplitButton/SplitButton";
+import { useAuth } from "@context/AuthContext";
+import { useToast } from "@context/ToastContext";
 import type { Questionnaire, QuestionnaireFrequency, Tag, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -121,7 +123,14 @@ function QuestionnaireBuilder({
   const updateQuestion = (id: string, field: string, value: string | null) =>
     setQuestions((qs) => qs.map((q) => (q.id === id ? { ...q, [field]: value } : q)));
 
+  const { isDemo } = useAuth();
+  const { showToast } = useToast();
+
   const handleCreateTag = async (questionId: string) => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     if (!newTagName.trim()) return;
     const result = await dispatch(createTag({ name: newTagName.trim() }));
     if (createTag.fulfilled.match(result)) {
@@ -132,6 +141,11 @@ function QuestionnaireBuilder({
   };
 
   const handleSave = () => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      onClose();
+      return;
+    }
     if (!title.trim() || questions.some((q) => !q.text.trim())) {
       alert("Please fill in a title and all question texts");
       return;
@@ -295,10 +309,16 @@ function AssignModal({
   onClose: () => void;
 }) {
   const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
+  const { showToast } = useToast();
   const assignments = useAppSelector(selectAssignmentsByQuestionnaire(questionnaire.id));
   const assignedIds = new Set(assignments.map((a) => a.user_id));
 
   const toggle = (userId: string) => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     if (assignedIds.has(userId)) {
       dispatch(
         unassignQuestionnaireByIds({
@@ -363,17 +383,27 @@ function AssignModal({
 
 function TagsModal({ tags, onClose }: { tags: Tag[]; onClose: () => void }) {
   const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
+  const { showToast } = useToast();
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
 
   const handleAdd = async () => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     if (!newName.trim()) return;
     await dispatch(createTag({ name: newName.trim() }));
     setNewName("");
   };
 
   const handleRename = async (tag: Tag) => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      return;
+    }
     if (!editName.trim()) return;
     await dispatch(updateTag({ id: tag.id, name: editName.trim() }));
     setEditingId(null);
@@ -422,7 +452,7 @@ function TagsModal({ tags, onClose }: { tags: Tag[]; onClose: () => void }) {
                   >
                     Rename
                   </Button>
-                  <Button size="sm" variant="danger" onClick={() => dispatch(deleteTag(tag.id))}>
+                  <Button size="sm" variant="danger" disabled={isDemo} onClick={() => dispatch(deleteTag(tag.id))}>
                     Delete
                   </Button>
                 </>
@@ -453,6 +483,8 @@ function TagsModal({ tags, onClose }: { tags: Tag[]; onClose: () => void }) {
 
 export default function AdminQuestionnairesPage() {
   const dispatch = useAppDispatch();
+  const { isDemo } = useAuth();
+  const { showToast } = useToast();
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const clients = useAppSelector(selectClientUsers);
   const tags = useAppSelector(selectAllTags);
@@ -555,11 +587,22 @@ export default function AdminQuestionnairesPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => dispatch(pauseQuestionnaire({ id: q.id, is_active: !q.is_active }))}
+                      onClick={() => {
+                        if (isDemo) {
+                          showToast("Demo mode — changes are not saved.");
+                          return;
+                        }
+                        dispatch(pauseQuestionnaire({ id: q.id, is_active: !q.is_active }));
+                      }}
                     >
                       {q.is_active ? "Pause" : "Activate"}
                     </Button>
-                    <Button variant="danger" size="sm" onClick={() => dispatch(deleteQuestionnaire(q.id))}>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      disabled={isDemo}
+                      onClick={() => dispatch(deleteQuestionnaire(q.id))}
+                    >
                       Delete
                     </Button>
                   </div>

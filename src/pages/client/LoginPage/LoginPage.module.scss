@@ -184,3 +184,63 @@
     border-radius: 2px;
   }
 }
+
+// ── Demo accounts ──────────────────────────────────────────
+.demoSection {
+  margin-top: $sp-6;
+}
+
+.demoDivider {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 $sp-3;
+}
+
+.demoCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $sp-3;
+}
+
+.demoCard {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: $sp-4;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-base), background var(--transition-base);
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--bg-muted);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+  }
+}
+
+.demoRole {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: $sp-1;
+}
+
+.demoDesc {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}

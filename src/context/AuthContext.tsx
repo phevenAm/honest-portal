@@ -17,6 +17,7 @@ type AuthContextType = {
   error: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isDemo: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, meta?: Record<string, unknown>, accessToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -176,6 +177,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateProfile = async (updates: ProfileUpdates) => {
     if (!authUser) return;
 
+    if (userProfile?.is_demo) {
+      setUserProfile((prev) => (prev ? { ...prev, ...updates } : prev));
+      return;
+    }
+
     const { error } = await supabase.from("users").update(updates).eq("id", authUser.id);
 
     if (error) throw new Error(error.message);
@@ -205,6 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isAuthenticated: !!authUser,
         isAdmin: userProfile?.role === "admin",
+        isDemo: userProfile?.is_demo ?? false,
         signIn,
         signUp,
         signOut,

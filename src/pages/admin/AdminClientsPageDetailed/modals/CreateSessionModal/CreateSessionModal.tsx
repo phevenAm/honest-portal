@@ -7,6 +7,7 @@ import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { createSession } from "@/store/slices/sessionsSlice";
 
@@ -19,7 +20,8 @@ type CreateSessionModalTypes = {
 };
 
 const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes) => {
-  const { authUser } = useAuth();
+  const { authUser, isDemo } = useAuth();
+  const { showToast } = useToast();
   const dispatch = useAppDispatch();
   const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -31,6 +33,11 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
   const [error, setError] = useState("");
 
   const handleSave = async () => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      onClose();
+      return;
+    }
     if (!authUser || !scheduledAt) return;
     setIsSaving(true);
     setError("");
@@ -60,6 +67,8 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
     const allSuccess = result.every((i) => i?.meta.requestStatus === "fulfilled");
 
     if (allSuccess) {
+      showToast("Sessions saved!");
+
       onClose();
     } else {
       setError("Failed to schedule session. Please try again.");

@@ -49,6 +49,20 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoSignIn = async (role: "admin" | "client") => {
+    setSubmitting(true);
+    try {
+      await signIn(
+        role === "admin" ? "demo-admin@honest.com" : "demo-client@honest.com",
+        role === "admin" ? "DemoAdmin2026" : "DemoClient2026",
+      );
+    } catch {
+      // error is set in AuthContext
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const isLoading = submitting || loading;
 
   return (
@@ -115,6 +129,30 @@ export default function LoginPage() {
               Sign up
             </Link>
           </p>
+        </div>
+
+        <div className={styles.demoSection}>
+          <p className={styles.demoDivider}>or try a demo account</p>
+          <div className={styles.demoCards}>
+            <button
+              type="button"
+              className={styles.demoCard}
+              onClick={() => handleDemoSignIn("admin")}
+              disabled={isLoading}
+            >
+              <span className={styles.demoRole}>Therapist view</span>
+              <span className={styles.demoDesc}>Manage clients, sessions &amp; check-ins</span>
+            </button>
+            <button
+              type="button"
+              className={styles.demoCard}
+              onClick={() => handleDemoSignIn("client")}
+              disabled={isLoading}
+            >
+              <span className={styles.demoRole}>Client view</span>
+              <span className={styles.demoDesc}>Complete check-ins &amp; view resources</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
