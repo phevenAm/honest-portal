@@ -15,9 +15,8 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import SplitButton from "@/components/shared/SplitButton/SplitButton";
 import { useAuth } from "@/context/AuthContext";
-import { fetchAllSessions } from "@/store/slices/sessionsSlice";
+import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
@@ -38,23 +37,11 @@ function getStatusClass(status: string) {
   }
 }
 
-function formatSessionDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
-}
-
-function formatSessionTime(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: true });
-}
-
 function SessionCard({ session, isDemo }: { session: Session; isDemo: boolean }) {
   return (
     <div className={styles.sessionItem}>
       <div className={styles.sessionItemHeader}>
-        <span className={styles.sessionItemDate}>
-          {formatSessionDate(session.scheduled_at)} · {formatSessionTime(session.scheduled_at)}
-        </span>
+        <span className={styles.sessionItemDate}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</span>
         <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
         <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status)}`}>
           {session.status.replace("_", " ")}
@@ -105,10 +92,13 @@ export default function AdminClientsPageDetailed() {
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState("");
   const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
   const [isManageSessionsModal, setIsManageSessionsModal] = useState(false);
+  const [sessionPageNumber, setSessionPageNumber] = useState<null | number>(1);
+
+  const [sessionsDateTab, setSessopmsDateTab] = useState<"upcoming" | "past">("upcoming");
 
   useFetchOnIdle(
     (state: RootState) => state.sessions.status,
-    () => fetchAllSessions(),
+    () => fetchSessionsByClientId(clientId!),
     "Failed to fetch questionnaires:",
   );
 
@@ -132,9 +122,7 @@ export default function AdminClientsPageDetailed() {
   );
 
   //! is there a selector for this? nah, i shuld just fetch sessions by id. i have a THUNK for that
-  const clientSessions = useAppSelector((state) =>
-    state.sessions.sessions.filter((session) => session.client_id === clientId),
-  );
+  const clientSessions = useAppSelector((state) => state.sessions.sessions);
 
   useEffect(() => {
     if (!selectedQuestionnaireId && questionnaireOptions[0]) {
@@ -165,6 +153,26 @@ export default function AdminClientsPageDetailed() {
     });
     setExporting(false);
   };
+
+  const now = new Date();
+
+  const groupPastandUpcomingSessions = () => {
+    if (sessionsDateTab === "upcoming") {
+      const upcomingSessions = clientSessions.filter((s) => new Date(s.scheduled_at) >= now);
+      return upcomingSessions;
+    } else {
+      const pastSessions = clientSessions.filter((s) => new Date(s.scheduled_at) < now);
+      return pastSessions;
+    }
+  };
+
+  const paginateSessions = (array: Session[], currentPage: number, pageSize: number) => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return array.slice(startIndex, endIndex);
+  };
+
+  const maxPageSize = 4;
 
   if (!client) {
     return (
@@ -290,10 +298,24 @@ export default function AdminClientsPageDetailed() {
           </div>
 
           <div className={styles.sessionTabs}>
-            <button type="button" className={styles.sessionTabActive}>
+            <button
+              type="button"
+              className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
+              onClick={() => {
+                setSessopmsDateTab("upcoming");
+                setSessionPageNumber(1);
+              }}
+            >
               Upcoming
             </button>
-            <button type="button" className={styles.sessionTab}>
+            <button
+              type="button"
+              className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
+              onClick={() => {
+                setSessopmsDateTab("past");
+                setSessionPageNumber(1);
+              }}
+            >
               Past
             </button>
           </div>
@@ -302,8 +324,41 @@ export default function AdminClientsPageDetailed() {
             {clientSessions.length === 0 ? (
               <p className={styles.sessionEmpty}>No sessions yet.</p>
             ) : (
-              clientSessions.map((s) => <SessionCard key={s.id} session={s} isDemo={isDemo} />)
+              paginateSessions(groupPastandUpcomingSessions(), sessionPageNumber ?? 1, maxPageSize).map((s) => (
+                <SessionCard key={s.id} session={s} isDemo={isDemo} />
+              ))
             )}
+
+            <div className={styles.sessionPagination}>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) - 1)}
+                disabled={(sessionPageNumber ?? 1) <= 1}
+              >
+                ← Prev
+              </Button>
+              <span>
+                {Array.from({ length: Math.ceil(groupPastandUpcomingSessions().length / 4) }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    variant={sessionPageNumber === i + 1 ? "primary" : "ghost"}
+                    size="sm"
+                    onClick={() => setSessionPageNumber(i + 1)}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </span>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) + 1)}
+                disabled={(sessionPageNumber ?? 1) >= Math.ceil(groupPastandUpcomingSessions().length / maxPageSize)}
+              >
+                Next →
+              </Button>
+            </div>
           </div>
         </Card>
 
