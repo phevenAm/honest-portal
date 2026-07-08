@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Session } from "@supabase/supabase-js";
 
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     setError(null);
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -109,87 +109,93 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setError(error.message);
       throw error;
     }
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string, meta?: Record<string, unknown>, accessToken?: string) => {
-    setError(null);
+  const signUp = useCallback(
+    async (email: string, password: string, meta?: Record<string, unknown>, accessToken?: string) => {
+      setError(null);
 
-    const cleanedToken = accessToken?.trim();
+      const cleanedToken = accessToken?.trim();
 
-    if (!cleanedToken) {
-      const message = "Access token is required.";
-      setError(message);
-      throw new Error(message);
-    }
+      if (!cleanedToken) {
+        const message = "Access token is required.";
+        setError(message);
+        throw new Error(message);
+      }
 
-    const { data: tokenRow, error: tokenError } = await supabase
-      .from("platform_access_token")
-      .select("id, token, is_used")
-      .eq("token", cleanedToken)
-      .maybeSingle();
+      const { data: tokenRow, error: tokenError } = await supabase
+        .from("platform_access_token")
+        .select("id, token, is_used")
+        .eq("token", cleanedToken)
+        .maybeSingle();
 
-    if (tokenError) {
-      setError(tokenError.message);
-      throw new Error(tokenError.message);
-    }
+      if (tokenError) {
+        setError(tokenError.message);
+        throw new Error(tokenError.message);
+      }
 
-    if (!tokenRow) {
-      const message = "Invalid access token.";
-      setError(message);
-      throw new Error(message);
-    }
+      if (!tokenRow) {
+        const message = "Invalid access token.";
+        setError(message);
+        throw new Error(message);
+      }
 
-    if (tokenRow.is_used === true) {
-      const message = "This access token has already been used.";
-      setError(message);
-      throw new Error(message);
-    }
+      if (tokenRow.is_used === true) {
+        const message = "This access token has already been used.";
+        setError(message);
+        throw new Error(message);
+      }
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: meta,
-      },
-    });
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: meta,
+        },
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      throw signUpError;
-    }
+      if (signUpError) {
+        setError(signUpError.message);
+        throw signUpError;
+      }
 
-    const { data: tokenConsumed, error: consumeTokenError } = await supabase.rpc("consume_platform_access_token", {
-      input_token: cleanedToken,
-    });
+      const { data: tokenConsumed, error: consumeTokenError } = await supabase.rpc("consume_platform_access_token", {
+        input_token: cleanedToken,
+      });
 
-    if (consumeTokenError) {
-      setError(consumeTokenError.message);
-      throw consumeTokenError;
-    }
+      if (consumeTokenError) {
+        setError(consumeTokenError.message);
+        throw consumeTokenError;
+      }
 
-    if (!tokenConsumed) {
-      const message = "This access token has already been used.";
-      setError(message);
-      throw new Error(message);
-    }
-  };
+      if (!tokenConsumed) {
+        const message = "This access token has already been used.";
+        setError(message);
+        throw new Error(message);
+      }
+    },
+    [],
+  );
 
-  const updateProfile = async (updates: ProfileUpdates) => {
-    if (!authUser) return;
+  const updateProfile = useCallback(
+    async (updates: ProfileUpdates) => {
+      if (!authUser) return;
 
-    if (userProfile?.is_demo) {
+      if (userProfile?.is_demo) {
+        setUserProfile((prev) => (prev ? { ...prev, ...updates } : prev));
+        return;
+      }
+
+      const { error } = await supabase.from("users").update(updates).eq("id", authUser.id);
+
+      if (error) throw new Error(error.message);
+
       setUserProfile((prev) => (prev ? { ...prev, ...updates } : prev));
-      return;
-    }
+    },
+    [authUser, userProfile],
+  );
 
-    const { error } = await supabase.from("users").update(updates).eq("id", authUser.id);
-
-    if (error) throw new Error(error.message);
-
-    setUserProfile((prev) => (prev ? { ...prev, ...updates } : prev));
-  };
-
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     setError(null);
 
     const { error } = await supabase.auth.signOut();
@@ -197,28 +203,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) {
       console.error("signOut error:", error.message);
     }
-  };
+  }, []);
 
   const displayName = userProfile?.display_name ?? userProfile?.first_name ?? null;
 
-  return (
-    <AuthContext.Provider
-      value={{
-        authUser,
-        userProfile,
-        displayName,
-        error,
-        loading,
-        isAuthenticated: !!authUser,
-        isAdmin: userProfile?.role === "admin",
-        isDemo: userProfile?.is_demo ?? false,
-        signIn,
-        signUp,
-        signOut,
-        updateProfile,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      authUser,
+      userProfile,
+      displayName,
+      error,
+      loading,
+      isAuthenticated: !!authUser,
+      isAdmin: userProfile?.role === "admin",
+      isDemo: userProfile?.is_demo ?? false,
+      signIn,
+      signUp,
+      signOut,
+      updateProfile,
+    }),
+    [authUser, userProfile, displayName, error, loading, signIn, signUp, signOut, updateProfile],
   );
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
