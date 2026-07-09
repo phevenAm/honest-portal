@@ -320,7 +320,7 @@ export default function AdminClientsPageDetailed() {
             {clientSessions.length === 0 ? (
               <p className={styles.sessionEmpty}>No sessions yet.</p>
             ) : (
-              paginateSessions(filteredSessions(), sessionPageNumber ?? 1, maxPageSize).map((s) => (
+              paginateSessions(filteredSessions, sessionPageNumber ?? 1, maxPageSize).map((s) => (
                 <SessionCard key={s.id} session={s} isDemo={isDemo} />
               ))
             )}
@@ -335,7 +335,7 @@ export default function AdminClientsPageDetailed() {
                 ← Prev
               </Button>
               <span>
-                {Array.from({ length: Math.ceil(filteredSessions().length / 4) }, (_, i) => (
+                {Array.from({ length: Math.ceil(filteredSessions.length / 4) }, (_, i) => (
                   <Button
                     key={i + 1}
                     variant={sessionPageNumber === i + 1 ? "primary" : "ghost"}
@@ -350,7 +350,7 @@ export default function AdminClientsPageDetailed() {
                 size="sm"
                 variant="secondary"
                 onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) + 1)}
-                disabled={(sessionPageNumber ?? 1) >= Math.ceil(filteredSessions().length / maxPageSize)}
+                disabled={(sessionPageNumber ?? 1) >= Math.ceil(filteredSessions.length / maxPageSize)}
               >
                 Next →
               </Button>
