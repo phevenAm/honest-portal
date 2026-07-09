@@ -21,6 +21,7 @@ import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import SessionNotesModal from "./modals/SessionNotesModal/SessionNotesModal";
 
 import styles from "./AdminClientsPage.module.scss";
+import Search from "@/components/shared/Search/Search";
 
 const getQuestionnaireForResponse = (response: Response | undefined, questionnaires: Questionnaire[]) => {
   if (!response) return undefined;
@@ -213,13 +214,12 @@ export default function AdminClientsPage() {
         </div>
 
         <div className={styles.searchWrap}>
-          <input
-            type="search"
+          <Search
+            id="clients"
+            showLabel={false}
+            label="Search clients"
             placeholder="Search by name or email…"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            aria-label="Search clients"
-            className={styles.searchInput}
+            handleChange={setSearch}
           />
         </div>
 
