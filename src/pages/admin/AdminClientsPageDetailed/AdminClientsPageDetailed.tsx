@@ -15,6 +15,7 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
+import Search from "@/components/shared/Search/Search";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
@@ -24,7 +25,7 @@ import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
 
-function getStatusClass(status: string) {
+function getStatusClass(status: string): string {
   switch (status) {
     case "completed":
       return styles.statusCompleted;
@@ -32,14 +33,27 @@ function getStatusClass(status: string) {
       return styles.statusNoShow;
     case "cancelled":
       return styles.statusCancelled;
+    case "rescheduled":
+      return styles.statusRescheduled;
     default:
       return styles.statusScheduled;
   }
 }
 
-function SessionCard({ session, isDemo }: { session: Session; isDemo: boolean }) {
+function getCardClass(status: string): string {
+  if (status === "no_show") return styles.sessionItemNoShow;
+  if (status === "rescheduled") return styles.sessionItemRescheduled;
+  return "";
+}
+
+interface SessionCardProps {
+  session: Session;
+  isDemo: boolean;
+}
+
+function SessionCard({ session, isDemo }: SessionCardProps) {
   return (
-    <div className={styles.sessionItem}>
+    <div className={[styles.sessionItem, getCardClass(session.status)].filter(Boolean).join(" ")}>
       <div className={styles.sessionItemHeader}>
         <span className={styles.sessionItemDate}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</span>
         <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
@@ -93,6 +107,7 @@ export default function AdminClientsPageDetailed() {
   const [isScheduleEditorOpen, setIsScheduleEditorOpen] = useState(false);
   const [isManageSessionsModal, setIsManageSessionsModal] = useState(false);
   const [sessionPageNumber, setSessionPageNumber] = useState<null | number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const [sessionsDateTab, setSessopmsDateTab] = useState<"upcoming" | "past">("upcoming");
 
@@ -154,7 +169,7 @@ export default function AdminClientsPageDetailed() {
     setExporting(false);
   };
 
-  const filteredSessions = useMemo(() => {
+  const sessionsGroupByType = useMemo((): Session[] => {
     const now = new Date();
     return clientSessions.filter((session) => {
       const scheduledAt = new Date(session.scheduled_at);
@@ -162,7 +177,24 @@ export default function AdminClientsPageDetailed() {
     });
   }, [sessionsDateTab, clientSessions]);
 
-  const paginateSessions = (array: Session[], currentPage: number, pageSize: number) => {
+  const searchResults = useMemo(
+    (): Session[] =>
+      searchTerm.length > 0
+        ? sessionsGroupByType.filter((s) => {
+            const dateStr =
+              `${dayjs(s.scheduled_at).format("dddd D MMMM YYYY")} ${dayjs(s.scheduled_at).format("D MMM YYYY")}`.toLowerCase();
+            return (
+              (s.notes && s.notes.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              dateStr.includes(searchTerm.toLowerCase())
+            );
+          })
+        : sessionsGroupByType,
+    [sessionsGroupByType, searchTerm],
+  );
+
+  console.log(sessionsGroupByType[0]);
+
+  const paginateSessions = (array: Session[], currentPage: number, pageSize: number): Session[] => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return array.slice(startIndex, endIndex);
@@ -293,68 +325,86 @@ export default function AdminClientsPageDetailed() {
             </Button>
           </div>
 
-          <div className={styles.sessionTabs}>
-            <button
-              type="button"
-              className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
-              onClick={() => {
-                setSessopmsDateTab("upcoming");
-                setSessionPageNumber(1);
-              }}
-            >
-              Upcoming
-            </button>
-            <button
-              type="button"
-              className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
-              onClick={() => {
-                setSessopmsDateTab("past");
-                setSessionPageNumber(1);
-              }}
-            >
-              Past
-            </button>
+          <div className={styles.mainActions}>
+            <div className={styles.sessionTabs}>
+              <button
+                type="button"
+                className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
+                onClick={() => {
+                  setSessopmsDateTab("upcoming");
+                  setSessionPageNumber(1);
+                }}
+              >
+                Upcoming
+              </button>
+              <button
+                type="button"
+                className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
+                onClick={() => {
+                  setSessopmsDateTab("past");
+                  setSessionPageNumber(1);
+                }}
+              >
+                Past
+              </button>
+            </div>
+
+            <div className="seachContainer">
+              <Search
+                handleChange={(e) => setSearchTerm(e)}
+                placeholder="Find a session..."
+                label="Search for a session"
+                id="session"
+              />
+            </div>
           </div>
 
           <div className={styles.sessionList}>
-            {clientSessions.length === 0 ? (
-              <p className={styles.sessionEmpty}>No sessions yet.</p>
-            ) : (
-              paginateSessions(filteredSessions, sessionPageNumber ?? 1, maxPageSize).map((s) => (
-                <SessionCard key={s.id} session={s} isDemo={isDemo} />
-              ))
-            )}
+            {(searchResults.length === 0 && <p className={styles.sessionEmpty}>No sessions found!</p>) ||
+              (clientSessions.length === 0 ? (
+                <p className={styles.sessionEmpty}>No sessions yet.</p>
+              ) : (
+                paginateSessions(searchResults, sessionPageNumber ?? 1, maxPageSize).map((s) => (
+                  <SessionCard key={s.id} session={s} isDemo={isDemo} />
+                ))
+              ))}
 
-            <div className={styles.sessionPagination}>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) - 1)}
-                disabled={(sessionPageNumber ?? 1) <= 1}
-              >
-                ← Prev
-              </Button>
-              <span>
-                {Array.from({ length: Math.ceil(filteredSessions.length / 4) }, (_, i) => (
-                  <Button
-                    key={i + 1}
-                    variant={sessionPageNumber === i + 1 ? "primary" : "ghost"}
-                    size="sm"
-                    onClick={() => setSessionPageNumber(i + 1)}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-              </span>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) + 1)}
-                disabled={(sessionPageNumber ?? 1) >= Math.ceil(filteredSessions.length / maxPageSize)}
-              >
-                Next →
-              </Button>
-            </div>
+            {searchResults.length > 4 && (
+              <div className={styles.sessionPagination}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) - 1)}
+                  disabled={(sessionPageNumber ?? 1) <= 1}
+                >
+                  ← Prev
+                </Button>
+                {Math.ceil(searchResults.length / maxPageSize) > 5 && (
+                  <span className={styles.pageInput}>
+                    <input
+                      type="number"
+                      min={1}
+                      max={Math.ceil(searchResults.length / maxPageSize)}
+                      value={sessionPageNumber ?? 1}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        const max = Math.ceil(searchResults.length / maxPageSize);
+                        setSessionPageNumber(Math.min(Math.max(val || 1, 1), max));
+                      }}
+                    />
+                    <span className={styles.pageTotal}>of {Math.ceil(searchResults.length / maxPageSize)}</span>
+                  </span>
+                )}
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setSessionPageNumber((sessionPageNumber ?? 1) + 1)}
+                  disabled={(sessionPageNumber ?? 1) >= Math.ceil(searchResults.length / maxPageSize)}
+                >
+                  Next →
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
 
