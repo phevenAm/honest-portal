@@ -4,6 +4,7 @@ import Modal from "@components/shared/Modal/Modal";
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteSession } from "@/store/slices/sessionsSlice";
+import { isDemo } from "@context/AuthContext";
 
 type ModalProps = {
   title: string;
@@ -36,7 +37,7 @@ const DeleteSessionModal = ({ id, onClose }: DeleteModalProps) => {
       <Button variant="danger" onClick={() => handleDelete(id)}>
         Yes, delete
       </Button>
-      <Button variant="ghost" onClick={onClose}>
+      <Button variant="ghost" onClick={onClose} disabled={isDemo}>
         No, cancel
       </Button>
     </div>
