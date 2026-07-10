@@ -4,15 +4,7 @@ import Modal from "@components/shared/Modal/Modal";
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteSession } from "@/store/slices/sessionsSlice";
-import { isDemo } from "@context/AuthContext";
-
-type ModalProps = {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-  actions?: React.ReactNode;
-  size?: "sm" | "md" | "lg";
-};
+import { useAuth } from "@context/AuthContext";
 
 type DeleteModalProps = {
   id: string;
@@ -22,6 +14,7 @@ type DeleteModalProps = {
 const DeleteSessionModal = ({ id, onClose }: DeleteModalProps) => {
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
+  const { isDemo } = useAuth();
 
   const handleDelete = (id: string) => {
     try {
