@@ -1,18 +1,21 @@
-import { Session } from "@/models/globalTypes";
 import type { MouseEvent } from "react";
-import styles from "./SessionCard.module.scss";
+
 import dayjs from "dayjs";
+
 import Button from "@components/shared/Button";
-import { updateSession } from "@/store/slices/sessionsSlice";
-import { useAppDispatch } from "@/store/hooks";
 import { useToast } from "@context/ToastContext";
 
-function getStatusClass(status: string): string {
+import { Session } from "@/models/globalTypes";
+import { useAppDispatch } from "@/store/hooks";
+import { updateSession } from "@/store/slices/sessionsSlice";
+
+import styles from "./SessionCard.module.scss";
+
+function getStatusClass(status: string, attended: boolean | null): string {
+  if (attended === false) return styles.statusNoShow;
   switch (status) {
     case "completed":
       return styles.statusCompleted;
-    case "no_show":
-      return styles.statusNoShow;
     case "cancelled":
       return styles.statusCancelled;
     case "rescheduled":
@@ -22,8 +25,8 @@ function getStatusClass(status: string): string {
   }
 }
 
-function getCardClass(status: string): string {
-  if (status === "no_show") return styles.sessionItemNoShow;
+function getCardClass(status: string, attended: boolean | null): string {
+  if (attended === false) return styles.sessionItemNoShow;
   if (status === "rescheduled") return styles.sessionItemRescheduled;
   return "";
 }
@@ -51,12 +54,12 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   };
 
   return (
-    <div className={[styles.sessionItem, getCardClass(session.status)].filter(Boolean).join(" ")}>
+    <div className={[styles.sessionItem, getCardClass(session.status, session.attended)].filter(Boolean).join(" ")}>
       <div className={styles.sessionItemHeader}>
         <span className={styles.sessionItemDate}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</span>
         <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
-        <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status)}`}>
-          {session.status.replace("_", " ")}
+        <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status, session.attended)}`}>
+          {session.attended === false ? "No Show" : session.status.replace("_", " ")}
         </span>
         <span
           className={session.paid ? styles.paidPill : styles.unpaidPill}
