@@ -14,6 +14,7 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
+import Search from "@/components/shared/Search/Search";
 import { getScoreAverage } from "../utils/AdminClientsPageUtils";
 import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
@@ -21,7 +22,6 @@ import ManageTokensModal from "./modals/ManageTokensModal/ManageTokensModal";
 import SessionNotesModal from "./modals/SessionNotesModal/SessionNotesModal";
 
 import styles from "./AdminClientsPage.module.scss";
-import Search from "@/components/shared/Search/Search";
 
 const getQuestionnaireForResponse = (response: Response | undefined, questionnaires: Questionnaire[]) => {
   if (!response) return undefined;
