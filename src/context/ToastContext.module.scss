@@ -21,8 +21,24 @@
     transform: translateX(-50%) translateY(8px);
     opacity: 0;
   }
+
   to {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
+}
+
+
+.neutral {
+  color: var(--text-primary);
+}
+
+.danger {
+  background: var(--danger);
+  color: var(--text-primary);
+}
+
+.success {
+  background: var(--success);
+  color: var(--text-inverse);
 }
