@@ -466,12 +466,7 @@ export type Database = {
       get_my_role: { Args: never; Returns: string }
     }
     Enums: {
-      session_status:
-        | "scheduled"
-        | "completed"
-        | "cancelled"
-        | "no_show"
-        | "rescheduled"
+      session_status: "scheduled" | "completed" | "cancelled" | "rescheduled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -599,13 +594,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      session_status: [
-        "scheduled",
-        "completed",
-        "cancelled",
-        "no_show",
-        "rescheduled",
-      ],
+      session_status: ["scheduled", "completed", "cancelled", "rescheduled"],
     },
   },
 } as const
