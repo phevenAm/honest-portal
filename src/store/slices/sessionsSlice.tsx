@@ -45,7 +45,7 @@ export const fetchSessionsByClientId = createAsyncThunk<Session[], string>(
 
 export const updateSession = createAsyncThunk<
   Session,
-  { id: string } & Partial<Pick<Session, "status" | "paid" | "notes" | "scheduled_at">>
+  { id: string } & Partial<Pick<Session, "status" | "attended" | "paid" | "notes" | "scheduled_at">>
 >("sessions/updateSession", async (sessionToUpdate, { rejectWithValue }) => {
   const { id, ...fields } = sessionToUpdate;
   const { data, error } = await supabase.from("sessions").update(fields).eq("id", id).select("*").single();
