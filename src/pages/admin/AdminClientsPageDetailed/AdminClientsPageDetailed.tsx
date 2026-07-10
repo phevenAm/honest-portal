@@ -22,15 +22,15 @@ import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/Dele
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
 import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
+import { SessionCard } from "./SessionCard/SessionCard";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
-import { SessionCard } from "./SessionCard/SessionCard";
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isDemo, isAdmin } = useAuth();
+  const { isDemo } = useAuth();
 
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const questionnaires = useAppSelector(selectAllQuestionnaires);
@@ -128,9 +128,6 @@ export default function AdminClientsPageDetailed() {
         : sessionsGroupByType,
     [sessionsGroupByType, searchTerm],
   );
-
-  console.log(sessionsGroupByType[0]);
-
   const paginateSessions = (array: Session[], currentPage: number, pageSize: number): Session[] => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -174,7 +171,9 @@ export default function AdminClientsPageDetailed() {
                 {client.first_name} {client.last_name}
               </h1>
               <p className={styles.heroEmail}>{client.email}</p>
-              {clientSince && <p className={styles.heroSince}>Client since {clientSince}</p>}
+              {clientSince && (
+                <p className={styles.heroSince}>Client since {dayjs(clientSince).format("DD/MM/YYYY")}</p>
+              )}
             </div>
           </div>
 

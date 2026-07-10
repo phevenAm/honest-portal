@@ -16,6 +16,7 @@ const initialState: SessionsState = {
 };
 
 type CreateSessionPayload = Omit<Session, "id" | "created_at" | "status">;
+// Note: avoid using React hooks at module scope; to show toasts, handle in components or middleware
 
 export const createSession = createAsyncThunk<Session, CreateSessionPayload>(
   "sessions/createSession",
@@ -43,6 +44,17 @@ export const fetchSessionsByClientId = createAsyncThunk<Session[], string>(
   },
 );
 
+export const deleteSession = createAsyncThunk<string, string>(
+  "sessions/deleteSession",
+  async (sessionId, { rejectWithValue }) => {
+    const { error } = await supabase.from("sessions").delete().eq("id", sessionId);
+
+    if (error) return rejectWithValue(error.message ?? "Something went wrong, could not delete");
+
+    return sessionId;
+  },
+);
+
 export const updateSession = createAsyncThunk<
   Session,
   { id: string } & Partial<Pick<Session, "status" | "attended" | "paid" | "notes" | "scheduled_at">>
@@ -51,6 +63,7 @@ export const updateSession = createAsyncThunk<
   const { data, error } = await supabase.from("sessions").update(fields).eq("id", id).select("*").single();
 
   if (error) return rejectWithValue(error.message || "Failed to update session. Please try again later");
+
   return data;
 });
 
@@ -127,6 +140,24 @@ const sessionsSlice = createSlice({
       .addCase(updateSession.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+      })
+      //---------------delete session
+      .addCase(deleteSession.fulfilled, (state, action) => {
+        // const { showToast } = useToast();
+        // action.payload is the deleted session id (string)
+        state.sessions = state.sessions.filter((s) => s.id !== action.payload);
+        state.status = "succeeded";
+        // showToast("Session has been deleted", "success");
+      })
+      .addCase(deleteSession.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteSession.rejected, (state, action) => {
+        // action.payload is the deleted session id (string)
+        state.status = "failed";
+        // const { showToast } = useToast();
+
+        // showToast(`${action.payload}`, "danger");
       });
   },
 });

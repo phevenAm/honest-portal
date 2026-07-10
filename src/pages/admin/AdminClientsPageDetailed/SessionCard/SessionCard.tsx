@@ -1,4 +1,4 @@
-import type { MouseEvent } from "react";
+import { type MouseEvent, useState } from "react";
 
 import dayjs from "dayjs";
 
@@ -8,6 +8,7 @@ import { useToast } from "@context/ToastContext";
 import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
+import DeleteSessionModal from "../DeleteSessionModal/DeleteSessionModal";
 
 import styles from "./SessionCard.module.scss";
 
@@ -40,6 +41,8 @@ interface SessionCardProps {
 export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
     const actionType = e.currentTarget.getAttribute("data-action-type");
@@ -90,12 +93,14 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
               {session.paid ? "Mark as unpaid" : "Mark as paid"}
             </Button>
 
-            <Button variant="danger" size="sm" disabled={isDemo}>
-              Delete{" "}
+            <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+              Delete
             </Button>
           </>
         )}
       </div>
+
+      {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={setIsDeleteModalOpen} />}
     </div>
   );
 }
