@@ -48,7 +48,7 @@ export default function SessionNotesModal({ user, onClose }: Props) {
 
   const handleAdd = async () => {
     if (isDemo) {
-      showToast("Demo mode — changes are not saved.");
+      showToast("Demo mode — changes are not saved.", "warning");
       return;
     }
     if (!content.trim() || !userProfile) return;
@@ -60,10 +60,13 @@ export default function SessionNotesModal({ user, onClose }: Props) {
       .select("id, content, created_at")
       .single();
 
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      setError(error.message);
+      showToast("Sorry, something went wrong", "warning");
+    } else {
       setNotes((prev) => [data, ...prev]);
       setContent("");
+      showToast("Note added");
     }
     setSaving(false);
   };

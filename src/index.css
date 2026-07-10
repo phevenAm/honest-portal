@@ -40,8 +40,8 @@
   /* Semantic */
   --accent:         var(--sage-dark);
   --accent-light:   var(--sage-light);
-  --danger:         #e07070;
-  --warning:        #e0a860;
+  --danger:         #c15f5f;
+  --warning:        #dac3a3;
   --success:        var(--sage-dark);
 
   /* Shadows */
