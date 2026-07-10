@@ -5,7 +5,7 @@
   transform: translateX(-50%);
   background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--r-full);
   padding: 10px 20px;
   font-size: 0.875rem;
@@ -21,8 +21,28 @@
     transform: translateX(-50%) translateY(8px);
     opacity: 0;
   }
+
   to {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
+}
+
+.neutral {
+  color: var(--text-primary);
+}
+
+.danger {
+  background: rgb(198, 64, 64);
+  color: var(--text-inverse);
+}
+
+.success {
+  background: var(--success);
+  color: var(--text-primary);
+}
+
+.warning {
+  background: rgb(242, 161, 80);
+  color: var(--text-primary);
 }

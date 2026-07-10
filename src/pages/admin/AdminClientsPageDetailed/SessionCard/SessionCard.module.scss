@@ -1,0 +1,141 @@
+@use "../../../../styles/spacing" as *;
+@use "../../../../styles/mixins" as *;
+
+.sessionItem {
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: $sp-4 $sp-5;
+    background: var(--bg-page);
+
+    @include until-md {
+        padding: $sp-3 $sp-4;
+    }
+}
+
+.sessionItemNoShow {
+    background: var(--bg-muted);
+    border-color: var(--border);
+    opacity: 0.6;
+}
+
+.sessionItemRescheduled {
+    background: color-mix(in srgb, #3b82f6 8%, transparent);
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+}
+
+.sessionItemHeader {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    flex-wrap: wrap;
+}
+
+.sessionItemDate {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
+
+    @include until-md {
+        flex-basis: 100%;
+        font-size: 0.82rem;
+    }
+}
+
+.sessionItemMeta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.sessionStatusBadge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: var(--r-full);
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.statusScheduled {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}
+
+.statusCompleted {
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #16a34a;
+}
+
+.statusNoShow {
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+    color: var(--danger);
+}
+
+.statusCancelled {
+    background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+    color: var(--text-muted);
+}
+
+.statusRescheduled {
+    background: color-mix(in srgb, #3b82f6 12%, transparent);
+    color: #2563eb;
+}
+
+.paidPill {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--r-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: color-mix(in srgb, #22c55e 15%, transparent);
+    color: #16a34a;
+}
+
+.unpaidPill {
+    width: 22px;
+    height: 22px;
+    border-radius: var(--r-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--bg-muted);
+    color: var(--text-muted);
+}
+
+.sessionNotes {
+    margin-top: $sp-4;
+    padding-top: $sp-4;
+    border-top: 1px solid var(--border);
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 0;
+}
+
+.sessionNoNotes {
+    margin-top: $sp-4;
+    padding-top: $sp-4;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 0;
+}
+
+.sessionActions {
+    display: flex;
+    gap: $sp-2;
+    margin-top: $sp-4;
+    padding-top: $sp-4;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}

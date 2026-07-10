@@ -22,72 +22,9 @@ import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/Dele
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
 import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
+import { SessionCard } from "./SessionCard/SessionCard";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
-
-function getStatusClass(status: string): string {
-  switch (status) {
-    case "completed":
-      return styles.statusCompleted;
-    case "no_show":
-      return styles.statusNoShow;
-    case "cancelled":
-      return styles.statusCancelled;
-    case "rescheduled":
-      return styles.statusRescheduled;
-    default:
-      return styles.statusScheduled;
-  }
-}
-
-function getCardClass(status: string): string {
-  if (status === "no_show") return styles.sessionItemNoShow;
-  if (status === "rescheduled") return styles.sessionItemRescheduled;
-  return "";
-}
-
-interface SessionCardProps {
-  session: Session;
-  isDemo: boolean;
-}
-
-function SessionCard({ session, isDemo }: SessionCardProps) {
-  return (
-    <div className={[styles.sessionItem, getCardClass(session.status)].filter(Boolean).join(" ")}>
-      <div className={styles.sessionItemHeader}>
-        <span className={styles.sessionItemDate}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</span>
-        <span className={styles.sessionItemMeta}>{session.duration_minutes} min</span>
-        <span className={`${styles.sessionStatusBadge} ${getStatusClass(session.status)}`}>
-          {session.status.replace("_", " ")}
-        </span>
-        <span
-          className={session.paid ? styles.paidPill : styles.unpaidPill}
-          title={session.paid ? "Paid" : "Payment pending"}
-        >
-          {session.paid ? "✓" : "£"}
-        </span>
-      </div>
-
-      {session.notes ? (
-        <p className={styles.sessionNotes}>{session.notes}</p>
-      ) : (
-        <p className={styles.sessionNoNotes}>No notes added.</p>
-      )}
-
-      <div className={styles.sessionActions}>
-        <Button variant="ghost" size="sm">
-          No-show
-        </Button>
-        <Button variant="secondary" size="sm">
-          Reschedule
-        </Button>
-        <Button variant="danger" size="sm" disabled={isDemo}>
-          Delete
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
@@ -191,9 +128,6 @@ export default function AdminClientsPageDetailed() {
         : sessionsGroupByType,
     [sessionsGroupByType, searchTerm],
   );
-
-  console.log(sessionsGroupByType[0]);
-
   const paginateSessions = (array: Session[], currentPage: number, pageSize: number): Session[] => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -237,7 +171,9 @@ export default function AdminClientsPageDetailed() {
                 {client.first_name} {client.last_name}
               </h1>
               <p className={styles.heroEmail}>{client.email}</p>
-              {clientSince && <p className={styles.heroSince}>Client since {clientSince}</p>}
+              {clientSince && (
+                <p className={styles.heroSince}>Client since {dayjs(clientSince).format("DD/MM/YYYY")}</p>
+              )}
             </div>
           </div>
 
@@ -365,7 +301,7 @@ export default function AdminClientsPageDetailed() {
                 <p className={styles.sessionEmpty}>No sessions yet.</p>
               ) : (
                 paginateSessions(searchResults, sessionPageNumber ?? 1, maxPageSize).map((s) => (
-                  <SessionCard key={s.id} session={s} isDemo={isDemo} />
+                  <SessionCard key={s.id} session={s} isDemo={isDemo} isAdmin />
                 ))
               ))}
 
