@@ -53,7 +53,8 @@ const auditLogsSlice = createSlice({
       .addCase(fetchAuditLogs.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      });
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 

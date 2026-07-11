@@ -141,7 +141,8 @@ const responsesSlice = createSlice({
       })
       .addCase(deleteResponse.rejected, (state, action) => {
         state.error = action.payload as string;
-      });
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 

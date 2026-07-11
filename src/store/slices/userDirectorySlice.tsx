@@ -89,7 +89,7 @@ const userDirectorySlice = createSlice({
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        (state.error as string) = action.payload;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -97,15 +97,16 @@ const userDirectorySlice = createSlice({
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        (state.error as string) = action.payload;
       })
       .addCase(deleteOwnAccount.fulfilled, (state, action) => {
         state.users = state.users.filter((u) => u.id !== action.payload);
       })
       .addCase(deleteOwnAccount.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload as string;
-      });
+        (state.error as string) = action.payload as string;
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 

@@ -153,7 +153,8 @@ const resourcesSlice = createSlice({
       })
       .addCase(togglePublished.rejected, (state, action) => {
         state.error = action.payload as string;
-      });
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 
