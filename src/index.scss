@@ -164,8 +164,14 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   transition: background var(--transition-slow), color var(--transition-slow);
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 // ── Focus ──────────────────────────────────────────────────
@@ -208,10 +214,10 @@ textarea {
 #main-content {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - (var(--navbar-height) + var(--footer-height) + 2px));
+  flex: 1;
+  overflow-y: auto;
   background: var(--bg-base);
   padding: $sp-8 $sp-6;
-  padding-bottom: max(env(safe-area-inset-bottom), #{$sp-8});
 
   .inner {
     @include container-inner($max: var(--max-width)); // control max with and responsive padding
