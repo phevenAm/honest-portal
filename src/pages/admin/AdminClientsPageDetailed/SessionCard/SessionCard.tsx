@@ -89,7 +89,11 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
               {session.attended ? "Attended" : "No show"}
             </Button>
 
-            <Button data-action-type="payment" onClick={toggleNoShowOrPayment}>
+            <Button
+              data-action-type="payment"
+              onClick={toggleNoShowOrPayment}
+              variant={session.paid ? "ghost" : "secondary"}
+            >
               {session.paid ? "Mark as unpaid" : "Mark as paid"}
             </Button>
 
@@ -100,7 +104,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
         )}
       </div>
 
-      {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={setIsDeleteModalOpen} />}
+      {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={() => setIsDeleteModalOpen(false)} />}
     </div>
   );
 }
