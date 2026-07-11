@@ -20,7 +20,7 @@
   }
 
   &.danger {
-    background: rgb(198, 64, 64);
+    background: var(--danger);
     color: var(--text-inverse);
   }
 
@@ -30,8 +30,8 @@
   }
 
   &.warning {
-    background: #d97706;
-    color: #fff;
+    background: var(--warning);
+    color: var(--text-primary);
   }
 }
 
