@@ -2,27 +2,27 @@ import { useState } from "react";
 
 import { DateTimePicker } from "@mui/x-date-pickers";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { createSession, updateSession } from "@/store/slices/sessionsSlice";
 
 import styles from "./CreateSessionModal.module.scss";
-import { Session } from "@/models/globalTypes";
-import dayjs from "dayjs";
 
 type CreateSessionModalTypes = {
-  id: string;
+  clientId: string;
   clientName?: string;
   onClose: () => void;
   session?: Session | null;
 };
 
-const CreateSessionModal = ({ id, onClose, clientName, session = null }: CreateSessionModalTypes) => {
+const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: CreateSessionModalTypes) => {
   // const { id, client_id, created_at, created_by, attended, duration_minutes, notes, paid, scheduled_at, status } =
   //   session;
 
@@ -59,7 +59,7 @@ const CreateSessionModal = ({ id, onClose, clientName, session = null }: CreateS
       dates.map((date) =>
         dispatch(
           createSession({
-            client_id: id,
+            client_id: clientId,
             scheduled_at: date.toISOString(),
             paid: isPrepaid,
             duration_minutes: sessionDuration,

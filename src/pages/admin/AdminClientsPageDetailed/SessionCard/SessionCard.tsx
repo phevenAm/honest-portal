@@ -9,9 +9,9 @@ import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
 import DeleteSessionModal from "../DeleteSessionModal/DeleteSessionModal";
+import CreateSessionModal from "../modals/CreateSessionModal/CreateSessionModal";
 
 import styles from "./SessionCard.module.scss";
-import CreateSessionModal from "../modals/CreateSessionModal/CreateSessionModal";
 
 function getStatusClass(status: string, attended: boolean | null): string {
   if (attended === false) return styles.statusNoShow;
@@ -108,7 +108,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
 
       {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={() => setIsDeleteModalOpen(false)} />}
       {openEditSession && (
-        <CreateSessionModal id={session.client_id!} session={session} onClose={() => setOpenEditSession(false)} />
+        <CreateSessionModal clientId={session.client_id!} session={session} onClose={() => setOpenEditSession(false)} />
       )}
     </div>
   );

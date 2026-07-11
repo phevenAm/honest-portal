@@ -382,7 +382,7 @@ export default function AdminClientsPageDetailed() {
       {isScheduleEditorOpen && (
         <CreateSessionModal
           clientName={client.display_name || client.first_name}
-          id={clientId!}
+          clientId={clientId!}
           onClose={() => setIsScheduleEditorOpen(false)}
         />
       )}
