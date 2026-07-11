@@ -143,6 +143,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  height: -webkit-fill-available;
 
   @media (prefers-reduced-motion: reduce) {
     scroll-behavior: auto;
@@ -163,6 +164,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   transition: background var(--transition-slow), color var(--transition-slow);
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
 }
 
 // ── Focus ──────────────────────────────────────────────────
@@ -194,13 +197,21 @@ h6 {
   font-weight: 600;
 }
 
+// ── iOS input zoom prevention ──────────────────────────────
+input,
+select,
+textarea {
+  font-size: max(16px, 1em);
+}
+
 // ── App shell layout ───────────────────────────────────────
 #main-content {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - (var(--navbar-height) + var(--footer-height) + 2px));
+  min-height: calc(100dvh - (var(--navbar-height) + var(--footer-height) + 2px));
   background: var(--bg-base);
   padding: $sp-8 $sp-6;
+  padding-bottom: max(env(safe-area-inset-bottom), #{$sp-8});
 
   .inner {
     @include container-inner($max: var(--max-width)); // control max with and responsive padding

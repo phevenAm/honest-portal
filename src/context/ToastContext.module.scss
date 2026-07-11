@@ -14,6 +14,25 @@
   white-space: nowrap;
   pointer-events: none;
   animation: slideUp 0.2s ease;
+
+  &.neutral {
+    color: var(--text-primary);
+  }
+
+  &.danger {
+    background: var(--danger);
+    color: var(--text-inverse);
+  }
+
+  &.success {
+    background: var(--accent);
+    color: var(--text-inverse);
+  }
+
+  &.warning {
+    background: var(--warning);
+    color: var(--text-primary);
+  }
 }
 
 @keyframes slideUp {
@@ -26,23 +45,4 @@
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
-}
-
-.neutral {
-  color: var(--text-primary);
-}
-
-.danger {
-  background: rgb(198, 64, 64);
-  color: var(--text-inverse);
-}
-
-.success {
-  background: var(--success);
-  color: var(--text-primary);
-}
-
-.warning {
-  background: rgb(242, 161, 80);
-  color: var(--text-primary);
 }

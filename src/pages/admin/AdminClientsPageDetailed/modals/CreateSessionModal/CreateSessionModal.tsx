@@ -2,34 +2,40 @@ import { useState } from "react";
 
 import { DateTimePicker } from "@mui/x-date-pickers";
 import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
-import { createSession } from "@/store/slices/sessionsSlice";
+import { createSession, updateSession } from "@/store/slices/sessionsSlice";
 
 import styles from "./CreateSessionModal.module.scss";
 
 type CreateSessionModalTypes = {
-  id: string;
-  clientName: string;
+  clientId: string;
+  clientName?: string;
   onClose: () => void;
+  session?: Session | null;
 };
 
-const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes) => {
+const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: CreateSessionModalTypes) => {
+  // const { id, client_id, created_at, created_by, attended, duration_minutes, notes, paid, scheduled_at, status } =
+  //   session;
+
   const { authUser, isDemo } = useAuth();
   const { showToast } = useToast();
   const dispatch = useAppDispatch();
-  const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(null);
+  const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(session ? dayjs(session.scheduled_at) : null);
   const [isSaving, setIsSaving] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringWeeks, setRecurringWeeks] = useState(3);
-  const [sessionDuration, setSessionDuration] = useState(50);
-  const [isPrepaid, setIsPrepaid] = useState(false);
-  const [notes, setNotes] = useState("");
+  const [sessionDuration, setSessionDuration] = useState(session?.duration_minutes ?? 50);
+  const [isPrepaid, setIsPrepaid] = useState(session?.paid ?? false);
+  const [notes, setNotes] = useState(session?.notes ?? "");
   const [error, setError] = useState("");
 
   const handleSave = async () => {
@@ -53,7 +59,7 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
       dates.map((date) =>
         dispatch(
           createSession({
-            client_id: id,
+            client_id: clientId,
             scheduled_at: date.toISOString(),
             paid: isPrepaid,
             duration_minutes: sessionDuration,
@@ -76,9 +82,41 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
     setIsSaving(false);
   };
 
+  const handleSessionUpdate = async (sess: Session) => {
+    if (isDemo) {
+      showToast("Demo mode — changes are not saved.");
+      onClose();
+      return;
+    }
+
+    if (!authUser || !scheduledAt) return;
+    setError("");
+    setIsSaving(true);
+
+    try {
+      await dispatch(
+        updateSession({
+          id: sess.id,
+          paid: isPrepaid,
+          notes: notes.trim() || null,
+          scheduled_at: scheduledAt.toISOString(),
+          duration_minutes: sessionDuration,
+          status: "rescheduled",
+        }),
+      ).unwrap();
+      onClose();
+      setIsSaving(false);
+      showToast("Session updated successfully.", "success");
+    } catch (err: any) {
+      const message = err?.message || String(err) || "oops";
+      setError(message);
+      showToast(`Something went wrong: ${message}`);
+    }
+  };
+
   return (
     <Modal
-      title={`Schedule session — ${clientName}`}
+      title={session ? "Update session" : `Create session - ${clientName}`}
       onClose={onClose}
       size="sm"
       actions={
@@ -86,10 +124,16 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!scheduledAt || isSaving}>
-            {/** biome-ignore lint/style/noNestedTernary: <explanation> */}
-            {isSaving ? "Scheduling…" : isRecurring ? "Schedule sessions" : "Schedule session"}
-          </Button>
+          {session ? (
+            <Button onClick={() => handleSessionUpdate(session)} disabled={!scheduledAt || isSaving}>
+              {isSaving ? "Updating session..." : "Update session"}
+            </Button>
+          ) : (
+            <Button onClick={handleSave} disabled={!scheduledAt || isSaving}>
+              {/** biome-ignore lint/style/noNestedTernary: <explanation> */}
+              {isSaving ? "Scheduling…" : isRecurring ? "Schedule sessions" : "Schedule session"}
+            </Button>
+          )}
         </div>
       }
     >
@@ -120,19 +164,23 @@ const CreateSessionModal = ({ id, onClose, clientName }: CreateSessionModalTypes
           </div>
         </div>
 
-        <div className={styles.checkboxGroup}>
-          <input
-            id="recurring"
-            type="checkbox"
-            checked={isRecurring}
-            onChange={(e) => setIsRecurring(e.target.checked)}
-          />
-          <label htmlFor="recurring" className={styles.checkboxLabel}>
-            Repeat weekly
-          </label>
-        </div>
+        {/* //! session means im rescheduling */}
+        {!session && (
+          <div className={styles.checkboxGroup}>
+            <input
+              id="recurring"
+              type="checkbox"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
+            />
+            <label htmlFor="recurring" className={styles.checkboxLabel}>
+              Repeat weekly
+            </label>
+          </div>
+        )}
 
-        {isRecurring && (
+        {/* //! session means im rescheduling */}
+        {isRecurring && !session && (
           <div className={styles.fieldGroup}>
             <label className={styles.label} htmlFor="recurring-weeks">
               Additional weeks

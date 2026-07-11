@@ -9,6 +9,7 @@ import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
 import DeleteSessionModal from "../DeleteSessionModal/DeleteSessionModal";
+import CreateSessionModal from "../modals/CreateSessionModal/CreateSessionModal";
 
 import styles from "./SessionCard.module.scss";
 
@@ -43,6 +44,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const { showToast } = useToast();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [openEditSession, setOpenEditSession] = useState(false);
 
   const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
     const actionType = e.currentTarget.getAttribute("data-action-type");
@@ -79,7 +81,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       )}
 
       <div className={styles.sessionActions}>
-        <Button variant="secondary" size="sm">
+        <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
           Reschedule
         </Button>
         {/* //!admin can change, client only sends email to admin */}
@@ -89,7 +91,11 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
               {session.attended ? "Attended" : "No show"}
             </Button>
 
-            <Button data-action-type="payment" onClick={toggleNoShowOrPayment}>
+            <Button
+              data-action-type="payment"
+              onClick={toggleNoShowOrPayment}
+              variant={session.paid ? "ghost" : "secondary"}
+            >
               {session.paid ? "Mark as unpaid" : "Mark as paid"}
             </Button>
 
@@ -100,7 +106,10 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
         )}
       </div>
 
-      {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={setIsDeleteModalOpen} />}
+      {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={() => setIsDeleteModalOpen(false)} />}
+      {openEditSession && (
+        <CreateSessionModal clientId={session.client_id!} session={session} onClose={() => setOpenEditSession(false)} />
+      )}
     </div>
   );
 }

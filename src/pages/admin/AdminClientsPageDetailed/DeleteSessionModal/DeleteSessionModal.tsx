@@ -5,7 +5,7 @@ import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteSession } from "@/store/slices/sessionsSlice";
 import { useAuth } from "@context/AuthContext";
-
+import styles from "./DeleteSessionModal.module.scss";
 type DeleteModalProps = {
   id: string;
   onClose: () => void;
@@ -26,7 +26,7 @@ const DeleteSessionModal = ({ id, onClose }: DeleteModalProps) => {
   };
 
   const actionsObj = (
-    <div>
+    <div className={styles.modalActions}>
       <Button variant="danger" onClick={() => handleDelete(id)}>
         Yes, delete
       </Button>
