@@ -11,6 +11,7 @@ import { updateSession } from "@/store/slices/sessionsSlice";
 import DeleteSessionModal from "../DeleteSessionModal/DeleteSessionModal";
 
 import styles from "./SessionCard.module.scss";
+import CreateSessionModal from "../modals/CreateSessionModal/CreateSessionModal";
 
 function getStatusClass(status: string, attended: boolean | null): string {
   if (attended === false) return styles.statusNoShow;
@@ -43,6 +44,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const { showToast } = useToast();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [openEditSession, setOpenEditSession] = useState(false);
 
   const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
     const actionType = e.currentTarget.getAttribute("data-action-type");
@@ -79,7 +81,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       )}
 
       <div className={styles.sessionActions}>
-        <Button variant="secondary" size="sm">
+        <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
           Reschedule
         </Button>
         {/* //!admin can change, client only sends email to admin */}
@@ -105,6 +107,9 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       </div>
 
       {isDeleteModalOpen && <DeleteSessionModal id={session.id} onClose={() => setIsDeleteModalOpen(false)} />}
+      {openEditSession && (
+        <CreateSessionModal id={session.client_id!} session={session} onClose={() => setOpenEditSession(false)} />
+      )}
     </div>
   );
 }
