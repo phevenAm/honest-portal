@@ -160,7 +160,8 @@ const sessionsSlice = createSlice({
         // const { showToast } = useToast();
 
         // showToast(`${action.payload}`, "danger");
-      });
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 

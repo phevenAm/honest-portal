@@ -3,10 +3,12 @@
 .footer {
   background: var(--bg-card);
   border-top: 1px solid var(--border);
-  height: var(--footer-height);
+  min-height: var(--footer-height);
+  padding-bottom: env(safe-area-inset-bottom);
   display: flex;
   align-items: center;
-  padding: 0 var(--sp-6);
+  padding-left: var(--sp-6);
+  padding-right: var(--sp-6);
   color: var(--text-muted);
   font-size: 0.8rem;
   flex-shrink: 0;

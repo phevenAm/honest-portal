@@ -3,14 +3,20 @@
 
 // Reuses same layout as login — shared auth page structure
 .page {
-  min-height: 100vh;
+  height: 100%;
   background: var(--bg-base);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: $sp-6;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @media (max-width: 640px) {
+    align-items: flex-start;
+    padding: $sp-4;
+  }
 }
 
 .blobTop {
@@ -44,6 +50,11 @@
 .logoWrap {
   text-align: center;
   margin-bottom: $sp-8;
+
+  @media (max-width: 640px) {
+    margin-bottom: $sp-4;
+    padding-top: $sp-4;
+  }
 }
 
 .logoMark {
@@ -56,6 +67,12 @@
   justify-content: center;
   color: var(--text-inverse);
   margin: 0 auto $sp-4;
+
+  @media (max-width: 640px) {
+    width: 40px;
+    height: 40px;
+    margin-bottom: $sp-2;
+  }
 }
 
 .logoTitle {
@@ -78,6 +95,11 @@
   border-radius: var(--r-xl);
   padding: $sp-8;
   box-shadow: var(--shadow-lg);
+
+  @media (max-width: 640px) {
+    padding: $sp-5;
+    border-radius: var(--r-lg);
+  }
 }
 
 .heading {
@@ -101,6 +123,10 @@
 
 .field {
   margin-bottom: $sp-4;
+
+  @media (max-width: 640px) {
+    margin-bottom: $sp-3;
+  }
 }
 
 .label {
@@ -199,12 +225,13 @@
 
 // ── Email confirmation screen ──────────────────────────────
 .confirmPage {
-  min-height: 100vh;
+  height: 100%;
   background: var(--bg-base);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: $sp-6;
+  overflow-y: auto;
 }
 
 .confirmBox {

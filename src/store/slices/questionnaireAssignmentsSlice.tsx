@@ -185,7 +185,8 @@ const assignmentsSlice = createSlice({
       })
       .addCase(unassignQuestionnaireByIds.rejected, (state, action) => {
         state.error = action.payload as string;
-      });
+      })
+      .addCase("RESET_ALL", () => initialState);
   },
 });
 

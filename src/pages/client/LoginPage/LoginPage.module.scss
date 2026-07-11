@@ -2,14 +2,15 @@
 @use '../../../styles/spacing' as *;
 
 .page {
-  min-height: 100vh;
+  height: 100%;
   background: var(--bg-base);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: $sp-6;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 // Subtle background shapes — teal tints

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Session } from "@supabase/supabase-js";
-
+import { store, resetStore } from "@store/index";
 import { supabase } from "../lib/supabase";
 import type { AuthUser, UserProfile } from "../models/globalTypes";
 
@@ -202,6 +202,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       console.error("signOut error:", error.message);
+    } else {
+      store.dispatch(resetStore());
     }
   }, []);
 
