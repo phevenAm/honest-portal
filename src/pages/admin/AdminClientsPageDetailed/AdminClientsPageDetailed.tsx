@@ -8,6 +8,9 @@ import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import Search from "@components/shared/Search/Search";
+import CreateSessionModal from "@components/shared/SessionCard/CreateSessionModal/CreateSessionModal";
+import { SessionCard } from "@components/shared/SessionCard/SessionCard";
 import type { Session, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -15,14 +18,11 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import Search from "@/components/shared/Search/Search";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
-import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
-import { SessionCard } from "./SessionCard/SessionCard";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
 
