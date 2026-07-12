@@ -23,9 +23,6 @@ type CreateSessionModalTypes = {
 };
 
 const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: CreateSessionModalTypes) => {
-  // const { id, client_id, created_at, created_by, attended, duration_minutes, notes, paid, scheduled_at, status } =
-  //   session;
-
   const { authUser, isDemo } = useAuth();
   const { showToast } = useToast();
   const dispatch = useAppDispatch();
@@ -74,7 +71,6 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
 
     if (allSuccess) {
       showToast("Sessions saved!");
-
       onClose();
     } else {
       setError("Failed to schedule session. Please try again.");
@@ -164,7 +160,6 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
           </div>
         </div>
 
-        {/* //! session means im rescheduling */}
         {!session && (
           <div className={styles.checkboxGroup}>
             <input
@@ -179,7 +174,6 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
           </div>
         )}
 
-        {/* //! session means im rescheduling */}
         {isRecurring && !session && (
           <div className={styles.fieldGroup}>
             <label className={styles.label} htmlFor="recurring-weeks">

@@ -27,6 +27,7 @@ export { default as Navbar } from "./Navbar/Navbar";
 export { default as ProgressChart } from "./ProgressChart/ProgressChart";
 export { default as ProtectedRoute } from "./ProtectedRoute/ProtectedRoute";
 export { default as Search } from "./Search/Search";
+export { SessionCard } from "./SessionCard/SessionCard";
 export { default as SkipToMain } from "./SkipToMain/SkipToMain";
 export { default as SplitButton } from "./SplitButton/SplitButton";
 export { default as UploadAndDisplayImage } from "./UploadAndDisplayImage/UploadAndDisplayImage";
