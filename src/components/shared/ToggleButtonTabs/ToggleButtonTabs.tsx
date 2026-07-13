@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import styles from "./ToggleButtonTabs.module.scss";
 
 export type ToggleButtonTabsTypes = {
