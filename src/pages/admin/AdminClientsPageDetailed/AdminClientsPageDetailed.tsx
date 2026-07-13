@@ -4,11 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import dayjs from "dayjs";
 
-import Avatar from "@components/shared/Avatar/Avatar";
-import Button from "@components/shared/Button/Button";
-import Card from "@components/shared/Card/Card";
-import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
-import Search from "@components/shared/Search/Search";
+import { Avatar, Button, Card, ToggleButtonTabs, ProgressChart, Search } from "@components/shared/index";
+
 import CreateSessionModal from "@components/shared/SessionCard/CreateSessionModal/CreateSessionModal";
 import { SessionCard } from "@components/shared/SessionCard/SessionCard";
 import type { Session, UserProfile } from "@models/globalTypes";
@@ -25,6 +22,7 @@ import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/Sess
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
+import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
@@ -155,6 +153,19 @@ export default function AdminClientsPageDetailed() {
 
   const clientSince = client.created_at?.split("T")[0];
 
+  const tabsObj: ToggleButtonTabsTypes = {
+    leftButtonTitle: "Past",
+    leftButtonAction: () => {
+      setSessionPageNumber(1);
+      setSessopmsDateTab("past");
+    },
+    rightButtonTitle: "Upcoming",
+    rightButtonAction: () => {
+      setSessionPageNumber(1);
+      setSessopmsDateTab("upcoming");
+    },
+  };
+
   return (
     <div className="page">
       <div className="inner">
@@ -262,28 +273,7 @@ export default function AdminClientsPageDetailed() {
           </div>
 
           <div className={styles.mainActions}>
-            <div className={styles.sessionTabs}>
-              <button
-                type="button"
-                className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
-                onClick={() => {
-                  setSessopmsDateTab("upcoming");
-                  setSessionPageNumber(1);
-                }}
-              >
-                Upcoming
-              </button>
-              <button
-                type="button"
-                className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
-                onClick={() => {
-                  setSessopmsDateTab("past");
-                  setSessionPageNumber(1);
-                }}
-              >
-                Past
-              </button>
-            </div>
+            <ToggleButtonTabs {...tabsObj} />
 
             <div className="seachContainer">
               <Search

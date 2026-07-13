@@ -1,0 +1,40 @@
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
+
+.sessionTabs {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-muted);
+    border-radius: var(--r-md);
+    padding: 3px;
+    width: fit-content;
+    margin-bottom: $sp-5;
+}
+
+.sessionTab {
+    padding: $sp-2 $sp-5;
+    border-radius: calc(var(--r-md) - 1px);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.15s;
+
+    &:hover {
+        color: var(--text-primary);
+    }
+}
+
+.sessionTabActive {
+    padding: $sp-2 $sp-5;
+    border-radius: calc(var(--r-md) - 1px);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    border: none;
+    background: var(--bg-card);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
