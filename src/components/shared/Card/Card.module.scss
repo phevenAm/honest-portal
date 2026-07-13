@@ -6,6 +6,10 @@
   box-shadow: var(--shadow-sm);
   overflow: visible;
   transition: box-shadow var(--transition-base);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .clickable {

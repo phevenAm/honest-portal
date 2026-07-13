@@ -85,8 +85,6 @@ function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resou
   };
   return (
     <Card>
-      <div className={styles.accentBar} style={{ background: "var(--accent)" }} />
-
       <div className={styles.cardBody}>
         <span className={styles.categoryBadge}>
           {resource.type === "video" ? <VideoIcon /> : <ArticleIcon />}

@@ -1,5 +1,5 @@
-@use "../../../../styles/spacing" as *;
-@use "../../../../styles/mixins" as *;
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
 
 .sessionItem {
     border: 1px solid var(--border);

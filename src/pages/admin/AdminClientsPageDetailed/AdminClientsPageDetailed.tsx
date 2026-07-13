@@ -4,10 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import dayjs from "dayjs";
 
-import Avatar from "@components/shared/Avatar/Avatar";
-import Button from "@components/shared/Button/Button";
-import Card from "@components/shared/Card/Card";
-import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
+import { Avatar, Button, Card, ProgressChart, Search, ToggleButtonTabs } from "@components/shared/index";
+import CreateSessionModal from "@components/shared/SessionCard/CreateSessionModal/CreateSessionModal";
+import { SessionCard } from "@components/shared/SessionCard/SessionCard";
 import type { Session, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
@@ -15,14 +14,12 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
-import Search from "@/components/shared/Search/Search";
+import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
-import CreateSessionModal from "./modals/CreateSessionModal/CreateSessionModal";
-import { SessionCard } from "./SessionCard/SessionCard";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
 
@@ -155,6 +152,19 @@ export default function AdminClientsPageDetailed() {
 
   const clientSince = client.created_at?.split("T")[0];
 
+  const tabsObj: ToggleButtonTabsTypes = {
+    leftButtonTitle: "Past",
+    leftButtonAction: () => {
+      setSessionPageNumber(1);
+      setSessopmsDateTab("past");
+    },
+    rightButtonTitle: "Upcoming",
+    rightButtonAction: () => {
+      setSessionPageNumber(1);
+      setSessopmsDateTab("upcoming");
+    },
+  };
+
   return (
     <div className="page">
       <div className="inner">
@@ -262,30 +272,11 @@ export default function AdminClientsPageDetailed() {
           </div>
 
           <div className={styles.mainActions}>
-            <div className={styles.sessionTabs}>
-              <button
-                type="button"
-                className={sessionsDateTab === "upcoming" ? styles.sessionTabActive : styles.sessionTab}
-                onClick={() => {
-                  setSessopmsDateTab("upcoming");
-                  setSessionPageNumber(1);
-                }}
-              >
-                Upcoming
-              </button>
-              <button
-                type="button"
-                className={sessionsDateTab === "past" ? styles.sessionTabActive : styles.sessionTab}
-                onClick={() => {
-                  setSessopmsDateTab("past");
-                  setSessionPageNumber(1);
-                }}
-              >
-                Past
-              </button>
+            <div className={styles.tabsContainer}>
+              <ToggleButtonTabs {...tabsObj} />
             </div>
 
-            <div className="seachContainer">
+            <div className={styles.searchContainer}>
               <Search
                 handleChange={(e) => setSearchTerm(e)}
                 placeholder="Find a session..."

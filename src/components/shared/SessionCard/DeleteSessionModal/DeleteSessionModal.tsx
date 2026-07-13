@@ -1,11 +1,13 @@
 import Button from "@components/shared/Button";
 import Modal from "@components/shared/Modal/Modal";
+import { useAuth } from "@context/AuthContext";
 
 import { useToast } from "@/context/ToastContext";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteSession } from "@/store/slices/sessionsSlice";
-import { useAuth } from "@context/AuthContext";
+
 import styles from "./DeleteSessionModal.module.scss";
+
 type DeleteModalProps = {
   id: string;
   onClose: () => void;

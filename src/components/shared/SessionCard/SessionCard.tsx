@@ -8,8 +8,8 @@ import { useToast } from "@context/ToastContext";
 import { Session } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
-import DeleteSessionModal from "../DeleteSessionModal/DeleteSessionModal";
-import CreateSessionModal from "../modals/CreateSessionModal/CreateSessionModal";
+import CreateSessionModal from "./CreateSessionModal/CreateSessionModal";
+import DeleteSessionModal from "./DeleteSessionModal/DeleteSessionModal";
 
 import styles from "./SessionCard.module.scss";
 
@@ -35,8 +35,8 @@ function getCardClass(status: string, attended: boolean | null): string {
 
 interface SessionCardProps {
   session: Session;
-  isDemo: boolean;
-  isAdmin: boolean;
+  isDemo?: boolean;
+  isAdmin?: boolean;
 }
 
 export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
@@ -47,19 +47,15 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const [openEditSession, setOpenEditSession] = useState(false);
 
   const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
-    if (isDemo === true) {
-      showToast(`Demo mode, no changes made`);
-    } else {
-      const actionType = e.currentTarget.getAttribute("data-action-type");
-      if (actionType === "attendance") {
-        dispatch(updateSession({ id: session.id, attended: !session.attended }));
-      }
-
-      if (actionType === "payment") {
-        dispatch(updateSession({ id: session.id, paid: !session.paid }));
-      }
-      showToast(`Updated ${actionType} status`);
+    const actionType = e.currentTarget.getAttribute("data-action-type");
+    if (actionType === "attendance") {
+      dispatch(updateSession({ id: session.id, attended: !session.attended }));
     }
+
+    if (actionType === "payment") {
+      dispatch(updateSession({ id: session.id, paid: !session.paid }));
+    }
+    showToast(`Updated ${actionType} status`);
   };
 
   return (
@@ -78,15 +74,16 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
         </span>
       </div>
 
-      {session.notes ? (
-        <p className={styles.sessionNotes}>{session.notes}</p>
-      ) : (
-        <p className={styles.sessionNoNotes}>No notes added.</p>
-      )}
+      {isAdmin &&
+        (session.notes ? (
+          <p className={styles.sessionNotes}>{session.notes}</p>
+        ) : (
+          <p className={styles.sessionNoNotes}>No notes added.</p>
+        ))}
 
       <div className={styles.sessionActions}>
         <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
-          Reschedule
+          Reschedule session
         </Button>
         {/* //!admin can change, client only sends email to admin */}
         {isAdmin && (
@@ -105,6 +102,18 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
 
             <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
               Delete
+            </Button>
+          </>
+        )}
+
+        {!isAdmin && (
+          <>
+            <Button variant="primary" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+              Pay for session
+            </Button>
+
+            <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+              Cancel session
             </Button>
           </>
         )}

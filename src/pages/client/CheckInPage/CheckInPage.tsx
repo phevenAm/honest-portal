@@ -126,6 +126,26 @@ export default function CheckInPage() {
 
   const questionnaire = availableAssignments[0]?.questionnaires;
 
+  if (submitted) {
+    return (
+      <div className={styles.completePage}>
+        <Card className={styles.completeCard}>
+          <div className={styles.completeIconWrap}>
+            <CheckIcon />
+          </div>
+
+          <h2 className={styles.completeTitle}>Thank you, {userProfile?.first_name}</h2>
+
+          <p className={styles.completeText}>Your check-in has been recorded.</p>
+
+          <Button onClick={() => navigate("/dashboard")} fullWidth>
+            View my progress
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   if (!questionnaire) {
     return (
       <div className={styles.emptyState}>
@@ -200,26 +220,6 @@ export default function CheckInPage() {
         console.error("Failed to submit check-in:", err);
       });
   };
-
-  if (submitted) {
-    return (
-      <div className={styles.completePage}>
-        <Card className={styles.completeCard}>
-          <div className={styles.completeIconWrap}>
-            <CheckIcon />
-          </div>
-
-          <h2 className={styles.completeTitle}>Thank you, {userProfile?.first_name}</h2>
-
-          <p className={styles.completeText}>Your check-in has been recorded.</p>
-
-          <Button onClick={() => navigate("/dashboard")} fullWidth>
-            View my progress
-          </Button>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="page">

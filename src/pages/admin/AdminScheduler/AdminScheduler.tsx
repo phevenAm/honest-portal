@@ -1,6 +1,28 @@
-// user should be emailed 4 days in advance - reminding them to pay if they hanvet or cancell if they cannot attend. failure todo so 2 days before the session automatically cancels the session and client will have to speak to the admin to schedule a new date. if admin marks the session as paid for then the email should just be reminding them of the session and that they can cancel before 48hrs to keep money or reschedule.
-//TODO: should show a calender where admin can allocate date and time to a client. admin should be able to click on a user and view a list of their future sessions. there should be action byttions next to each session and checkbox to bulk edit. actions include canceling and moving dates altogther. cancellination and date change should always fire an email over to the client
-// maybe here or in cleints page, admin should be able to get how often client has attended, paid late, cancelled and what dates these occoured.
+// ─── ADMIN SCHEDULER — DEFERRED ───────────────────────────────────────────────
+//
+// This page is intentionally left as a stub. Per-client session management
+// is handled in AdminClientsPageDetailed. Come back here when caseload grows
+// and a bird's-eye view becomes necessary.
+//
+// PLANNED: Bird's-eye calendar view
+//   - react-big-calendar week/month grid showing ALL sessions across ALL clients
+//   - Each event block labelled with client name (look up from userDirectory by client_id)
+//   - Click an event → jump to that client's AdminClientsPageDetailed
+//   - Helps admin see scheduling gaps, conflicts, and busy weeks at a glance
+//
+// PLANNED: Session actions from the calendar
+//   - Bulk select sessions via checkbox → bulk cancel or bulk reschedule
+//   - Cancel / reschedule always fires a notification email to the client (requires Section 0 email infra)
+//
+// PLANNED: Email automation (requires Section 0 — Resend + Supabase Edge Function)
+//   - 4 days before session: remind client to pay (if unpaid) or confirm attendance
+//   - 2 days before session: if still unpaid and unconfirmed → auto-cancel, client must contact admin to rebook
+//   - If admin has already marked session as paid → reminder email only (no payment prompt)
+//   - Cancellation or date change always fires a notification email to the client
+//
+// PLANNED: Attendance analytics (overlaps with Section 5)
+//   - Per-client stats: attendance rate, late payments, cancellations, with dates
+//   - Could live here or be folded into AdminClientsPageDetailed stats bar
 
 const AdminScheduler = () => {
   return (
