@@ -5,27 +5,19 @@ import { useMemo, useState } from "react";
 import { useAuth } from "@context/AuthContext";
 import { RootState } from "@/store";
 
-import { SessionCard, ToggleButtonTabs } from "@/components/shared";
+import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
+import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { Session } from "@/models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
-import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();
   //   console.log(userProfile);
   // const [userSessions, setUserSessions] = useState<Session[]>([]);
   const [activeTabs, setActiveTabs] = useState<"past" | "upcoming">("upcoming");
-
-  //   const sessionsGroupByType = useMemo((): Session[] => {
-  //       const now = new Date();
-  //       return clientSessions.filter((session) => {
-  //         const scheduledAt = new Date(session.scheduled_at);
-  //         return sessionsDateTab === "upcoming" ? scheduledAt >= now : scheduledAt < now;
-  //       });
-  //     }, [sessionsDateTab, clientSessions]);
 
   userProfile &&
     useFetchOnIdle(
@@ -54,31 +46,31 @@ const ClientSchedule = () => {
   return (
     <div className="page">
       <div className="inner">
-        <h1>My Sessions</h1>
+        <h1 className={styles.heading}>My Sessions</h1>
         <div className={styles.flexWrapper}>
-          <section className={styles.sessions}>
-            <div className={styles.sessions_Dashboard}>
-              {/* //!summary of sessions. inforapgics of sessions, completed, missed, reschedled? maybe not the last two. show */}
-              {/* some random notes from checkins */}
-            </div>
-            <div className={styles.session_current}>
-              {/* //! details fo the current / next session - if paid, option to cancel etc. - if remote or in person (this remote/imperson needs to be added to admin + DB).*/}
+          <Card className={styles.sessions}>
+            {/* TODO: replace with <NextSessionCard session={upcomingSessions[0]} /> — bespoke component
+                showing date/time prominently, duration, paid status, and a cancel button */}
+            {upcomingSessions[0] && <SessionCard session={upcomingSessions[0]} />}
 
-              {upcomingSessions[0] && <SessionCard key={upcomingSessions[0]?.id || ""} session={upcomingSessions[0]} />}
-            </div>
-          </section>
-          <aside className={styles.sessionsList}>
+            {/* TODO: empty state when upcomingSessions.length === 0 — "No upcoming sessions booked" */}
+
+            {/* TODO: SessionStatsStrip — X upcoming, X attended, X this month
+                computed from upcomingSessions and pastSessions, no extra fetch needed */}
+          </Card>
+
+          <Card className={styles.sessionsList}>
+            {/* TODO: show past sessions count and upcoming count as small labels above tabs */}
             <div className={styles.tabContainer}>
               <ToggleButtonTabs {...tabsObj} />
             </div>
             <div className={styles.scrollable}>
-              <ul>
-                {(activeTabs === "past" ? pastSessions : upcomingSessions).slice(1).map((session) => (
-                  <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
-                ))}
-              </ul>
+              {/* TODO: empty state per tab — "No past sessions yet" / "No other upcoming sessions" */}
+              {(activeTabs === "past" ? pastSessions : upcomingSessions).slice(1).map((session) => (
+                <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
+              ))}
             </div>
-          </aside>
+          </Card>
         </div>
       </div>
     </div>

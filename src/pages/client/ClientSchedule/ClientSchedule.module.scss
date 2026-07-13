@@ -1,32 +1,58 @@
 @use "../../../styles/spacing" as *;
 @use "../../../styles/mixins" as *;
 
+.heading {
+    margin-bottom: $sp-6;
+}
+
 .flexWrapper {
     display: flex;
-    gap: $sp-4 ;
     flex-direction: column;
+    gap: $sp-5;
 
-    @mixin from-sm {
+    @include from-lg {
         flex-direction: row;
+        align-items: stretch;
+        height: calc(100dvh - var(--navbar-height, 64px) - var(--footer-height, 60px) - 180px);
     }
+}
 
-    .sessions {
-        min-width: 50vw;
-        background-color: indianred;
+.sessions {
+    flex: 1;
+    min-height: 400px;
+    padding: $sp-6;
+
+    @include from-lg {
+        min-height: 0;
+        overflow-y: auto;
     }
+}
 
-    .sessionsList {
-        background: rgba(167, 166, 166, 0.252);
+.sessionsList {
+    display: flex;
+    flex-direction: column;
+    padding: $sp-5;
+    min-height: 0;
 
-        .tabContainer {
-            display: grid;
-            place-content: center;
-            height: 50px;
-        }
-
-        .scrollable {
-            max-height: 75dvh;
-            overflow-y: scroll;
-        }
+    @include from-lg {
+        width: 400px;
+        flex-shrink: 0;
+        overflow: hidden;
     }
+}
+
+.tabContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: $sp-4;
+    flex-shrink: 0;
+}
+
+.scrollable {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: $sp-3;
 }
