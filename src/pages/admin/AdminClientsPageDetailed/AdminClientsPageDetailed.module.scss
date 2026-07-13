@@ -217,10 +217,17 @@
 
 .mainActions {
   gap: $sp-4;
+  margin-bottom: $sp-5;
+
+  .tabsContainer {
+    @include until-lg {
+      margin-bottom: $sp-3;
+    }
+  }
 
   @include from-lg {
     display: flex;
-
+    align-items: center;
   }
 }
 

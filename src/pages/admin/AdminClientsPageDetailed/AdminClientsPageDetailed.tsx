@@ -4,8 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import dayjs from "dayjs";
 
-import { Avatar, Button, Card, ToggleButtonTabs, ProgressChart, Search } from "@components/shared/index";
-
+import { Avatar, Button, Card, ProgressChart, Search, ToggleButtonTabs } from "@components/shared/index";
 import CreateSessionModal from "@components/shared/SessionCard/CreateSessionModal/CreateSessionModal";
 import { SessionCard } from "@components/shared/SessionCard/SessionCard";
 import type { Session, UserProfile } from "@models/globalTypes";
@@ -15,6 +14,7 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
+import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
@@ -22,7 +22,6 @@ import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/Sess
 import { exportClientPDF, getScoreAverage } from "../utils/AdminClientsPageUtils";
 
 import styles from "./AdminClientsPageDetailed.module.scss";
-import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 
 export default function AdminClientsPageDetailed() {
   const { clientId } = useParams();
@@ -273,9 +272,11 @@ export default function AdminClientsPageDetailed() {
           </div>
 
           <div className={styles.mainActions}>
-            <ToggleButtonTabs {...tabsObj} />
+            <div className={styles.tabsContainer}>
+              <ToggleButtonTabs {...tabsObj} />
+            </div>
 
-            <div className="seachContainer">
+            <div className={styles.searchContainer}>
               <Search
                 handleChange={(e) => setSearchTerm(e)}
                 placeholder="Find a session..."

@@ -1,0 +1,32 @@
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
+
+.flexWrapper {
+    display: flex;
+    gap: $sp-4 ;
+    flex-direction: column;
+
+    @mixin from-sm {
+        flex-direction: row;
+    }
+
+    .sessions {
+        min-width: 50vw;
+        background-color: indianred;
+    }
+
+    .sessionsList {
+        background: rgba(167, 166, 166, 0.252);
+
+        .tabContainer {
+            display: grid;
+            place-content: center;
+            height: 50px;
+        }
+
+        .scrollable {
+            max-height: 75dvh;
+            overflow-y: scroll;
+        }
+    }
+}
