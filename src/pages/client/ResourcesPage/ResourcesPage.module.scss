@@ -1,5 +1,6 @@
 // ResourcesPage.scss
 @use '../../../styles/spacing' as *;
+@use '../../../styles/mixins' as *;
 
 .header {
   margin-bottom: $sp-8;
@@ -74,12 +75,9 @@
 }
 
 // ── Resource card ──────────────────────────────────────────
-.accentBar {
-  height: 4px;
-}
-
 .cardBody {
   padding: $sp-5 $sp-5 $sp-4;
+  position: relative;
 }
 
 .categoryBadge {
