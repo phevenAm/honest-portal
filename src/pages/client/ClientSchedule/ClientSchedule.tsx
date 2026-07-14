@@ -43,6 +43,10 @@ const ClientSchedule = () => {
     rightButtonAction: () => setActiveTabs("upcoming"),
   };
 
+  const sessionsToRender = () => {
+    return activeTabs === "past" ? pastSessions : upcomingSessions;
+  };
+
   return (
     <div className="page">
       <div className="inner">
@@ -65,10 +69,17 @@ const ClientSchedule = () => {
               <ToggleButtonTabs {...tabsObj} />
             </div>
             <div className={styles.scrollable}>
-              {/* TODO: empty state per tab — "No past sessions yet" / "No other upcoming sessions" */}
-              {(activeTabs === "past" ? pastSessions : upcomingSessions).slice(1).map((session) => (
-                <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
-              ))}
+              {sessionsToRender().length === 0 ? (
+                <div className={styles.scrollablenoSessions}>
+                  <p>No sessions</p>
+                </div>
+              ) : (
+                sessionsToRender()
+                  .slice(1)
+                  .map((session) => (
+                    <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
+                  ))
+              )}
             </div>
           </Card>
         </div>

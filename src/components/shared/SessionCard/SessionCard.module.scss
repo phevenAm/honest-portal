@@ -110,6 +110,18 @@
     color: var(--text-muted);
 }
 
+.locationLink {
+    display: inline-block;
+    margin-top: $sp-2;
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 .sessionNotes {
     margin-top: $sp-4;
     padding-top: $sp-4;
