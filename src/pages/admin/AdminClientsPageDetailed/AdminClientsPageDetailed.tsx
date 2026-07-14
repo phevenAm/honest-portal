@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { Avatar, Button, Card, ProgressChart, Search, ToggleButtonTabs } from "@components/shared/index";
 import CreateSessionModal from "@components/shared/SessionCard/CreateSessionModal/CreateSessionModal";
 import { SessionCard } from "@components/shared/SessionCard/SessionCard";
-import type { Session, UserProfile } from "@models/globalTypes";
+import type { RescheduleRequest, Session, UserProfile } from "@models/globalTypes";
 import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
@@ -16,6 +16,8 @@ import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice"
 
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { supabase } from "@/lib/supabase.js";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
 import SessionNotesModal from "../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal";
@@ -28,11 +30,15 @@ export default function AdminClientsPageDetailed() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isDemo } = useAuth();
+  const { showToast } = useToast();
 
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
   const clientResponses = useAppSelector(selectResponsesByUser(clientId ?? ""));
+
+  const [rescheduleRequests, setRescheduleRequests] = useState<RescheduleRequest[]>([]);
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
 
   const [notesOpen, setNotesOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -62,6 +68,65 @@ export default function AdminClientsPageDetailed() {
   useEffect(() => {
     if (questionnairesStatus === "idle") dispatch(fetchQuestionnaires());
   }, [dispatch, questionnairesStatus]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    supabase
+      .from("reschedule_requests")
+      .select("*")
+      .eq("client_id", clientId)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setRescheduleRequests(data as RescheduleRequest[]);
+      });
+  }, [clientId]);
+
+  const handleAcceptReschedule = async (req: RescheduleRequest) => {
+    setResolvingId(req.id);
+    const { error: sessionErr } = await supabase
+      .from("sessions")
+      .update({ scheduled_at: req.requested_at, status: "rescheduled" })
+      .eq("id", req.session_id);
+
+    if (sessionErr) {
+      showToast("Failed to update session", "danger");
+      setResolvingId(null);
+      return;
+    }
+
+    await Promise.all([
+      supabase.from("reschedule_requests").update({ status: "accepted" }).eq("id", req.id),
+      supabase.from("notifications").insert({
+        user_id: req.client_id,
+        type: "reschedule_accepted",
+        message: `Your reschedule request has been accepted. Your session is now on ${dayjs(req.requested_at).format("dddd D MMM [at] h:mma")}.`,
+      }),
+    ]);
+    dispatch(fetchSessionsByClientId(clientId!));
+    setRescheduleRequests((prev) => prev.map((r) => (r.id === req.id ? { ...r, status: "accepted" as const } : r)));
+    showToast("Reschedule accepted — session updated");
+    setResolvingId(null);
+  };
+
+  const handleDeclineReschedule = async (req: RescheduleRequest) => {
+    setResolvingId(req.id);
+    const { error } = await supabase.from("reschedule_requests").update({ status: "rejected" }).eq("id", req.id);
+
+    if (error) {
+      showToast("Failed to decline request", "danger");
+      setResolvingId(null);
+      return;
+    }
+
+    await supabase.from("notifications").insert({
+      user_id: req.client_id,
+      type: "reschedule_declined",
+      message: `Your request to move your session to ${dayjs(req.requested_at).format("D MMM [at] h:mma")} wasn't accepted. Please contact your therapist to arrange a new time.`,
+    });
+    setRescheduleRequests((prev) => prev.map((r) => (r.id === req.id ? { ...r, status: "rejected" as const } : r)));
+    showToast("Reschedule declined");
+    setResolvingId(null);
+  };
 
   const client = allUsers.find((u) => u.id === clientId);
 
@@ -262,6 +327,42 @@ export default function AdminClientsPageDetailed() {
             </Card>
           )}
         </div>
+
+        {rescheduleRequests.some((r) => r.status === "pending") && (
+          <div className={styles.pendingRequests}>
+            <p className={styles.pendingRequestsTitle}>Pending reschedule requests</p>
+            {rescheduleRequests
+              .filter((r) => r.status === "pending")
+              .map((req) => {
+                const linkedSession = clientSessions.find((s) => s.id === req.session_id);
+                return (
+                  <div key={req.id} className={styles.pendingRequest}>
+                    <div className={styles.pendingRequestDates}>
+                      <span className={styles.pendingFrom}>
+                        {linkedSession ? dayjs(linkedSession.scheduled_at).format("D MMM [at] h:mma") : "—"}
+                      </span>
+                      <span className={styles.pendingArrow}>→</span>
+                      <span className={styles.pendingTo}>{dayjs(req.requested_at).format("D MMM [at] h:mma")}</span>
+                    </div>
+                    {req.message && <p className={styles.pendingMessage}>"{req.message}"</p>}
+                    <div className={styles.pendingActions}>
+                      <Button size="sm" disabled={resolvingId === req.id} onClick={() => handleAcceptReschedule(req)}>
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={resolvingId === req.id}
+                        onClick={() => handleDeclineReschedule(req)}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
 
         <Card className={[styles.section, styles.session].join(" ")}>
           <div className={styles.sessionHeading}>

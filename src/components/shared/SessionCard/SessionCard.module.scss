@@ -22,32 +22,30 @@
     border-color: color-mix(in srgb, #3b82f6 30%, transparent);
 }
 
-.sessionItemHeader {
-    display: flex;
-    align-items: center;
-    gap: $sp-3;
-    flex-wrap: wrap;
-}
-
-.sessionItemDate {
+.date {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-primary);
-    flex: 1;
-    min-width: 0;
-
-    @include until-md {
-        flex-basis: 100%;
-        font-size: 0.82rem;
-    }
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.sessionItemMeta {
+.meta {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
+    margin-top: $sp-1;
+    flex-wrap: wrap;
+}
+
+.duration {
     font-size: 0.78rem;
     color: var(--text-muted);
 }
 
-.sessionStatusBadge {
+.badge {
     font-size: 0.7rem;
     font-weight: 600;
     padding: 2px 9px;
@@ -122,31 +120,78 @@
     }
 }
 
-.sessionNotes {
-    margin-top: $sp-4;
-    padding-top: $sp-4;
-    border-top: 1px solid var(--border);
+.notes {
+    margin-top: $sp-3;
     font-size: 0.84rem;
     color: var(--text-secondary);
     line-height: 1.55;
     margin-bottom: 0;
 }
 
-.sessionNoNotes {
-    margin-top: $sp-4;
-    padding-top: $sp-4;
-    border-top: 1px solid var(--border);
+.noNotes {
+    margin-top: $sp-3;
     font-size: 0.82rem;
     color: var(--text-muted);
     font-style: italic;
     margin-bottom: 0;
 }
 
-.sessionActions {
+.actions {
     display: flex;
+    align-items: center;
     gap: $sp-2;
     margin-top: $sp-4;
     padding-top: $sp-4;
     border-top: 1px solid var(--border);
     flex-wrap: wrap;
+}
+
+.history {
+    margin-top: $sp-3;
+    padding-top: $sp-3;
+    border-top: 1px solid var(--border);
+}
+
+.historyToggle {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
+.historyList {
+    list-style: none;
+    margin: $sp-2 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $sp-1;
+}
+
+.historyItem {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $sp-3;
+    font-size: 0.8rem;
+}
+
+.historyLabel {
+    color: var(--text-secondary);
+}
+
+.historyDate {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
 }

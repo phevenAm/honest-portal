@@ -7,8 +7,7 @@ import { RootState } from "@/store";
 
 import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
-import { Session } from "@/models/globalTypes";
-import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@/store/hooks";
+import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
@@ -19,12 +18,11 @@ const ClientSchedule = () => {
   // const [userSessions, setUserSessions] = useState<Session[]>([]);
   const [activeTabs, setActiveTabs] = useState<"past" | "upcoming">("upcoming");
 
-  userProfile &&
-    useFetchOnIdle(
-      (state: RootState) => state.sessions.status,
-      () => fetchSessionsByClientId(userProfile?.id),
-      "Failed to fetch client's sessions",
-    );
+  useFetchOnIdle(
+    (state: RootState) => state.sessions.status,
+    userProfile ? () => fetchSessionsByClientId(userProfile.id) : null,
+    "Failed to fetch client's sessions",
+  );
 
   const mySessions = (useAppSelector((state) => state.sessions.sessions) ?? [])
     .slice()
@@ -55,7 +53,13 @@ const ClientSchedule = () => {
           <Card className={styles.sessions}>
             {/* TODO: replace with <NextSessionCard session={upcomingSessions[0]} /> — bespoke component
                 showing date/time prominently, duration, paid status, and a cancel button */}
-            {upcomingSessions[0] && <SessionCard session={upcomingSessions[0]} />}
+            {upcomingSessions[0] ? (
+              <SessionCard session={upcomingSessions[0]} />
+            ) : (
+              <div className={styles.noCurrentSessions}>
+                <p>No upcoming sessions</p>
+              </div>
+            )}
 
             {/* TODO: empty state when upcomingSessions.length === 0 — "No upcoming sessions booked" */}
 
@@ -71,7 +75,7 @@ const ClientSchedule = () => {
             <div className={styles.scrollable}>
               {sessionsToRender().length === 0 ? (
                 <div className={styles.scrollablenoSessions}>
-                  <p>No sessions</p>
+                  <p>{activeTabs === "upcoming" ? "Nothing booked yet" : "No past sessions"}</p>
                 </div>
               ) : (
                 sessionsToRender()
