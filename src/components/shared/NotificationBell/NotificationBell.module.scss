@@ -1,0 +1,114 @@
+@use "../../../styles/spacing" as *;
+
+.wrapper {
+  position: relative;
+}
+
+.bell {
+  position: relative;
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  padding: $sp-2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+
+  &:hover {
+    background: var(--border);
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 3px;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: var(--r-full);
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 1.5px solid var(--bg-card);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  padding: $sp-3 $sp-4;
+  border-bottom: 1px solid var(--border);
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  padding: $sp-5 $sp-4;
+  margin: 0;
+  text-align: center;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.item {
+  padding: $sp-3 $sp-4;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.unread {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.message {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  margin: 0 0 $sp-1;
+  line-height: 1.45;
+}
+
+.date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}

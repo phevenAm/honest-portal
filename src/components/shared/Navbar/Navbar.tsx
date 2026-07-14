@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
 import Avatar from "../Avatar/Avatar";
 import { CloseIcon, LogoIcon, MenuIcon, MoonIcon, Settingsicon, SunIcon } from "../Icons/Icons";
+import { NotificationBell } from "../NotificationBell/NotificationBell";
 import SkipToMain from "../SkipToMain/SkipToMain";
 
 import styles from "./Navbar.module.scss";
@@ -94,6 +95,8 @@ export default function Navbar() {
           >
             {themeMode === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
+
+          {!isAdmin && <NotificationBell />}
 
           <div className={styles.userSection}>
             {userProfile && (

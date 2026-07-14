@@ -164,3 +164,21 @@ export type AuditLog = {
 export type SessionStatus = Database["public"]["Enums"]["session_status"];
 
 export type Session = Tables<"sessions">;
+
+export type RescheduleRequest = {
+  id: string;
+  session_id: string;
+  client_id: string;
+  requested_at: string;
+  message: string | null;
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+};
+
+export type SessionEvent = {
+  id: string;
+  session_id: string;
+  event_type: "scheduled" | "rescheduled" | "cancelled" | "paid" | "unpaid" | "attended" | "no_show";
+  metadata: { from?: string; to?: string } | null;
+  created_at: string;
+};

@@ -3,6 +3,7 @@ export { default as Button } from "./Button/Button";
 export { default as Card } from "./Card/Card";
 export { default as DemoBanner } from "./DemoBanner/DemoBanner";
 export { default as Footer } from "./Footer/Footer";
+export { default as IconButton } from "./IconButton/IconButton";
 export {
   ArticleIcon,
   BookIcon,

@@ -288,6 +288,80 @@
   margin: 0;
 }
 
+// ── Pending reschedule requests ───────────────────────────────
+.pendingRequests {
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: var(--r-lg);
+  padding: $sp-4 $sp-6;
+  margin-bottom: $sp-4;
+}
+
+.pendingRequestsTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 0 0 $sp-3;
+}
+
+.pendingRequest {
+  display: flex;
+  align-items: center;
+  gap: $sp-4;
+  padding: $sp-3 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  flex-wrap: wrap;
+
+  &:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.pendingRequestDates {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
+  font-size: 0.88rem;
+  flex: 1;
+  min-width: 220px;
+}
+
+.pendingFrom {
+  color: var(--text-secondary);
+}
+
+.pendingArrow {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.pendingTo {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pendingMessage {
+  flex-basis: 100%;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding-left: 0;
+}
+
+.pendingActions {
+  display: flex;
+  gap: $sp-2;
+  flex-shrink: 0;
+}
+
 // ── Danger zone ──────────────────────────────────────────────
 .dangerZone {
   display: flex;
