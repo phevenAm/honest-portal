@@ -32,6 +32,8 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
   const [recurringWeeks, setRecurringWeeks] = useState(3);
   const [sessionDuration, setSessionDuration] = useState(session?.duration_minutes ?? 50);
   const [isPrepaid, setIsPrepaid] = useState(session?.paid ?? false);
+  const [location, setLocation] = useState<"remote" | "in_person">(session?.location ?? "in_person");
+  const [sessionAddress, setSessionAddress] = useState(session?.address ?? "");
   const [notes, setNotes] = useState(session?.notes ?? "");
   const [error, setError] = useState("");
 
@@ -61,6 +63,8 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
             paid: isPrepaid,
             duration_minutes: sessionDuration,
             notes: notes.trim() || undefined,
+            location: location,
+            address: sessionAddress,
             created_by: authUser.id,
           }),
         ),
@@ -97,6 +101,8 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
           notes: notes.trim() || null,
           scheduled_at: scheduledAt.toISOString(),
           duration_minutes: sessionDuration,
+          location: location,
+          address: sessionAddress,
           status: "rescheduled",
         }),
       ).unwrap();
@@ -134,19 +140,17 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
       }
     >
       <div className={styles.form}>
-        <div className={styles.fieldGroup}>
+        <fieldset className={styles.fieldGroup}>
+          <legend className={styles.label}>Date & time</legend>
           <DateTimePicker
-            label="Date & time"
             value={scheduledAt}
             onChange={(val) => setScheduledAt(val)}
             slotProps={{ textField: { fullWidth: true } }}
           />
-        </div>
+        </fieldset>
 
-        <div className={styles.fieldGroup}>
-          <label className={styles.label} htmlFor="session-duration">
-            Session duration
-          </label>
+        <fieldset className={styles.fieldGroup}>
+          <legend className={styles.label}>Session duration</legend>
           <div className={styles.inputWrapper}>
             <input
               id="session-duration"
@@ -158,7 +162,38 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
               onChange={(e) => setSessionDuration(Number(e.target.value))}
             />
           </div>
-        </div>
+        </fieldset>
+
+        <fieldset className={styles.fieldGroup}>
+          <legend className={styles.label}>Session location</legend>
+          <div className={styles.locationRadios}>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name="sessionLocation"
+                checked={location === "in_person"}
+                onChange={() => setLocation("in_person")}
+              />
+              In-person
+            </label>
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name="sessionLocation"
+                checked={location === "remote"}
+                onChange={() => setLocation("remote")}
+              />
+              Remote
+            </label>
+          </div>
+          <input
+            className={styles.input}
+            type="url"
+            placeholder={location === "in_person" ? "Google Maps link (optional)" : "Meeting link (optional)"}
+            value={sessionAddress}
+            onChange={(e) => setSessionAddress(e.target.value)}
+          />
+        </fieldset>
 
         {!session && (
           <div className={styles.checkboxGroup}>

@@ -74,6 +74,12 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
         </span>
       </div>
 
+      {session.address && dayjs(session.scheduled_at).isAfter(dayjs()) && (
+        <a href={session.address} target="_blank" rel="noreferrer" className={styles.locationLink}>
+          {session.location === "in_person" ? "Open in Maps" : "Join meeting"}
+        </a>
+      )}
+
       {isAdmin &&
         (session.notes ? (
           <p className={styles.sessionNotes}>{session.notes}</p>
