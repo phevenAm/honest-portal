@@ -15,7 +15,9 @@ const initialState: SessionsState = {
   error: null,
 };
 
-type CreateSessionPayload = Omit<Session, "id" | "created_at" | "status">;
+type CreateSessionPayload = Omit<Session, "id" | "created_at" | "status"> & {
+  metadata?: Session["metadata"];
+};
 // Note: avoid using React hooks at module scope; to show toasts, handle in components or middleware
 
 export const createSession = createAsyncThunk<Session, CreateSessionPayload>(

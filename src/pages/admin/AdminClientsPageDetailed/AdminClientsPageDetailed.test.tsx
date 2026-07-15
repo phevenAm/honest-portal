@@ -1,20 +1,818 @@
+/**
+ * AdminClientsPageDetailed — comprehensive test suite
+ *
+ * Strategy overview:
+ *
+ * 1. Supabase is mocked at the module level. Per-test data is set via
+ *    supabaseMock.from.mockImplementation() in beforeEach or individual tests.
+ *
+ * 2. Redux thunks (fetchAllUsers, fetchAllResponses, fetchQuestionnaires,
+ *    fetchSessionsByClientId) are replaced with no-ops so that useEffect
+ *    dispatches don't overwrite the preloaded store state. Selectors and
+ *    reducers are kept intact via importOriginal.
+ *
+ * 3. Heavy sub-components (SessionCard, ProgressChart, modals) are stubbed
+ *    to prevent their own side-effects and keep assertions focused on this
+ *    component's logic.
+ *
+ * 4. renderPage() mounts the component inside a MemoryRouter with a matching
+ *    Route so that useParams() correctly returns clientId from the URL.
+ */
+
+import React from "react";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 
-import { render, screen } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { configureStore } from "@reduxjs/toolkit";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { store } from "../../../store";
-import AdminClientsPage from "./AdminClientsPageDetailed";
+import auditLogsReducer from "@store/slices/auditLogsSlice";
+import assignmentsReducer from "@store/slices/questionnaireAssignmentsSlice";
+import questionnairesReducer from "@store/slices/questionnairesSlice";
+import resourcesReducer from "@store/slices/resourcesSlice";
+import responsesReducer from "@store/slices/responsesSlice";
+import sessionsReducer from "@store/slices/sessionsSlice";
+import tagsReducer from "@store/slices/tagsSlice";
+import themeReducer from "@store/slices/themeSlice";
+import userDirectoryReducer from "@store/slices/userDirectorySlice";
 
-test("renders AdminClientsPage component", () => {
-  render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <AdminClientsPage />
-      </BrowserRouter>
+import AdminClientsPageDetailed from "./AdminClientsPageDetailed";
+
+// ── Supabase mock ─────────────────────────────────────────────────────────────
+//
+// makeChain() returns an object that looks like a Supabase query builder.
+// It supports both `await chain` (via .then) and `.then()` directly because
+// the component uses both patterns — useEffect uses .then() directly while
+// handlers use await.
+//
+// mockReturnThis() on select/eq/etc. returns the chain itself, so chained
+// calls like .select("*").eq("id", x).order("created_at") all stay on the
+// same chain and resolve to { data, error } when awaited.
+//
+// vi.hoisted() is required here because vi.mock() factories are hoisted to
+// the top of the file by Vitest. Any variable referenced inside a factory
+// must be initialized before the factory runs — regular const/let declarations
+// are in the TDZ at that point. vi.hoisted() runs its callback before the
+// mock factories, making the returned values available in time.
+
+const { makeChain, supabaseMock, mockShowToast } = vi.hoisted(() => {
+  const makeChain = (data: unknown[] | null = [], error: unknown = null) => {
+    const result = Promise.resolve({ data, error });
+    const chain: Record<string, unknown> & {
+      then: (...args: unknown[]) => unknown;
+    } = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      single: vi.fn(() => result),
+      // then + catch make this a "thenable", so Promise.all and await both work
+      then: (res: (...args: unknown[]) => unknown, rej?: (...args: unknown[]) => unknown) =>
+        result.then(res as never, rej as never),
+      catch: (rej: (...args: unknown[]) => unknown) => result.catch(rej as never),
+    };
+    return chain;
+  };
+  return {
+    makeChain,
+    supabaseMock: { from: vi.fn(() => makeChain()) },
+    mockShowToast: vi.fn(),
+  };
+});
+
+vi.mock("@/lib/supabase.js", () => ({ supabase: supabaseMock }));
+
+// ── Thunk no-ops ──────────────────────────────────────────────────────────────
+//
+// The component dispatches thunks unconditionally in useEffect. Those thunks
+// call supabase and would overwrite the preloaded store state with empty data.
+// Replacing them with no-ops keeps the preloaded state intact throughout tests.
+// importOriginal spreads everything else (reducer, selectors) so they work as normal.
+
+vi.mock("@store/slices/userDirectorySlice", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@store/slices/userDirectorySlice")>();
+  return { ...mod, fetchAllUsers: () => () => Promise.resolve() };
+});
+
+vi.mock("@store/slices/responsesSlice", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@store/slices/responsesSlice")>();
+  return { ...mod, fetchAllResponses: () => () => Promise.resolve() };
+});
+
+vi.mock("@store/slices/questionnairesSlice", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@store/slices/questionnairesSlice")>();
+  return { ...mod, fetchQuestionnaires: () => () => Promise.resolve() };
+});
+
+vi.mock("@store/slices/sessionsSlice", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@store/slices/sessionsSlice")>();
+  return { ...mod, fetchSessionsByClientId: () => () => Promise.resolve() };
+});
+
+// useFetchOnIdle watches state.sessions.status and dispatches a thunk when "idle".
+// Making it a no-op is simpler than setting status to "succeeded" in every test.
+vi.mock("@store/hooks", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@store/hooks")>();
+  return { ...mod, useFetchOnIdle: vi.fn() };
+});
+
+// ── Context mocks ─────────────────────────────────────────────────────────────
+
+vi.mock("@/context/AuthContext", () => ({
+  useAuth: () => ({ isAdmin: true, isDemo: false }),
+}));
+
+vi.mock("@/context/ToastContext", () => ({
+  useToast: () => ({ showToast: mockShowToast }),
+}));
+
+// ── Shared component stubs ────────────────────────────────────────────────────
+//
+// Stubbing these prevents their own supabase calls and Recharts rendering.
+// SessionCard in particular fetches session_events on mount — without stubbing
+// it would make additional supabase calls that muddy assertions.
+
+vi.mock("@components/shared/index", () => ({
+  Avatar: ({ name }: { name: string }) => <span data-testid="avatar">{name}</span>,
+  // Render a plain <button> so aria queries like getByRole("button", { name }) work.
+  Button: ({
+    children,
+    onClick,
+    disabled,
+  }: {
+    children: React.ReactNode;
+    onClick?: () => void;
+    disabled?: boolean;
+  }) => (
+    <button type="button" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  ),
+  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={className}>{children}</div>
+  ),
+  ProgressChart: () => <div data-testid="progress-chart" />,
+  // Render a plain <input> and forward the string value to handleChange,
+  // matching the real Search API (it calls handleChange(string), not an event).
+  Search: ({
+    handleChange,
+    placeholder,
+    id,
+  }: {
+    handleChange: (v: string) => void;
+    placeholder?: string;
+    id?: string;
+  }) => <input id={id} placeholder={placeholder} onChange={(e) => handleChange(e.target.value)} />,
+  // Render two plain buttons so click events trigger the tab switch callbacks.
+  ToggleButtonTabs: ({
+    leftButtonTitle,
+    leftButtonAction,
+    rightButtonTitle,
+    rightButtonAction,
+  }: {
+    leftButtonTitle: string;
+    leftButtonAction: () => void;
+    rightButtonTitle: string;
+    rightButtonAction: () => void;
+  }) => (
+    <div>
+      <button type="button" onClick={leftButtonAction}>
+        {leftButtonTitle}
+      </button>
+      <button type="button" onClick={rightButtonAction}>
+        {rightButtonTitle}
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("@components/shared/SessionCard/SessionCard", () => ({
+  SessionCard: ({ session }: { session: { id: string } }) => <div data-testid={`session-card-${session.id}`} />,
+}));
+
+vi.mock("@components/shared/SessionCard/CreateSessionModal/CreateSessionModal", () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="create-session-modal">
+      <button type="button" onClick={onClose}>
+        Close create
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("../AdminClientsPage/modals/SessionNotesModal/SessionNotesModal", () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="notes-modal">
+      <button type="button" onClick={onClose}>
+        Close notes
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal", () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="delete-modal">
+      <button type="button" onClick={onClose}>
+        Close delete
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("../utils/AdminClientsPageUtils", () => ({
+  exportClientPDF: vi.fn(),
+  getScoreAverage: vi.fn(() => null),
+}));
+
+// ── Test data ─────────────────────────────────────────────────────────────────
+
+const CLIENT_ID = "client-test-abc-123";
+
+const mockClient = {
+  id: CLIENT_ID,
+  first_name: "Jane",
+  last_name: "Smith",
+  email: "jane@example.com",
+  role: "client",
+  created_at: "2025-03-15T00:00:00Z",
+  display_name: "Jane S",
+  avatar_url: null,
+  disabled: false,
+};
+
+const futureISO = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+const pastISO = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+const requestedISO = new Date(Date.now() + 37 * 24 * 60 * 60 * 1000).toISOString();
+
+const mockUpcomingSession = {
+  id: "session-upcoming-1",
+  client_id: CLIENT_ID,
+  scheduled_at: futureISO,
+  duration_minutes: 60,
+  status: "scheduled",
+  paid: false,
+  attended: null,
+  notes: null,
+  location: null,
+  address: null,
+  created_at: new Date().toISOString(),
+};
+
+const mockPastSession = {
+  id: "session-past-1",
+  client_id: CLIENT_ID,
+  scheduled_at: pastISO,
+  duration_minutes: 50,
+  status: "completed",
+  paid: true,
+  attended: true,
+  notes: "Great progress!",
+  location: null,
+  address: null,
+  created_at: new Date().toISOString(),
+};
+
+const mockPendingRequest = {
+  id: "req-pending-1",
+  session_id: mockUpcomingSession.id,
+  client_id: CLIENT_ID,
+  requested_at: requestedISO,
+  message: "I have a conflict that day",
+  status: "pending",
+  created_at: new Date().toISOString(),
+};
+
+// ── Store factory ─────────────────────────────────────────────────────────────
+//
+// Creates a real Redux store with controlled preloaded state.
+// The inspirationalQuotesApi RTK Query slice is intentionally omitted —
+// the component doesn't use it, so no selector will try to read that state key.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createTestStore(extra: Record<string, any> = {}) {
+  return configureStore({
+    reducer: {
+      userDirectory: userDirectoryReducer,
+      sessions: sessionsReducer,
+      questionnaires: questionnairesReducer,
+      responses: responsesReducer,
+      assignments: assignmentsReducer,
+      resources: resourcesReducer,
+      tags: tagsReducer,
+      theme: themeReducer,
+      auditLogs: auditLogsReducer,
+    },
+    preloadedState: {
+      userDirectory: { users: [mockClient], status: "succeeded", error: null },
+      sessions: { sessions: [mockUpcomingSession, mockPastSession], status: "succeeded", error: null },
+      questionnaires: { questionnaires: [], status: "succeeded", error: null },
+      responses: { responses: [], status: "succeeded", error: null },
+      ...extra,
+    },
+  });
+}
+
+// ── Render helper ─────────────────────────────────────────────────────────────
+//
+// Wraps the component in a real store + MemoryRouter so useParams() extracts
+// clientId from the URL — the same way the real app router works.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderPage(extra: Record<string, any> = {}) {
+  const testStore = createTestStore(extra);
+  return render(
+    <Provider store={testStore}>
+      <MemoryRouter initialEntries={[`/admin/clients/${CLIENT_ID}`]}>
+        <Routes>
+          <Route path="/admin/clients/:clientId" element={<AdminClientsPageDetailed />} />
+        </Routes>
+      </MemoryRouter>
     </Provider>,
   );
+}
 
-  expect(screen.getByRole("heading", { name: /clients/i })).toBeInTheDocument();
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+describe("AdminClientsPageDetailed", () => {
+  // RTL does not auto-register cleanup in Vitest unless globals:true is set.
+  // afterEach(cleanup) ensures the DOM is wiped between tests so renders
+  // don't accumulate and cause "found multiple elements" failures.
+  afterEach(cleanup);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: all supabase queries return an empty array with no error.
+    // Individual tests override this with mockImplementation when they need
+    // specific data (e.g. pending reschedule requests).
+    supabaseMock.from.mockImplementation(() => makeChain([]));
+  });
+
+  // ── Client not found ─────────────────────────────────────────────────────────
+
+  describe("when no user in the store matches the URL clientId", () => {
+    const emptyUsers = { userDirectory: { users: [], status: "succeeded", error: null } };
+
+    it("shows the 'Client not found' heading", () => {
+      renderPage(emptyUsers);
+      expect(screen.getByText("Client not found")).toBeInTheDocument();
+    });
+
+    it("shows a back button that navigates to /admin/clients", () => {
+      renderPage(emptyUsers);
+      expect(screen.getByRole("button", { name: /back to clients/i })).toBeInTheDocument();
+    });
+
+    it("does not render the profile hero", () => {
+      renderPage(emptyUsers);
+      expect(screen.queryByText("Jane Smith")).not.toBeInTheDocument();
+    });
+  });
+
+  // ── Profile hero ─────────────────────────────────────────────────────────────
+
+  describe("profile hero (client found)", () => {
+    it("renders the client's full name", () => {
+      renderPage();
+      // Target the h1 specifically — the Avatar stub also renders "Jane Smith"
+      // so getByText would find two elements. getByRole scopes to the heading.
+      expect(screen.getByRole("heading", { level: 1, name: /jane smith/i })).toBeInTheDocument();
+    });
+
+    it("renders the client's email address", () => {
+      renderPage();
+      expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+    });
+
+    it("renders the 'Client since' date formatted from created_at", () => {
+      renderPage();
+      // mockClient.created_at = "2025-03-15T00:00:00Z" → "Client since 15/03/2025"
+      expect(screen.getByText(/client since/i)).toBeInTheDocument();
+      expect(screen.getByText(/15\/03\/2025/i)).toBeInTheDocument();
+    });
+  });
+
+  // ── Stats bar ─────────────────────────────────────────────────────────────────
+
+  describe("stats bar", () => {
+    it("shows 0 check-ins when there are no responses in the store", () => {
+      renderPage();
+      expect(screen.getByText("0")).toBeInTheDocument();
+    });
+
+    it("shows — for last check-in when there are no responses", () => {
+      renderPage();
+      // Both "Latest score" and "Last check-in" show "—" when there are no
+      // responses (getScoreAverage returns null and lastCheckIn defaults to "—").
+      // getAllByText asserts that at least two instances exist, which is correct.
+      expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("shows the correct check-in count when responses exist", () => {
+      const mockResponse = {
+        id: "resp-1",
+        user_id: CLIENT_ID,
+        questionnaire_id: "q-1",
+        answers: {},
+        score: 7,
+        submitted_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      };
+      renderPage({
+        responses: { responses: [mockResponse], status: "succeeded", error: null },
+        questionnaires: {
+          questionnaires: [{ id: "q-1", title: "Wellbeing check", published: true, tag_id: null, created_at: "" }],
+          status: "succeeded",
+          error: null,
+        },
+      });
+      expect(screen.getByText("1")).toBeInTheDocument();
+    });
+  });
+
+  // ── Sessions section ──────────────────────────────────────────────────────────
+
+  describe("sessions section", () => {
+    it("renders the Sessions heading", () => {
+      renderPage();
+      expect(screen.getByText("Sessions")).toBeInTheDocument();
+    });
+
+    it("shows the + New session button", () => {
+      renderPage();
+      expect(screen.getByRole("button", { name: /\+ new session/i })).toBeInTheDocument();
+    });
+
+    // Default tab is "upcoming" — future sessions appear, past ones do not
+    it("displays the upcoming session card on initial render", () => {
+      renderPage();
+      expect(screen.getByTestId(`session-card-${mockUpcomingSession.id}`)).toBeInTheDocument();
+    });
+
+    it("does not show the past session card on the upcoming tab", () => {
+      renderPage();
+      expect(screen.queryByTestId(`session-card-${mockPastSession.id}`)).not.toBeInTheDocument();
+    });
+
+    it("switches to past sessions when the Past tab is clicked", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /^past$/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId(`session-card-${mockPastSession.id}`)).toBeInTheDocument();
+        expect(screen.queryByTestId(`session-card-${mockUpcomingSession.id}`)).not.toBeInTheDocument();
+      });
+    });
+
+    it("switches back to upcoming when the Upcoming tab is clicked", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /^past$/i }));
+      await waitFor(() => screen.getByTestId(`session-card-${mockPastSession.id}`));
+      fireEvent.click(screen.getByRole("button", { name: /^upcoming$/i }));
+      await waitFor(() => {
+        expect(screen.getByTestId(`session-card-${mockUpcomingSession.id}`)).toBeInTheDocument();
+      });
+    });
+
+    it("shows 'No sessions found!' when the store has no sessions at all", () => {
+      renderPage({ sessions: { sessions: [], status: "succeeded", error: null } });
+      expect(screen.getByText("No sessions found!")).toBeInTheDocument();
+    });
+
+    it("shows 'No sessions found!' when a search term matches nothing", async () => {
+      renderPage();
+      fireEvent.change(screen.getByPlaceholderText("Find a session..."), {
+        target: { value: "xyznotamatch999" },
+      });
+      await waitFor(() => {
+        expect(screen.getByText("No sessions found!")).toBeInTheDocument();
+        expect(screen.queryByTestId(`session-card-${mockUpcomingSession.id}`)).not.toBeInTheDocument();
+      });
+    });
+
+    it("filters sessions by date string when a search term is entered", async () => {
+      renderPage();
+      // The upcoming session's year will appear in the formatted date string
+      const yearStr = new Date(futureISO).getFullYear().toString();
+      fireEvent.change(screen.getByPlaceholderText("Find a session..."), {
+        target: { value: yearStr },
+      });
+      await waitFor(() => {
+        expect(screen.getByTestId(`session-card-${mockUpcomingSession.id}`)).toBeInTheDocument();
+      });
+    });
+
+    it("restores all sessions when the search is cleared", async () => {
+      renderPage();
+      const input = screen.getByPlaceholderText("Find a session...");
+      fireEvent.change(input, { target: { value: "xyznotamatch999" } });
+      await waitFor(() => expect(screen.getByText("No sessions found!")).toBeInTheDocument());
+      fireEvent.change(input, { target: { value: "" } });
+      await waitFor(() => expect(screen.getByTestId(`session-card-${mockUpcomingSession.id}`)).toBeInTheDocument());
+    });
+  });
+
+  // ── Pending reschedule requests ───────────────────────────────────────────────
+
+  describe("pending reschedule requests banner", () => {
+    it("is not rendered when supabase returns no requests", () => {
+      renderPage();
+      expect(screen.queryByText("Pending reschedule requests")).not.toBeInTheDocument();
+    });
+
+    it("appears when supabase returns a pending request", async () => {
+      supabaseMock.from.mockImplementation(() => makeChain([mockPendingRequest]));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText("Pending reschedule requests")).toBeInTheDocument();
+      });
+    });
+
+    it("shows the client's message in quotes", async () => {
+      supabaseMock.from.mockImplementation(() => makeChain([mockPendingRequest]));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText(`"${mockPendingRequest.message}"`)).toBeInTheDocument();
+      });
+    });
+
+    it("shows Accept and Decline buttons for each pending request", async () => {
+      supabaseMock.from.mockImplementation(() => makeChain([mockPendingRequest]));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /^accept$/i })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /^decline$/i })).toBeInTheDocument();
+      });
+    });
+
+    it("does not render the banner when requests are accepted or rejected", async () => {
+      supabaseMock.from.mockImplementation(() => makeChain([{ ...mockPendingRequest, status: "accepted" }]));
+      renderPage();
+      // Give async state update a chance to resolve
+      await waitFor(() => {
+        expect(screen.queryByText("Pending reschedule requests")).not.toBeInTheDocument();
+      });
+    });
+
+    describe("Accept button", () => {
+      beforeEach(() => {
+        supabaseMock.from.mockImplementation(() => makeChain([mockPendingRequest]));
+      });
+
+      it("calls supabase to update the linked session's scheduled_at", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^accept$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^accept$/i }));
+        await waitFor(() => {
+          expect(supabaseMock.from).toHaveBeenCalledWith("sessions");
+        });
+      });
+
+      it("inserts an in-app notification for the client", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^accept$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^accept$/i }));
+        await waitFor(() => {
+          expect(supabaseMock.from).toHaveBeenCalledWith("notifications");
+        });
+      });
+
+      it("shows 'Reschedule accepted — session updated' toast", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^accept$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^accept$/i }));
+        await waitFor(() => {
+          expect(mockShowToast).toHaveBeenCalledWith("Reschedule accepted — session updated");
+        });
+      });
+
+      it("hides the pending banner after the request is accepted", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^accept$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^accept$/i }));
+        await waitFor(() => {
+          expect(screen.queryByText("Pending reschedule requests")).not.toBeInTheDocument();
+        });
+      });
+
+      it("shows an error toast if the session update fails", async () => {
+        supabaseMock.from.mockImplementation((table: string) => {
+          if (table === "reschedule_requests") return makeChain([mockPendingRequest]);
+          // Simulate a supabase error for the sessions table
+          if (table === "sessions") return makeChain(null, { message: "DB error" });
+          return makeChain([]);
+        });
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^accept$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^accept$/i }));
+        await waitFor(() => {
+          expect(mockShowToast).toHaveBeenCalledWith("Failed to update session", "danger");
+        });
+      });
+    });
+
+    describe("Decline button", () => {
+      beforeEach(() => {
+        supabaseMock.from.mockImplementation(() => makeChain([mockPendingRequest]));
+      });
+
+      it("calls supabase to update the request status to rejected", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^decline$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^decline$/i }));
+        await waitFor(() => {
+          expect(supabaseMock.from).toHaveBeenCalledWith("reschedule_requests");
+        });
+      });
+
+      it("inserts an in-app notification for the client", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^decline$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^decline$/i }));
+        await waitFor(() => {
+          expect(supabaseMock.from).toHaveBeenCalledWith("notifications");
+        });
+      });
+
+      it("shows a 'Reschedule declined' toast", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^decline$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^decline$/i }));
+        await waitFor(() => {
+          expect(mockShowToast).toHaveBeenCalledWith("Reschedule declined");
+        });
+      });
+
+      it("hides the pending banner after the request is declined", async () => {
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^decline$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^decline$/i }));
+        await waitFor(() => {
+          expect(screen.queryByText("Pending reschedule requests")).not.toBeInTheDocument();
+        });
+      });
+
+      it("shows an error toast if the supabase update fails", async () => {
+        supabaseMock.from.mockImplementation((table: string) => {
+          if (table === "reschedule_requests") return makeChain([mockPendingRequest], { message: "DB error" });
+          return makeChain([]);
+        });
+        renderPage();
+        await waitFor(() => screen.getByRole("button", { name: /^decline$/i }));
+        fireEvent.click(screen.getByRole("button", { name: /^decline$/i }));
+        await waitFor(() => {
+          expect(mockShowToast).toHaveBeenCalledWith("Failed to decline request", "danger");
+        });
+      });
+    });
+  });
+
+  // ── Modals ─────────────────────────────────────────────────────────────────
+
+  describe("Notes modal", () => {
+    it("opens when the Notes button is clicked", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /^notes$/i }));
+      expect(await screen.findByTestId("notes-modal")).toBeInTheDocument();
+    });
+
+    it("closes when its onClose is triggered", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /^notes$/i }));
+      await screen.findByTestId("notes-modal");
+      fireEvent.click(screen.getByRole("button", { name: /close notes/i }));
+      await waitFor(() => {
+        expect(screen.queryByTestId("notes-modal")).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Create Session modal", () => {
+    it("opens when + New session is clicked", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /\+ new session/i }));
+      expect(await screen.findByTestId("create-session-modal")).toBeInTheDocument();
+    });
+
+    it("closes when its onClose is triggered", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /\+ new session/i }));
+      await screen.findByTestId("create-session-modal");
+      fireEvent.click(screen.getByRole("button", { name: /close create/i }));
+      await waitFor(() => {
+        expect(screen.queryByTestId("create-session-modal")).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Delete Client modal", () => {
+    it("opens when Delete client is clicked", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /delete client/i }));
+      expect(await screen.findByTestId("delete-modal")).toBeInTheDocument();
+    });
+
+    it("closes when its onClose is triggered", async () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /delete client/i }));
+      await screen.findByTestId("delete-modal");
+      fireEvent.click(screen.getByRole("button", { name: /close delete/i }));
+      await waitFor(() => {
+        expect(screen.queryByTestId("delete-modal")).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  // ── Export PDF button ─────────────────────────────────────────────────────────
+
+  describe("Export PDF button", () => {
+    it("is disabled when the client has no responses", () => {
+      renderPage();
+      expect(screen.getByRole("button", { name: /export pdf/i })).toBeDisabled();
+    });
+
+    it("is enabled when the client has at least one response for a known questionnaire", () => {
+      const mockResponse = {
+        id: "resp-1",
+        user_id: CLIENT_ID,
+        questionnaire_id: "q-1",
+        answers: {},
+        score: 7,
+        submitted_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      };
+      const mockQuestionnaire = {
+        id: "q-1",
+        title: "Wellbeing check",
+        published: true,
+        tag_id: null,
+        created_at: "",
+      };
+      renderPage({
+        responses: { responses: [mockResponse], status: "succeeded", error: null },
+        questionnaires: { questionnaires: [mockQuestionnaire], status: "succeeded", error: null },
+      });
+      expect(screen.getByRole("button", { name: /export pdf/i })).not.toBeDisabled();
+    });
+  });
+
+  // ── Session pagination ────────────────────────────────────────────────────────
+
+  describe("session pagination", () => {
+    // Pagination appears only when searchResults.length > 4 (maxPageSize)
+    it("does not show pagination controls with 4 or fewer sessions", () => {
+      renderPage();
+      expect(screen.queryByRole("button", { name: /← prev/i })).not.toBeInTheDocument();
+    });
+
+    it("shows Prev and Next controls when there are more than 4 sessions", () => {
+      const manySessions = Array.from({ length: 5 }, (_, i) => ({
+        ...mockUpcomingSession,
+        id: `session-upcoming-${i}`,
+        scheduled_at: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      }));
+      renderPage({ sessions: { sessions: manySessions, status: "succeeded", error: null } });
+      expect(screen.getByRole("button", { name: /← prev/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /next →/i })).toBeInTheDocument();
+    });
+
+    it("Prev button is disabled on page 1", () => {
+      const manySessions = Array.from({ length: 5 }, (_, i) => ({
+        ...mockUpcomingSession,
+        id: `session-upcoming-${i}`,
+        scheduled_at: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      }));
+      renderPage({ sessions: { sessions: manySessions, status: "succeeded", error: null } });
+      expect(screen.getByRole("button", { name: /← prev/i })).toBeDisabled();
+    });
+
+    it("Next button is disabled on the last page", async () => {
+      const manySessions = Array.from({ length: 5 }, (_, i) => ({
+        ...mockUpcomingSession,
+        id: `session-upcoming-${i}`,
+        scheduled_at: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      }));
+      renderPage({ sessions: { sessions: manySessions, status: "succeeded", error: null } });
+      // 5 sessions / maxPageSize 4 = 2 pages — clicking Next once reaches the last page
+      fireEvent.click(screen.getByRole("button", { name: /next →/i }));
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /next →/i })).toBeDisabled();
+      });
+    });
+
+    it("Prev becomes enabled after navigating to page 2", async () => {
+      const manySessions = Array.from({ length: 5 }, (_, i) => ({
+        ...mockUpcomingSession,
+        id: `session-upcoming-${i}`,
+        scheduled_at: new Date(Date.now() + (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      }));
+      renderPage({ sessions: { sessions: manySessions, status: "succeeded", error: null } });
+      fireEvent.click(screen.getByRole("button", { name: /next →/i }));
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /← prev/i })).not.toBeDisabled();
+      });
+    });
+  });
 });

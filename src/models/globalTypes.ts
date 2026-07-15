@@ -163,7 +163,16 @@ export type AuditLog = {
 
 export type SessionStatus = Database["public"]["Enums"]["session_status"];
 
-export type Session = Tables<"sessions">;
+export type SessionBlockMeta = {
+  block_id: string;
+  block_pos: number;
+  block_total: number;
+  block_start: string;
+};
+
+// Tables<"sessions"> will include metadata: Json | null after type regen.
+// Until then, extend manually so components can read/write block metadata.
+export type Session = Tables<"sessions"> & { metadata?: SessionBlockMeta | null };
 
 export type RescheduleRequest = {
   id: string;

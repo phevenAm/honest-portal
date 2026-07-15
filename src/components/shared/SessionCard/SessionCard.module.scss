@@ -80,6 +80,17 @@
     color: #2563eb;
 }
 
+.blockBadge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    white-space: nowrap;
+    background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+}
+
 .paidPill {
     width: 22px;
     height: 22px;

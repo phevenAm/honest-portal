@@ -54,8 +54,12 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
       }
     }
 
+    // For batch creates, tag every session with a shared block_id so the
+    // counsellor can see "Block 15 Jan · 2/4" on each card and track cadence.
+    const blockId = isRecurring ? crypto.randomUUID().slice(0, 6) : null;
+
     const result = await Promise.all(
-      dates.map((date) =>
+      dates.map((date, i) =>
         dispatch(
           createSession({
             client_id: clientId,
@@ -66,6 +70,14 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
             location: location,
             address: sessionAddress,
             created_by: authUser.id,
+            metadata: blockId
+              ? {
+                  block_id: blockId,
+                  block_pos: i + 1,
+                  block_total: dates.length,
+                  block_start: scheduledAt.toISOString(),
+                }
+              : undefined,
           }),
         ),
       ),
