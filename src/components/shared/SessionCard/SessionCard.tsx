@@ -6,7 +6,7 @@ import Button from "@components/shared/Button";
 import { useToast } from "@context/ToastContext";
 
 import { supabase } from "@/lib/supabase.js";
-import { Session, SessionEvent } from "@/models/globalTypes";
+import { Session, SessionBlockMeta, SessionEvent } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
 import CancelSessionModal from "./CancelSessionModal/CancelSessionModal";
@@ -117,6 +117,12 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
         >
           £
         </span>
+        {session.metadata && (session.metadata as SessionBlockMeta).block_id && (
+          <span className={styles.blockBadge} title={`Block ID: ${(session.metadata as SessionBlockMeta).block_id}`}>
+            Block {dayjs((session.metadata as SessionBlockMeta).block_start).format("D MMM")} ·{" "}
+            {(session.metadata as SessionBlockMeta).block_pos}/{(session.metadata as SessionBlockMeta).block_total}
+          </span>
+        )}
       </div>
 
       {session.address && dayjs(session.scheduled_at).isAfter(dayjs()) && (

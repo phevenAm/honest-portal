@@ -54,13 +54,24 @@ Deno.serve(async (req) => {
     });
     if (insertError) throw insertError;
 
-    const [{ data: client }, { data: session }] = await Promise.all([
+    const [{ data: client }, { data: session }, { data: admins }] = await Promise.all([
       supabase.from("users").select("first_name, last_name").eq("id", user.id).single(),
       supabase.from("sessions").select("scheduled_at").eq("id", session_id).single(),
+      supabase.from("users").select("id").eq("role", "admin"),
     ]);
 
     const clientName = client ? `${client.first_name} ${client.last_name}` : "A client";
     const appUrl = (Deno.env.get("APP_URL") ?? "").replace(/\/$/, "");
+
+    if (admins && admins.length > 0) {
+      await supabase.from("notifications").insert(
+        admins.map((a: { id: string }) => ({
+          user_id: a.id,
+          type: "reschedule_request",
+          message: `${clientName} requested to move their session${session?.scheduled_at ? ` from ${fmt(session.scheduled_at)}` : ""} to ${fmt(requested_at)}.`,
+        })),
+      );
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

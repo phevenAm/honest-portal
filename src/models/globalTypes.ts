@@ -163,6 +163,15 @@ export type AuditLog = {
 
 export type SessionStatus = Database["public"]["Enums"]["session_status"];
 
+// Shape of the metadata stored on sessions created as part of a block.
+// Casting is required when reading session.metadata since the DB type is Json.
+export type SessionBlockMeta = {
+  block_id: string;
+  block_pos: number;
+  block_total: number;
+  block_start: string;
+};
+
 export type Session = Tables<"sessions">;
 
 export type RescheduleRequest = {

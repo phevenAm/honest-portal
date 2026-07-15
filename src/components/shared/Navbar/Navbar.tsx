@@ -96,7 +96,7 @@ export default function Navbar() {
             {themeMode === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
 
-          {!isAdmin && <NotificationBell />}
+          <NotificationBell />
 
           <div className={styles.userSection}>
             {userProfile && (
