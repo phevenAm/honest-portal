@@ -1,7 +1,11 @@
 import ReactDOM from "react-dom/client";
+
+import { registerSW } from "virtual:pwa-register";
 import "./index.scss";
 
 import App from "./App";
+
+registerSW({ immediate: true });
 
 if (import.meta.env.DEV) {
   const { default: axe } = await import("@axe-core/react");
