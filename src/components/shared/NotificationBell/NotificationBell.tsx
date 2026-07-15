@@ -24,12 +24,14 @@ export function NotificationBell() {
   const ref = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    typeof Notification !== "undefined" ? Notification.permission : "denied",
+  );
 
   useEffect(() => {
-    if (typeof Notification !== "undefined" && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-  }, []);
+    if (notifPermission !== "default") return;
+    Notification.requestPermission().then((result) => setNotifPermission(result));
+  }, [notifPermission]);
 
   useEffect(() => {
     if (!userProfile?.id) return;
@@ -71,7 +73,7 @@ export function NotificationBell() {
     } else {
       nav.clearAppBadge?.();
     }
-  }, [unreadCount]);
+  }, [unreadCount, notifPermission]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
