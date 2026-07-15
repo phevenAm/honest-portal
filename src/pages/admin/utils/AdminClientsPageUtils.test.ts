@@ -1,6 +1,7 @@
 import { describe, expect, it, test } from "vitest";
 
-import { Questionnaire, QuestionnaireFrequency, Response } from "../../../../models/globalTypes";
+import { Questionnaire, QuestionnaireFrequency, Response } from "@models/globalTypes";
+
 import { generateAccessToken, getScoreAverage } from "./AdminClientsPageUtils";
 
 describe("ageScoreAverage", () => {

@@ -26,6 +26,12 @@ export function NotificationBell() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!userProfile?.id) return;
 
     supabase
