@@ -55,6 +55,33 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_access_token: {
         Row: {
           created_at: string
@@ -208,6 +235,44 @@ export type Database = {
           },
         ]
       }
+      reschedule_requests: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          message: string | null
+          requested_at: string
+          session_id: string
+          status: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          requested_at: string
+          session_id: string
+          status?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          requested_at?: string
+          session_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reschedule_requests_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resources: {
         Row: {
           category: string | null
@@ -301,6 +366,38 @@ export type Database = {
           },
         ]
       }
+      session_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_notes: {
         Row: {
           admin_id: string
@@ -343,6 +440,7 @@ export type Database = {
           duration_minutes: number
           id: string
           location: string | null
+          metadata: Json | null
           notes: string | null
           paid: boolean
           scheduled_at: string
@@ -357,6 +455,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           location?: string | null
+          metadata?: Json | null
           notes?: string | null
           paid?: boolean
           scheduled_at: string
@@ -371,6 +470,7 @@ export type Database = {
           duration_minutes?: number
           id?: string
           location?: string | null
+          metadata?: Json | null
           notes?: string | null
           paid?: boolean
           scheduled_at?: string
