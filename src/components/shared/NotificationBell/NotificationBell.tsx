@@ -67,11 +67,25 @@ export function NotificationBell() {
       setAppBadge?: (count: number) => Promise<void>;
       clearAppBadge?: () => Promise<void>;
     };
+    console.log(
+      "[badge] permission:",
+      notifPermission,
+      "| unreadCount:",
+      unreadCount,
+      "| setAppBadge available:",
+      !!nav.setAppBadge,
+    );
     if (!nav.setAppBadge) return;
     if (unreadCount > 0) {
-      nav.setAppBadge(unreadCount);
+      nav
+        .setAppBadge(unreadCount)
+        .then(() => console.log("[badge] setAppBadge success"))
+        .catch((e) => console.error("[badge] setAppBadge error:", e));
     } else {
-      nav.clearAppBadge?.();
+      nav
+        .clearAppBadge?.()
+        .then(() => console.log("[badge] cleared"))
+        .catch((e) => console.error("[badge] clearAppBadge error:", e));
     }
   }, [unreadCount, notifPermission]);
 
