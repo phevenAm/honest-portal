@@ -10,9 +10,19 @@ import UploadAndDisplayImage from "@components/shared/UploadAndDisplayImage/Uplo
 import { useAuth } from "@context/AuthContext";
 import { useToast } from "@context/ToastContext";
 
+import { supabase } from "@/lib/supabase";
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
+
+const BUSINESS_FIELDS = [
+  { key: "business_name", label: "Business name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "address", label: "Address" },
+] as const;
+
+type BusinessField = (typeof BUSINESS_FIELDS)[number]["key"];
 
 const SettingsPage = () => {
   const { userProfile, updateProfile, isAdmin, isDemo } = useAuth();
@@ -23,6 +33,15 @@ const SettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const [practiceDetails, setPracticeDetails] = useState<Record<BusinessField, string>>({
+    business_name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+  const [logoUrl, setLogoUrl] = useState("");
+  const [savingBusiness, setSavingBusiness] = useState(false);
+
   const avatarColor = userProfile?.id ? pickColor(userProfile.id) : "teal";
 
   useEffect(() => {
@@ -30,6 +49,21 @@ const SettingsPage = () => {
     setImageUrl(userProfile?.avatar_url ?? "");
     setKeywords(userProfile?.focus_keywords ?? []);
   }, [userProfile]);
+
+  useEffect(() => {
+    if (!isAdmin || !userProfile?.id) return;
+    supabase
+      .from("practice_settings")
+      .select("*")
+      .eq("admin_id", userProfile.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setPracticeDetails(data as Record<BusinessField, string>);
+          setLogoUrl(data.logo_url ?? "");
+        }
+      });
+  }, [isAdmin, userProfile?.id]);
 
   const toggleKeyword = (kw: string) =>
     setKeywords((prev) => (prev.includes(kw) ? prev.filter((k) => k !== kw) : [...prev, kw]));
@@ -48,22 +82,34 @@ const SettingsPage = () => {
     setSaving(false);
   };
 
+  const handleUpdateBusiness = async () => {
+    if (!userProfile?.id) return;
+    setSavingBusiness(true);
+    await supabase
+      .from("practice_settings")
+      .update({ ...practiceDetails, logo_url: logoUrl || null })
+      .eq("admin_id", userProfile.id);
+    setSavingBusiness(false);
+    showToast("Business information updated.");
+  };
+
   return (
     <div className="page">
       <div className={`inner ${styles.columns}`}>
         <div className={styles.pageHeader}>
           <h1>Settings</h1>
-          <p>Update or remove your profile</p>
+          <p>{isAdmin ? "Update your profile and business information" : "Update or remove your profile"}</p>
         </div>
 
+        {/* ── Profile card ── */}
         <Card className={styles.card}>
           <div className={styles.topRow}>
             <section className={styles.left}>
               <form className={styles.form}>
-                <h3>Edit Profile</h3>
+                <h3 className={styles.sectionTitle}>Edit profile</h3>
                 <div className={styles.field}>
                   <label htmlFor="displayName">
-                    Display name <small>shown on your dashboard — use a nickname or short name</small>
+                    Display name <small>(shown on your dashboard — use a nickname or short name)</small>
                   </label>
                   <input
                     id="displayName"
@@ -128,6 +174,49 @@ const SettingsPage = () => {
             )}
           </div>
         </Card>
+
+        {/* ── Business info card (admin only) ── */}
+        {isAdmin && (
+          <Card className={styles.card}>
+            <section className={styles.businessSection}>
+              <h3>Business information</h3>
+              <p>This information can be used across the app and in client communications.</p>
+              <form className={styles.form}>
+                {BUSINESS_FIELDS.map(({ key, label }) => (
+                  <div className={styles.field} key={key}>
+                    <label>{label}</label>
+                    <input
+                      value={practiceDetails[key] ?? ""}
+                      onChange={(e) => setPracticeDetails((prev) => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+                <div className={styles.field}>
+                  <label>Logo</label>
+                  {logoUrl ? (
+                    <>
+                      <img src={logoUrl} alt="Practice logo" className={styles.logoPreview} />
+                      <Button variant="ghost-danger" size="sm" onClick={() => setLogoUrl("")}>
+                        Remove logo
+                      </Button>
+                    </>
+                  ) : (
+                    <UploadAndDisplayImage
+                      userId={userProfile?.id ?? ""}
+                      bucket="logos"
+                      onUpload={(url) => setLogoUrl(url)}
+                    />
+                  )}
+                </div>
+              </form>
+            </section>
+            <div className={styles.actions}>
+              <Button variant="primary" className={styles.saveButton} onClick={handleUpdateBusiness}>
+                {savingBusiness ? "Saving…" : "Save business info"}
+              </Button>
+            </div>
+          </Card>
+        )}
       </div>
 
       {isDeleteModalOpen && <DeleteUserModal onClose={() => setIsDeleteModalOpen(false)} />}
