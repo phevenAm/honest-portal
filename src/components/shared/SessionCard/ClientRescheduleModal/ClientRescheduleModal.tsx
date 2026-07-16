@@ -8,6 +8,7 @@ import Button from "@components/shared/Button/Button";
 import Modal from "@components/shared/Modal/Modal";
 
 import { useToast } from "@/context/ToastContext";
+import { useCounsellorName } from "@/Hooks/useCounsellorName";
 import { supabase } from "@/lib/supabase.js";
 import { Session } from "@/models/globalTypes";
 
@@ -18,6 +19,7 @@ type ClientRescheduleModalProps = {
 
 const ClientRescheduleModal = ({ session, onClose }: ClientRescheduleModalProps) => {
   const { showToast } = useToast();
+  const counsellorName = useCounsellorName();
   const [requestedAt, setRequestedAt] = useState<Dayjs | null>(dayjs(session.scheduled_at));
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -37,7 +39,7 @@ const ClientRescheduleModal = ({ session, onClose }: ClientRescheduleModalProps)
     if (error) {
       showToast("Failed to send request. Please try again.", "danger");
     } else {
-      showToast("Reschedule request sent to your therapist.");
+      showToast(`Reschedule request sent to ${counsellorName}.`);
       onClose();
     }
     setIsSending(false);
@@ -61,7 +63,7 @@ const ClientRescheduleModal = ({ session, onClose }: ClientRescheduleModalProps)
     >
       <p style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
         Your current session is on <strong>{dayjs(session.scheduled_at).format("dddd D MMM [at] h:mma")}</strong>. Pick
-        a date you'd like to move it to — your therapist will confirm.
+        a date you'd like to move it to — {counsellorName} will confirm.
       </p>
       <DateTimePicker
         value={requestedAt}

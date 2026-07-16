@@ -17,6 +17,7 @@ import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice"
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { useCounsellorName } from "@/Hooks/useCounsellorName";
 import { supabase } from "@/lib/supabase.js";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 import DeleteClientModal from "../AdminClientsPage/modals/DeleteClientModal/DeleteClientModal";
@@ -37,6 +38,7 @@ export default function AdminClientsPageDetailed() {
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
   const clientResponses = useAppSelector(selectResponsesByUser(clientId ?? ""));
 
+  const counsellorName = useCounsellorName();
   const [rescheduleRequests, setRescheduleRequests] = useState<RescheduleRequest[]>([]);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
 
@@ -121,7 +123,7 @@ export default function AdminClientsPageDetailed() {
     await supabase.from("notifications").insert({
       user_id: req.client_id,
       type: "reschedule_declined",
-      message: `Your request to move your session to ${dayjs(req.requested_at).format("D MMM [at] h:mma")} wasn't accepted. Please contact your therapist to arrange a new time.`,
+      message: `Your request to move your session to ${dayjs(req.requested_at).format("D MMM [at] h:mma")} wasn't accepted. Please contact ${counsellorName} to arrange a new time.`,
     });
     setRescheduleRequests((prev) => prev.map((r) => (r.id === req.id ? { ...r, status: "rejected" as const } : r)));
     showToast("Reschedule declined");
