@@ -7,6 +7,7 @@ export type ToggleButtonTabsTypes = {
   leftButtonAction: () => void;
   rightButtonTitle: string;
   rightButtonAction: () => void;
+  activeTab: string;
 };
 export type toggleTypes = "left" | "right";
 const ToggleButtonTabs = ({
@@ -14,27 +15,21 @@ const ToggleButtonTabs = ({
   rightButtonTitle,
   leftButtonAction,
   rightButtonAction,
+  activeTab,
 }: ToggleButtonTabsTypes) => {
-  const [activeButton, setActiveButton] = useState<toggleTypes>("left");
   return (
     <div className={styles.sessionTabs}>
       <button
         type="button"
-        className={activeButton === "left" ? styles.sessionTabActive : styles.sessionTab}
-        onClick={() => {
-          setActiveButton("left");
-          leftButtonAction();
-        }}
+        className={activeTab === "left" ? styles.sessionTabActive : styles.sessionTab}
+        onClick={leftButtonAction}
       >
         {leftButtonTitle}
       </button>
       <button
         type="button"
-        className={activeButton === "right" ? styles.sessionTabActive : styles.sessionTab}
-        onClick={() => {
-          setActiveButton("right");
-          rightButtonAction();
-        }}
+        className={activeTab === "right" ? styles.sessionTabActive : styles.sessionTab}
+        onClick={rightButtonAction}
       >
         {rightButtonTitle}
       </button>
