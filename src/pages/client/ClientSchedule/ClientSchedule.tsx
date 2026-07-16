@@ -11,6 +11,7 @@ import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
+import { SessionCardDetailed } from "@/components/shared/SessionCard/SessionCardDetailed";
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();
@@ -55,7 +56,7 @@ const ClientSchedule = () => {
             {/* TODO: replace with <NextSessionDashboard session={upcomingSessions[0]} /> — bespoke component
                 showing date/time prominently, duration, paid status, and a cancel button */}
             {upcomingSessions[0] ? (
-              <SessionCard session={upcomingSessions[0]} />
+              <SessionCardDetailed session={upcomingSessions[0]} />
             ) : (
               <div className={styles.noCurrentSessions}>
                 <p>No upcoming sessions</p>

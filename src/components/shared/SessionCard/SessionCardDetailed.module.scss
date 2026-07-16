@@ -155,15 +155,6 @@
     padding-top: $sp-4;
     border-top: 1px solid var(--border);
     flex-wrap: wrap;
-    padding-right: $sp-3;
-
-
-    &_Icons {
-        padding-left: $sp-3;
-        border-left: 1px solid var(--border);
-        display: flex;
-        gap: $sp-2;
-    }
 }
 
 .history {

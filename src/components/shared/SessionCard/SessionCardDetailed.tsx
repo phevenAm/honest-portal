@@ -3,20 +3,18 @@ import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 import Button from "@components/shared/Button";
-import { useToast } from "@context/ToastContext";
 
 import { supabase } from "@/lib/supabase.js";
 import { Session, SessionBlockMeta, SessionEvent } from "@/models/globalTypes";
-import IconButton from "../IconButton/IconButton";
-import { BinIcon, CancelIcon, PaidIcon, RescheduleIcon, UnpaidIcon } from "../Icons/Icons";
+
 import CancelSessionModal from "./CancelSessionModal/CancelSessionModal";
 import ClientRescheduleModal from "./ClientRescheduleModal/ClientRescheduleModal";
 import CreateSessionModal from "./CreateSessionModal/CreateSessionModal";
 import DeleteSessionModal from "./DeleteSessionModal/DeleteSessionModal";
 import PaySessionModal from "./PaySessionModal/PaySessionModal";
-import useSessionCard from "./useSessionCard";
 
-import styles from "./SessionCard.module.scss";
+import styles from "./SessionCardDetailed.module.scss";
+import useSessionCard from "./useSessionCard";
 
 interface SessionCardProps {
   session: Session;
@@ -24,7 +22,7 @@ interface SessionCardProps {
   isAdmin?: boolean;
 }
 
-export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
+export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -93,55 +91,39 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
             <Button variant="ghost" size="sm" onClick={toggleNoShowOrPayment} data-action-type="attendance">
               {session.attended ? "Attended" : "No show"}
             </Button>
-            <div className={styles.actions_Icons}>
-              <IconButton
-                icon={session.paid ? <UnpaidIcon /> : <PaidIcon />}
-                label={session.paid ? "Mark as unpaid" : "Mark as paid"}
-                variant="success"
-                data-action-type="payment"
-                onClick={toggleNoShowOrPayment}
-              />
-              <IconButton
-                icon={<RescheduleIcon />}
-                label="Reschedule session"
-                variant="info"
-                onClick={() => setOpenEditSession(true)}
-              />
-              <IconButton
-                icon={<BinIcon />}
-                label="Delete session"
-                variant="danger"
-                disabled={isDemo}
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
-            </div>
+            <Button
+              size="sm"
+              data-action-type="payment"
+              onClick={toggleNoShowOrPayment}
+              variant={session.paid ? "ghost" : "secondary"}
+            >
+              {session.paid ? "Mark as unpaid" : "Mark as paid"}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
+              Reschedule
+            </Button>
+            <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+              Delete
+            </Button>
           </>
         ) : (
-          dayjs(session.scheduled_at).isAfter(dayjs()) && (
-            <div className={styles.actions_Icons}>
-              <IconButton
-                icon={<PaidIcon />}
-                label="Pay"
-                variant="success"
-                disabled={isDemo || session.paid}
-                onClick={() => setIsPayModalOpen(true)}
-              />
-              <IconButton
-                icon={<RescheduleIcon />}
-                label="Reschedule"
-                variant="info"
-                disabled={isDemo}
-                onClick={() => setIsRescheduleModalOpen(true)}
-              />
-              <IconButton
-                icon={<CancelIcon />}
-                label="Cancel session"
-                variant="danger"
-                disabled={isDemo}
-                onClick={() => setIsCancelModalOpen(true)}
-              />
-            </div>
-          )
+          <>
+            {!session.paid && (
+              <Button variant="primary" size="sm" disabled={isDemo} onClick={() => setIsPayModalOpen(true)}>
+                Pay
+              </Button>
+            )}
+            {dayjs(session.scheduled_at).isAfter(dayjs()) && (
+              <>
+                <Button variant="secondary" size="sm" disabled={isDemo} onClick={() => setIsRescheduleModalOpen(true)}>
+                  Reschedule
+                </Button>
+                <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsCancelModalOpen(true)}>
+                  Cancel
+                </Button>
+              </>
+            )}
+          </>
         )}
       </div>
 
