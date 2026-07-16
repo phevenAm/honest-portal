@@ -60,6 +60,14 @@
   overflow: hidden;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $sp-3 $sp-4;
+  border-bottom: 1px solid var(--border);
+}
+
 .title {
   font-size: 0.75rem;
   font-weight: 600;
@@ -67,8 +75,19 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0;
-  padding: $sp-3 $sp-4;
-  border-bottom: 1px solid var(--border);
+}
+
+.clearAll {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--danger);
+  }
 }
 
 .empty {
@@ -88,6 +107,9 @@
 }
 
 .item {
+  display: flex;
+  align-items: flex-start;
+  gap: $sp-2;
   padding: $sp-3 $sp-4;
   border-bottom: 1px solid var(--border);
 
@@ -96,8 +118,37 @@
   }
 }
 
+.itemBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.dismiss {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 1px;
+
+  &:hover {
+    color: var(--danger);
+  }
+}
+
 .unread {
   background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bg-muted);
+  }
 }
 
 .message {

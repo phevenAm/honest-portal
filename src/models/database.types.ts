@@ -62,6 +62,7 @@ export type Database = {
           message: string
           read: boolean
           type: string
+          url: string | null
           user_id: string
         }
         Insert: {
@@ -70,6 +71,7 @@ export type Database = {
           message: string
           read?: boolean
           type: string
+          url?: string | null
           user_id: string
         }
         Update: {
@@ -78,6 +80,7 @@ export type Database = {
           message?: string
           read?: boolean
           type?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: []
@@ -106,6 +109,42 @@ export type Database = {
           is_used?: boolean | null
           token?: string | null
           used_at?: string | null
+        }
+        Relationships: []
+      }
+      practice_settings: {
+        Row: {
+          address: string | null
+          admin_id: string
+          business_name: string | null
+          counsellor_name: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          admin_id: string
+          business_name?: string | null
+          counsellor_name?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          admin_id?: string
+          business_name?: string | null
+          counsellor_name?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

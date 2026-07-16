@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import dayjs from "dayjs";
 
@@ -15,10 +16,12 @@ type Notification = {
   message: string;
   read: boolean;
   created_at: string;
+  url: string | null;
 };
 
 export function NotificationBell() {
   const { userProfile } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -67,11 +70,25 @@ export function NotificationBell() {
       setAppBadge?: (count: number) => Promise<void>;
       clearAppBadge?: () => Promise<void>;
     };
+    console.log(
+      "[badge] permission:",
+      notifPermission,
+      "| unreadCount:",
+      unreadCount,
+      "| setAppBadge available:",
+      !!nav.setAppBadge,
+    );
     if (!nav.setAppBadge) return;
     if (unreadCount > 0) {
-      nav.setAppBadge(unreadCount);
+      nav
+        .setAppBadge(unreadCount)
+        .then(() => console.log("[badge] setAppBadge success"))
+        .catch((e) => console.error("[badge] setAppBadge error:", e));
     } else {
-      nav.clearAppBadge?.();
+      nav
+        .clearAppBadge?.()
+        .then(() => console.log("[badge] cleared"))
+        .catch((e) => console.error("[badge] clearAppBadge error:", e));
     }
   }, [unreadCount, notifPermission]);
 
@@ -89,6 +106,18 @@ export function NotificationBell() {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const clearAll = async () => {
+    if (!userProfile?.id) return;
+    await supabase.from("notifications").delete().eq("user_id", userProfile.id);
+    setNotifications([]);
+  };
+
+  const dismissOne = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("notifications").delete().eq("id", id);
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   const handleToggle = () => {
     const next = !open;
     setOpen(next);
@@ -104,15 +133,43 @@ export function NotificationBell() {
 
       {open && (
         <div className={styles.dropdown}>
-          <p className={styles.title}>Notifications</p>
+          <div className={styles.titleRow}>
+            <p className={styles.title}>Notifications</p>
+            {notifications.length > 0 && (
+              <button type="button" className={styles.clearAll} onClick={clearAll}>
+                Clear all
+              </button>
+            )}
+          </div>
           {notifications.length === 0 ? (
             <p className={styles.empty}>Nothing here yet</p>
           ) : (
             <ul className={styles.list}>
               {notifications.map((n) => (
-                <li key={n.id} className={[styles.item, !n.read ? styles.unread : ""].filter(Boolean).join(" ")}>
-                  <p className={styles.message}>{n.message}</p>
-                  <p className={styles.date}>{dayjs(n.created_at).format("D MMM [at] h:mma")}</p>
+                <li
+                  key={n.id}
+                  className={[styles.item, !n.read ? styles.unread : "", n.url ? styles.clickable : ""]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => {
+                    if (n.url) {
+                      setOpen(false);
+                      navigate(n.url.replace(window.location.origin, ""));
+                    }
+                  }}
+                >
+                  <div className={styles.itemBody}>
+                    <p className={styles.message}>{n.message}</p>
+                    <p className={styles.date}>{dayjs(n.created_at).format("D MMM [at] h:mma")}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.dismiss}
+                    onClick={(e) => dismissOne(n.id, e)}
+                    aria-label="Dismiss"
+                  >
+                    ×
+                  </button>
                 </li>
               ))}
             </ul>

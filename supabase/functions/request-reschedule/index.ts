@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
           user_id: a.id,
           type: "reschedule_request",
           message: `${clientName} requested to move their session${session?.scheduled_at ? ` from ${fmt(session.scheduled_at)}` : ""} to ${fmt(requested_at)}.`,
+          url: `${appUrl}/admin/clients/${user.id}`,
         })),
       );
     }
