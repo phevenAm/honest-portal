@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { pickColor } from "@Helpers/Helpers";
 
 import { useAuth } from "../../../context/AuthContext";
+import { supabase } from "../../../lib/supabase.js";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectThemeMode, toggleTheme } from "../../../store/slices/themeSlice";
 import Avatar from "../Avatar/Avatar";
@@ -18,7 +19,17 @@ export default function Navbar() {
   const location = useLocation();
   const themeMode = useAppSelector(selectThemeMode);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [practiceLogoUrl, setPracticeLogoUrl] = useState<string | null>(null);
   const { isAdmin, signOut, userProfile, displayName } = useAuth();
+
+  useEffect(() => {
+    supabase
+      .from("practice_settings")
+      .select("logo_url")
+      .limit(1)
+      .single()
+      .then(({ data }) => setPracticeLogoUrl(data?.logo_url ?? null));
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -60,7 +71,11 @@ export default function Navbar() {
           data-testid="logo-link"
         >
           <div className={styles.logoMark}>
-            <LogoIcon />
+            {practiceLogoUrl ? (
+              <img src={practiceLogoUrl} alt="Logo" style={{ width: 20, height: 20, objectFit: "contain" }} />
+            ) : (
+              <LogoIcon />
+            )}
           </div>
           <span className={styles.logoText}>WithMe</span>
           {isAdmin && <span className={styles.adminBadge}>Admin</span>}
