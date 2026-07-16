@@ -39,6 +39,7 @@ const ClientSchedule = () => {
     leftButtonTitle: "Past sessions",
     rightButtonTitle: "Upcoming Sessions",
     rightButtonAction: () => setActiveTabs("upcoming"),
+    activeTab: activeTabs === "past" ? "left" : "right",
   };
 
   const sessionsToRender = () => {
