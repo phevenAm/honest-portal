@@ -52,7 +52,7 @@ const ClientSchedule = () => {
         <h1 className={styles.heading}>My Sessions</h1>
         <div className={styles.flexWrapper}>
           <Card className={styles.sessions}>
-            {/* TODO: replace with <NextSessionCard session={upcomingSessions[0]} /> — bespoke component
+            {/* TODO: replace with <NextSessionDashboard session={upcomingSessions[0]} /> — bespoke component
                 showing date/time prominently, duration, paid status, and a cancel button */}
             {upcomingSessions[0] ? (
               <SessionCard session={upcomingSessions[0]} />

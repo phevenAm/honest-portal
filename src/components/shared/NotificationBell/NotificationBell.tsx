@@ -70,27 +70,14 @@ export function NotificationBell() {
       setAppBadge?: (count: number) => Promise<void>;
       clearAppBadge?: () => Promise<void>;
     };
-    console.log(
-      "[badge] permission:",
-      notifPermission,
-      "| unreadCount:",
-      unreadCount,
-      "| setAppBadge available:",
-      !!nav.setAppBadge,
-    );
+
     if (!nav.setAppBadge) return;
     if (unreadCount > 0) {
-      nav
-        .setAppBadge(unreadCount)
-        .then(() => console.log("[badge] setAppBadge success"))
-        .catch((e) => console.error("[badge] setAppBadge error:", e));
+      nav.setAppBadge(unreadCount).catch((e) => void e);
     } else {
-      nav
-        .clearAppBadge?.()
-        .then(() => console.log("[badge] cleared"))
-        .catch((e) => console.error("[badge] clearAppBadge error:", e));
+      nav.clearAppBadge?.().catch((e) => void e);
     }
-  }, [unreadCount, notifPermission]);
+  }, [unreadCount]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -157,6 +144,15 @@ export function NotificationBell() {
                       navigate(n.url.replace(window.location.origin, ""));
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if ((e.key === "Enter" || e.key === " ") && n.url) {
+                      e.preventDefault();
+                      setOpen(false);
+                      navigate(n.url.replace(window.location.origin, ""));
+                    }
+                  }}
+                  role="button"
+                  tabIndex={n.url ? 0 : -1}
                 >
                   <div className={styles.itemBody}>
                     <p className={styles.message}>{n.message}</p>
