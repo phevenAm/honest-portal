@@ -36,9 +36,9 @@ export default function Navbar() {
   ];
 
   const clientLinks = [
-    { to: "/dashboard", label: "My Progress" },
-    { to: "/check-in", label: "Check-in" },
+    // { to: "/dashboard", label: "My Progress" },
     { to: "/my-sessions", label: "My sessions" },
+    { to: "/check-in", label: "Check-in" },
     { to: "/resources", label: "Resources" },
   ];
 

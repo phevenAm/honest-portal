@@ -18,7 +18,7 @@ type ClientRescheduleModalProps = {
 
 const ClientRescheduleModal = ({ session, onClose }: ClientRescheduleModalProps) => {
   const { showToast } = useToast();
-  const [requestedAt, setRequestedAt] = useState<Dayjs | null>(null);
+  const [requestedAt, setRequestedAt] = useState<Dayjs | null>(dayjs(session.scheduled_at));
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
 
