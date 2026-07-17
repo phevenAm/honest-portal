@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     timerRef.current = setTimeout(() => {
       setMessage(null);
       setToastType("neutral");
-    }, 5000);
+    }, 8000);
   }, []);
 
   return (

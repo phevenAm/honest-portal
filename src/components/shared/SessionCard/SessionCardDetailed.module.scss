@@ -1,0 +1,271 @@
+@use "../../../styles/spacing" as *;
+@use "../../../styles/mixins" as *;
+
+.sessionItem {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--r-md);
+    background: var(--bg-card);
+    overflow: hidden;
+    transition: border-color 200ms ease, background 200ms ease;
+}
+
+.sessionItemCompleted {
+    background: color-mix(in srgb, #22c55e 5%, var(--bg-card));
+}
+
+.sessionItemNoShow {
+    background: color-mix(in srgb, var(--danger) 5%, var(--bg-card));
+}
+
+.sessionItemRescheduled {
+    background: color-mix(in srgb, #3b82f6 5%, var(--bg-card));
+}
+
+// ── Header ──────────────────────────────────────────────
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $sp-3;
+    padding: $sp-5;
+    flex-shrink: 0;
+}
+
+.date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
+    margin-top: $sp-1;
+    flex-wrap: wrap;
+}
+
+.duration {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.blockBadge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    white-space: nowrap;
+    background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+}
+
+// ── Status badge ─────────────────────────────────────────
+.badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    text-transform: capitalize;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.statusScheduled {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}
+
+.statusCompleted {
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #16a34a;
+}
+
+.statusNoShow {
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+    color: var(--danger);
+}
+
+.statusCancelled {
+    background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+    color: var(--text-muted);
+}
+
+.statusRescheduled {
+    background: color-mix(in srgb, #3b82f6 12%, transparent);
+    color: #2563eb;
+}
+
+// ── Map ──────────────────────────────────────────────────
+.mapWrapper {
+    flex: 1;
+    min-height: 180px;
+    position: relative;
+}
+
+.map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+// ── Location link (remote) ───────────────────────────────
+.locationLink {
+    display: inline-block;
+    padding: $sp-3 $sp-5;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+    flex-shrink: 0;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+// ── Notes ────────────────────────────────────────────────
+.notes {
+    padding: 0 $sp-5;
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    flex-shrink: 0;
+}
+
+.noNotes {
+    padding: 0 $sp-5;
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+    flex-shrink: 0;
+}
+
+// ── Admin actions ─────────────────────────────────────────
+.adminActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $sp-3;
+    padding: $sp-4 $sp-5;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.statusRow {
+    display: flex;
+    gap: $sp-2;
+    flex-wrap: wrap;
+}
+
+.statusPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: var(--r-full);
+    font-size: 0.78rem;
+    font-weight: 500;
+    font-family: inherit;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: filter 150ms ease;
+
+    &:hover {
+        filter: brightness(0.93);
+    }
+}
+
+.statusPillNeutral {
+    background: var(--bg-muted);
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+.statusPillAttended {
+    background: color-mix(in srgb, #22c55e 15%, transparent);
+    color: #16a34a;
+    border-color: color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+.statusPillNoShow {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+
+.statusPillPaid {
+    background: color-mix(in srgb, #22c55e 15%, transparent);
+    color: #16a34a;
+    border-color: color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+// ── Client actions ────────────────────────────────────────
+.clientActions {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
+    padding: $sp-4 $sp-5;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+// ── History ──────────────────────────────────────────────
+.history {
+    padding: $sp-3 $sp-5;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.historyToggle {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+        color: var(--text-secondary);
+    }
+}
+
+.historyList {
+    list-style: none;
+    margin: $sp-2 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $sp-1;
+}
+
+.historyItem {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $sp-3;
+    font-size: 0.8rem;
+}
+
+.historyLabel {
+    color: var(--text-secondary);
+}
+
+.historyDate {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}

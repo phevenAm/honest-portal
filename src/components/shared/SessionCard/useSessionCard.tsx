@@ -1,0 +1,91 @@
+import { type MouseEvent } from "react";
+
+import dayjs from "dayjs";
+
+import { useToast } from "@/context/ToastContext";
+import { Session, SessionEvent } from "@/models/globalTypes";
+import { useAppDispatch } from "@/store/hooks";
+import { updateSession } from "@/store/slices/sessionsSlice";
+
+import styles from "./SessionCard.module.scss";
+
+const useSessionCard = (session: Session) => {
+  const dispatch = useAppDispatch();
+  const { showToast } = useToast();
+
+  const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
+    const actionType = e.currentTarget.getAttribute("data-action-type");
+    if (actionType === "payment") {
+      dispatch(updateSession({ id: session.id, paid: !session.paid }));
+      showToast(`Updated payment status`);
+    }
+  };
+
+  const markAttended = () => {
+    dispatch(updateSession({ id: session.id, attended: true }));
+    showToast("Marked as attended");
+  };
+
+  const markNoShow = () => {
+    dispatch(updateSession({ id: session.id, attended: false }));
+    showToast("Marked as no show");
+  };
+
+  function getStatusClass(status: string, attended: boolean | null, paid: boolean, scheduled_at: string): string {
+    if (attended === false) return styles.statusNoShow;
+    if (attended === true && paid === true && dayjs(scheduled_at).isBefore(dayjs())) {
+      return styles.statusCompleted;
+    }
+    switch (status) {
+      case "cancelled":
+        return styles.statusCancelled;
+      case "rescheduled":
+        return styles.statusRescheduled;
+      default:
+        return styles.statusScheduled;
+    }
+  }
+
+  function getCardClass(status: string, attended: boolean | null): string {
+    if (attended === false) return styles.sessionItemNoShow;
+    if (status === "rescheduled") return styles.sessionItemRescheduled;
+    return "";
+  }
+
+  function formatEventLabel(ev: SessionEvent): string {
+    switch (ev.event_type) {
+      case "scheduled":
+        return "Scheduled";
+      case "rescheduled": {
+        const from = ev.metadata?.from ? dayjs(ev.metadata.from).format("D MMM [at] h:mma") : null;
+        const to = ev.metadata?.to ? dayjs(ev.metadata.to).format("D MMM [at] h:mma") : null;
+        return from && to ? `Rescheduled from ${from} to ${to}` : "Rescheduled";
+      }
+      case "cancelled":
+        return "Cancelled";
+      case "paid":
+        return "Marked as paid";
+      case "unpaid":
+        return "Marked as unpaid";
+      case "attended":
+        return "Attended";
+      case "no_show":
+        return "No show";
+      default:
+        return ev.event_type;
+    }
+  }
+  const isWithin48Hours = dayjs(session.scheduled_at).isBefore(dayjs().add(48, "hour"));
+
+  return {
+    toggleNoShowOrPayment,
+    markAttended,
+    markNoShow,
+    getStatusClass,
+    getCardClass,
+    formatEventLabel,
+    isWithin48Hours,
+  };
+};
+
+export default useSessionCard;

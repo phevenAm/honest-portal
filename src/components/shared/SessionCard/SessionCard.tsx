@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 
@@ -7,59 +7,16 @@ import { useToast } from "@context/ToastContext";
 
 import { supabase } from "@/lib/supabase.js";
 import { Session, SessionBlockMeta, SessionEvent } from "@/models/globalTypes";
-import { useAppDispatch } from "@/store/hooks";
-import { updateSession } from "@/store/slices/sessionsSlice";
+import IconButton from "../IconButton/IconButton";
+import { BinIcon, CancelIcon, PaidIcon, RescheduleIcon, UnpaidIcon } from "../Icons/Icons";
 import CancelSessionModal from "./CancelSessionModal/CancelSessionModal";
 import ClientRescheduleModal from "./ClientRescheduleModal/ClientRescheduleModal";
 import CreateSessionModal from "./CreateSessionModal/CreateSessionModal";
 import DeleteSessionModal from "./DeleteSessionModal/DeleteSessionModal";
 import PaySessionModal from "./PaySessionModal/PaySessionModal";
+import useSessionCard from "./useSessionCard";
 
 import styles from "./SessionCard.module.scss";
-
-function getStatusClass(status: string, attended: boolean | null): string {
-  if (attended === false) return styles.statusNoShow;
-  switch (status) {
-    case "completed":
-      return styles.statusCompleted;
-    case "cancelled":
-      return styles.statusCancelled;
-    case "rescheduled":
-      return styles.statusRescheduled;
-    default:
-      return styles.statusScheduled;
-  }
-}
-
-function getCardClass(status: string, attended: boolean | null): string {
-  if (attended === false) return styles.sessionItemNoShow;
-  if (status === "rescheduled") return styles.sessionItemRescheduled;
-  return "";
-}
-
-function formatEventLabel(ev: SessionEvent): string {
-  switch (ev.event_type) {
-    case "scheduled":
-      return "Scheduled";
-    case "rescheduled": {
-      const from = ev.metadata?.from ? dayjs(ev.metadata.from).format("D MMM [at] h:mma") : null;
-      const to = ev.metadata?.to ? dayjs(ev.metadata.to).format("D MMM [at] h:mma") : null;
-      return from && to ? `Rescheduled from ${from} to ${to}` : "Rescheduled";
-    }
-    case "cancelled":
-      return "Cancelled";
-    case "paid":
-      return "Marked as paid";
-    case "unpaid":
-      return "Marked as unpaid";
-    case "attended":
-      return "Attended";
-    case "no_show":
-      return "No show";
-    default:
-      return ev.event_type;
-  }
-}
 
 interface SessionCardProps {
   session: Session;
@@ -68,9 +25,6 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
-  const dispatch = useAppDispatch();
-  const { showToast } = useToast();
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -78,6 +32,8 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const [openEditSession, setOpenEditSession] = useState(false);
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -91,16 +47,17 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       });
   }, [session.id, isAdmin]);
 
-  const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
-    const actionType = e.currentTarget.getAttribute("data-action-type");
-    if (actionType === "attendance") {
-      dispatch(updateSession({ id: session.id, attended: !session.attended }));
-    }
-    if (actionType === "payment") {
-      dispatch(updateSession({ id: session.id, paid: !session.paid }));
-    }
-    showToast(`Updated ${actionType} status`);
-  };
+  const {
+    toggleNoShowOrPayment,
+    markAttended,
+    markNoShow,
+    getCardClass,
+    getStatusClass,
+    formatEventLabel,
+    isWithin48Hours,
+  } = useSessionCard(session);
+
+  const isPast = dayjs(session.scheduled_at).isBefore(dayjs());
 
   return (
     <div className={[styles.sessionItem, getCardClass(session.status, session.attended)].filter(Boolean).join(" ")}>
@@ -143,44 +100,110 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       {isAdmin && <p className={session.notes ? styles.notes : styles.noNotes}>{session.notes ?? "No notes added."}</p>}
 
       <div className={styles.actions}>
-        {isAdmin ? (
+        {isAdmin && isPast && (
           <>
-            <Button variant="ghost" size="sm" onClick={toggleNoShowOrPayment} data-action-type="attendance">
-              {session.attended ? "Attended" : "No show"}
-            </Button>
-            <Button
-              size="sm"
-              data-action-type="payment"
-              onClick={toggleNoShowOrPayment}
-              variant={session.paid ? "ghost" : "secondary"}
-            >
-              {session.paid ? "Mark as unpaid" : "Mark as paid"}
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
-              Reschedule
-            </Button>
-            <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
-              Delete
-            </Button>
+            <div className={styles.attendanceGroup}>
+              <button
+                type="button"
+                className={[styles.attendanceBtn, session.attended === true ? styles.attendanceBtnAttended : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={markAttended}
+              >
+                Attended
+              </button>
+              <button
+                type="button"
+                className={[styles.attendanceBtn, session.attended === false ? styles.attendanceBtnNoShow : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={markNoShow}
+              >
+                No Show
+              </button>
+            </div>
+            <div className={styles.actions_Icons}>
+              <IconButton
+                icon={session.paid ? <UnpaidIcon /> : <PaidIcon />}
+                label={session.paid ? "Mark as unpaid" : "Mark as paid"}
+                variant="success"
+                data-action-type="payment"
+                onClick={toggleNoShowOrPayment}
+              />
+              <IconButton
+                icon={<BinIcon />}
+                label="Delete session"
+                variant="danger"
+                disabled={isDemo}
+                onClick={() => setIsDeleteModalOpen(true)}
+              />
+            </div>
           </>
-        ) : (
-          <>
-            {!session.paid && (
-              <Button variant="primary" size="sm" disabled={isDemo} onClick={() => setIsPayModalOpen(true)}>
-                Pay
-              </Button>
-            )}
-            {dayjs(session.scheduled_at).isAfter(dayjs()) && (
-              <>
-                <Button variant="secondary" size="sm" disabled={isDemo} onClick={() => setIsRescheduleModalOpen(true)}>
-                  Reschedule
-                </Button>
-                <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsCancelModalOpen(true)}>
-                  Cancel
-                </Button>
-              </>
-            )}
-          </>
+        )}
+
+        {isAdmin && !isPast && (
+          <div className={styles.actions_Icons}>
+            <IconButton
+              icon={<RescheduleIcon />}
+              label="Reschedule session"
+              variant="info"
+              onClick={() => setOpenEditSession(true)}
+            />
+            <IconButton
+              icon={<BinIcon />}
+              label="Delete session"
+              variant="danger"
+              disabled={isDemo}
+              onClick={() => setIsDeleteModalOpen(true)}
+            />
+          </div>
+        )}
+
+        {!isAdmin && dayjs(session.scheduled_at).isAfter(dayjs()) && !isWithin48Hours && (
+          <div className={styles.actions_Icons}>
+            <IconButton
+              icon={<PaidIcon />}
+              label="Pay"
+              variant="success"
+              disabled={isDemo || session.paid}
+              onClick={() => {
+                if (isWithin48Hours) {
+                  showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment");
+                  return;
+                } else {
+                  setIsPayModalOpen(true);
+                }
+              }}
+            />
+            <IconButton
+              icon={<RescheduleIcon />}
+              label="Reschedule"
+              variant="info"
+              disabled={isDemo}
+              onClick={() => {
+                if (isWithin48Hours) {
+                  showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment");
+                  return;
+                } else {
+                  setIsRescheduleModalOpen(true);
+                }
+              }}
+            />
+            <IconButton
+              icon={<CancelIcon />}
+              label="Cancel session"
+              variant="danger"
+              disabled={isDemo}
+              onClick={() => {
+                if (isWithin48Hours) {
+                  showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment");
+                  return;
+                } else {
+                  setIsCancelModalOpen(true);
+                }
+              }}
+            />
+          </div>
         )}
       </div>
 

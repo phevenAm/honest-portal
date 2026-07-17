@@ -230,6 +230,7 @@ export default function AdminClientsPageDetailed() {
       setSessionPageNumber(1);
       setSessopmsDateTab("upcoming");
     },
+    activeTab: sessionsDateTab === "past" ? "left" : "right",
   };
 
   return (

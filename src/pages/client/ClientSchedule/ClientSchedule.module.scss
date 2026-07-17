@@ -21,7 +21,8 @@
     flex: 1;
     min-height: 400px;
     padding: $sp-6;
-
+    flex-direction: column;
+    // overflow: hidden;
 
     .noCurrentSessions {
         height: 100%;
@@ -31,7 +32,7 @@
 
     @include from-lg {
         min-height: 0;
-        overflow-y: auto;
+        overflow: auto;
     }
 }
 

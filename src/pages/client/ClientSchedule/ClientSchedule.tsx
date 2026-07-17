@@ -6,6 +6,7 @@ import { useAuth } from "@context/AuthContext";
 import { RootState } from "@/store";
 
 import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
+import { SessionCardDetailed } from "@/components/shared/SessionCard/SessionCardDetailed";
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
@@ -52,10 +53,10 @@ const ClientSchedule = () => {
         <h1 className={styles.heading}>My Sessions</h1>
         <div className={styles.flexWrapper}>
           <Card className={styles.sessions}>
-            {/* TODO: replace with <NextSessionCard session={upcomingSessions[0]} /> — bespoke component
+            {/* TODO: replace with <NextSessionDashboard session={upcomingSessions[0]} /> — bespoke component
                 showing date/time prominently, duration, paid status, and a cancel button */}
             {upcomingSessions[0] ? (
-              <SessionCard session={upcomingSessions[0]} />
+              <SessionCardDetailed session={upcomingSessions[0]} />
             ) : (
               <div className={styles.noCurrentSessions}>
                 <p>No upcoming sessions</p>

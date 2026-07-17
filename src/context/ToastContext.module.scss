@@ -30,8 +30,9 @@
   }
 
   &.warning {
-    background: var(--warning);
+    background: var(--warning-light);
     color: var(--text-primary);
+
   }
 }
 

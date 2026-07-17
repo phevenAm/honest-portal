@@ -1,4 +1,9 @@
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
+import CreditScoreOutlinedIcon from "@mui/icons-material/CreditScoreOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import EventRepeatOutlinedIcon from "@mui/icons-material/EventRepeatOutlined";
 import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -260,3 +265,12 @@ export const BellIcon = () => (
     <path d="M13.73 21a2 2 0 0 1-3.46 0" />
   </svg>
 );
+
+export const BinIcon = () => {
+  return <DeleteOutlinedIcon />;
+};
+
+export const RescheduleIcon = () => <EventRepeatOutlinedIcon />;
+export const PaidIcon = () => <CreditScoreOutlinedIcon />;
+export const UnpaidIcon = () => <CreditCardOutlinedIcon />;
+export const CancelIcon = () => <CancelOutlinedIcon />;
