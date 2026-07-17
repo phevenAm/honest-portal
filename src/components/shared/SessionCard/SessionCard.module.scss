@@ -166,6 +166,50 @@
     }
 }
 
+.attendanceGroup {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.attendanceBtn {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+
+  &:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  &:hover {
+    background: var(--bg-muted);
+  }
+}
+
+.attendanceBtnAttended {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+
+  &:hover {
+    background: color-mix(in srgb, var(--success) 25%, transparent);
+  }
+}
+
+.attendanceBtnNoShow {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: var(--danger);
+
+  &:hover {
+    background: color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+}
+
 .history {
     margin-top: $sp-3;
     padding-top: $sp-3;

@@ -30,8 +30,9 @@
   }
 
   &.warning {
-    background: var(--warning);
-    color: var(--text-primary);
+    background: var(--warning-light);
+    color: var(--warning);
+    border: 1px solid var(--warning);
   }
 }
 

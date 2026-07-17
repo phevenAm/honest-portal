@@ -15,20 +15,28 @@ const useSessionCard = (session: Session) => {
 
   const toggleNoShowOrPayment = (e: MouseEvent<HTMLButtonElement>) => {
     const actionType = e.currentTarget.getAttribute("data-action-type");
-    if (actionType === "attendance") {
-      dispatch(updateSession({ id: session.id, attended: !session.attended }));
-    }
     if (actionType === "payment") {
       dispatch(updateSession({ id: session.id, paid: !session.paid }));
+      showToast(`Updated payment status`);
     }
-    showToast(`Updated ${actionType} status`);
   };
 
-  function getStatusClass(status: string, attended: boolean | null): string {
+  const markAttended = () => {
+    dispatch(updateSession({ id: session.id, attended: true }));
+    showToast("Marked as attended");
+  };
+
+  const markNoShow = () => {
+    dispatch(updateSession({ id: session.id, attended: false }));
+    showToast("Marked as no show");
+  };
+
+  function getStatusClass(status: string, attended: boolean | null, paid: boolean, scheduled_at: string): string {
     if (attended === false) return styles.statusNoShow;
+    if (attended === true && paid === true && dayjs(scheduled_at).isBefore(dayjs())) {
+      return styles.statusCompleted;
+    }
     switch (status) {
-      case "completed":
-        return styles.statusCompleted;
       case "cancelled":
         return styles.statusCancelled;
       case "rescheduled":
@@ -67,12 +75,16 @@ const useSessionCard = (session: Session) => {
         return ev.event_type;
     }
   }
+  const isWithin48Hours = dayjs(session.scheduled_at).isBefore(dayjs().add(48, "hour"));
 
   return {
     toggleNoShowOrPayment,
+    markAttended,
+    markNoShow,
     getStatusClass,
     getCardClass,
     formatEventLabel,
+    isWithin48Hours,
   };
 };
 

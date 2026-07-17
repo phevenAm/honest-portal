@@ -15,6 +15,7 @@ import PaySessionModal from "./PaySessionModal/PaySessionModal";
 
 import styles from "./SessionCardDetailed.module.scss";
 import useSessionCard from "./useSessionCard";
+import { useToast } from "@/context/ToastContext";
 
 interface SessionCardProps {
   session: Session;
@@ -31,6 +32,8 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardPro
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
+  const { showToast } = useToast();
+
   useEffect(() => {
     if (!isAdmin) return;
     supabase
@@ -43,7 +46,8 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardPro
       });
   }, [session.id, isAdmin]);
 
-  const { toggleNoShowOrPayment, getCardClass, getStatusClass, formatEventLabel } = useSessionCard(session);
+  const { toggleNoShowOrPayment, getCardClass, getStatusClass, formatEventLabel, isWithin48Hours } =
+    useSessionCard(session);
 
   return (
     <div className={[styles.sessionItem, getCardClass(session.status, session.attended)].filter(Boolean).join(" ")}>
@@ -109,16 +113,61 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardPro
         ) : (
           <>
             {!session.paid && (
-              <Button variant="primary" size="sm" disabled={isDemo} onClick={() => setIsPayModalOpen(true)}>
+              <Button
+                variant="primary"
+                size="sm"
+                disabled={isDemo}
+                onClick={() => {
+                  if (isWithin48Hours) {
+                    showToast(
+                      "Sorry, its too late to pay for this session. It has automatically been cancelled.",
+                      "warning",
+                    );
+                    return;
+                  } else {
+                    setIsPayModalOpen(true);
+                  }
+                }}
+              >
                 Pay
               </Button>
             )}
             {dayjs(session.scheduled_at).isAfter(dayjs()) && (
               <>
-                <Button variant="secondary" size="sm" disabled={isDemo} onClick={() => setIsRescheduleModalOpen(true)}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={isDemo}
+                  onClick={() => {
+                    if (isWithin48Hours) {
+                      showToast(
+                        "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
+                        "warning",
+                      );
+                      return;
+                    } else {
+                      setIsRescheduleModalOpen(true);
+                    }
+                  }}
+                >
                   Reschedule
                 </Button>
-                <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsCancelModalOpen(true)}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={isDemo}
+                  onClick={() => {
+                    if (isWithin48Hours) {
+                      showToast(
+                        "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
+                        "warning",
+                      );
+                      return;
+                    } else {
+                      setIsCancelModalOpen(true);
+                    }
+                  }}
+                >
                   Cancel
                 </Button>
               </>
@@ -127,7 +176,7 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardPro
         )}
       </div>
 
-      {isAdmin && events.length > 0 && (
+      {events.length > 0 && (
         <div className={styles.history}>
           <button type="button" className={styles.historyToggle} onClick={() => setShowHistory((v) => !v)}>
             {showHistory ? "Hide history" : `History (${events.length})`}

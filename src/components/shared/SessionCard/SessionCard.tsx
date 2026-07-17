@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 
-import Button from "@components/shared/Button";
 import { useToast } from "@context/ToastContext";
 
 import { supabase } from "@/lib/supabase.js";
@@ -33,6 +32,8 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
+  const { showToast } = useToast();
+
   useEffect(() => {
     if (!isAdmin) return;
     supabase
@@ -45,7 +46,17 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       });
   }, [session.id, isAdmin]);
 
-  const { toggleNoShowOrPayment, getCardClass, getStatusClass, formatEventLabel } = useSessionCard(session);
+  const {
+    toggleNoShowOrPayment,
+    markAttended,
+    markNoShow,
+    getCardClass,
+    getStatusClass,
+    formatEventLabel,
+    isWithin48Hours,
+  } = useSessionCard(session);
+
+  const isPast = dayjs(session.scheduled_at).isBefore(dayjs());
 
   return (
     <div className={[styles.sessionItem, getCardClass(session.status, session.attended)].filter(Boolean).join(" ")}>
@@ -53,8 +64,14 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
 
       <div className={styles.meta}>
         <span className={styles.duration}>{session.duration_minutes} min</span>
-        <span className={`${styles.badge} ${getStatusClass(session.status, session.attended)}`}>
-          {session.attended === false ? "No Show" : session.status.replace("_", " ")}
+        <span
+          className={`${styles.badge} ${getStatusClass(session.status, session.attended, session.paid, session.scheduled_at)}`}
+        >
+          {session.attended === false
+            ? "No Show"
+            : session.attended === true && session.paid && isPast
+              ? "Completed"
+              : session.status.replace("_", " ")}
         </span>
         <span
           className={session.paid ? styles.paidPill : styles.unpaidPill}
@@ -90,55 +107,117 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       <div className={styles.actions}>
         {isAdmin ? (
           <>
-            <Button variant="ghost" size="sm" onClick={toggleNoShowOrPayment} data-action-type="attendance">
-              {session.attended ? "Attended" : "No show"}
-            </Button>
-            <div className={styles.actions_Icons}>
-              <IconButton
-                icon={session.paid ? <UnpaidIcon /> : <PaidIcon />}
-                label={session.paid ? "Mark as unpaid" : "Mark as paid"}
-                variant="success"
-                data-action-type="payment"
-                onClick={toggleNoShowOrPayment}
-              />
-              <IconButton
-                icon={<RescheduleIcon />}
-                label="Reschedule session"
-                variant="info"
-                onClick={() => setOpenEditSession(true)}
-              />
-              <IconButton
-                icon={<BinIcon />}
-                label="Delete session"
-                variant="danger"
-                disabled={isDemo}
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
-            </div>
+            {isPast ? (
+              <>
+                <div className={styles.attendanceGroup}>
+                  <button
+                    type="button"
+                    className={[styles.attendanceBtn, session.attended === true ? styles.attendanceBtnAttended : ""]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={markAttended}
+                  >
+                    Attended
+                  </button>
+                  <button
+                    type="button"
+                    className={[styles.attendanceBtn, session.attended === false ? styles.attendanceBtnNoShow : ""]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={markNoShow}
+                  >
+                    No Show
+                  </button>
+                </div>
+                <div className={styles.actions_Icons}>
+                  <IconButton
+                    icon={session.paid ? <UnpaidIcon /> : <PaidIcon />}
+                    label={session.paid ? "Mark as unpaid" : "Mark as paid"}
+                    variant="success"
+                    data-action-type="payment"
+                    onClick={toggleNoShowOrPayment}
+                  />
+                  <IconButton
+                    icon={<BinIcon />}
+                    label="Delete session"
+                    variant="danger"
+                    disabled={isDemo}
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className={styles.actions_Icons}>
+                <IconButton
+                  icon={<RescheduleIcon />}
+                  label="Reschedule session"
+                  variant="info"
+                  onClick={() => setOpenEditSession(true)}
+                />
+                <IconButton
+                  icon={<BinIcon />}
+                  label="Delete session"
+                  variant="danger"
+                  disabled={isDemo}
+                  onClick={() => setIsDeleteModalOpen(true)}
+                />
+              </div>
+            )}
           </>
         ) : (
-          dayjs(session.scheduled_at).isAfter(dayjs()) && (
+          dayjs(session.scheduled_at).isAfter(dayjs()) &&
+          !isWithin48Hours && (
             <div className={styles.actions_Icons}>
               <IconButton
                 icon={<PaidIcon />}
                 label="Pay"
                 variant="success"
                 disabled={isDemo || session.paid}
-                onClick={() => setIsPayModalOpen(true)}
+                onClick={() => {
+                  if (isWithin48Hours) {
+                    showToast(
+                      "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
+                      "warning",
+                    );
+                    return;
+                  } else {
+                    setIsPayModalOpen(true);
+                  }
+                }}
               />
               <IconButton
                 icon={<RescheduleIcon />}
                 label="Reschedule"
                 variant="info"
                 disabled={isDemo}
-                onClick={() => setIsRescheduleModalOpen(true)}
+                onClick={() => {
+                  if (isWithin48Hours) {
+                    showToast(
+                      "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
+                      "warning",
+                    );
+                    return;
+                  } else {
+                    setIsRescheduleModalOpen(true);
+                  }
+                }}
               />
               <IconButton
                 icon={<CancelIcon />}
                 label="Cancel session"
                 variant="danger"
                 disabled={isDemo}
-                onClick={() => setIsCancelModalOpen(true)}
+                onClick={() => {
+                  if (isWithin48Hours) {
+                    showToast(
+                      "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
+                      "warning",
+                    );
+                    return;
+                  } else {
+                    setIsCancelModalOpen(true);
+                  }
+                }}
               />
             </div>
           )
