@@ -6,12 +6,12 @@ import { useAuth } from "@context/AuthContext";
 import { RootState } from "@/store";
 
 import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
+import { SessionCardDetailed } from "@/components/shared/SessionCard/SessionCardDetailed";
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
-import { SessionCardDetailed } from "@/components/shared/SessionCard/SessionCardDetailed";
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();

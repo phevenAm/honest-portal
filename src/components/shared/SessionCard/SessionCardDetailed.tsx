@@ -2,28 +2,34 @@ import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 
-import Button from "@components/shared/Button";
-
+import { useToast } from "@/context/ToastContext";
 import { supabase } from "@/lib/supabase.js";
 import { Session, SessionBlockMeta, SessionEvent } from "@/models/globalTypes";
-
+import IconButton from "../IconButton/IconButton";
+import { BinIcon, CancelIcon, PaidIcon, RescheduleIcon, UnpaidIcon } from "../Icons/Icons";
 import CancelSessionModal from "./CancelSessionModal/CancelSessionModal";
 import ClientRescheduleModal from "./ClientRescheduleModal/ClientRescheduleModal";
 import CreateSessionModal from "./CreateSessionModal/CreateSessionModal";
 import DeleteSessionModal from "./DeleteSessionModal/DeleteSessionModal";
 import PaySessionModal from "./PaySessionModal/PaySessionModal";
+import useSessionCard from "./useSessionCard";
 
 import styles from "./SessionCardDetailed.module.scss";
-import useSessionCard from "./useSessionCard";
-import { useToast } from "@/context/ToastContext";
 
-interface SessionCardProps {
+interface SessionCardDetailedProps {
   session: Session;
   isDemo?: boolean;
   isAdmin?: boolean;
 }
 
-export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardProps) {
+function formatSessionDate(session: Session): string {
+  const scheduled = dayjs(session.scheduled_at);
+  if (scheduled.isSame(dayjs(), "day")) return `Today at ${scheduled.format("h:mma")}`;
+  if (scheduled.isSame(dayjs().add(1, "day"), "day")) return `Tomorrow at ${scheduled.format("h:mma")}`;
+  return scheduled.format("dddd D MMM YYYY · h:mma");
+}
+
+export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDetailedProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
@@ -46,136 +52,190 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardPro
       });
   }, [session.id, isAdmin]);
 
-  const { toggleNoShowOrPayment, getCardClass, getStatusClass, formatEventLabel, isWithin48Hours } =
+  const { toggleNoShowOrPayment, markAttended, markNoShow, formatEventLabel, isWithin48Hours } =
     useSessionCard(session);
 
-  return (
-    <div className={[styles.sessionItem, getCardClass(session.status, session.attended)].filter(Boolean).join(" ")}>
-      <p className={styles.date}>{dayjs(session.scheduled_at).format("dddd D MMM YYYY · h:mma")}</p>
+  const isPast = dayjs(session.scheduled_at).isBefore(dayjs());
+  const isCompleted = isPast && session.attended === true && session.paid === true;
+  const isNoShow = session.attended === false;
+  const isInPerson = session.location === "in_person";
 
-      <div className={styles.meta}>
-        <span className={styles.duration}>{session.duration_minutes} min</span>
-        <span className={`${styles.badge} ${getStatusClass(session.status, session.attended)}`}>
-          {session.attended === false ? "No Show" : session.status.replace("_", " ")}
-        </span>
-        <span
-          className={session.paid ? styles.paidPill : styles.unpaidPill}
-          title={session.paid ? "Paid" : "Payment pending"}
-        >
-          £
-        </span>
-        {session.metadata && (session.metadata as SessionBlockMeta).block_id && (
-          <span className={styles.blockBadge} title={`Block ID: ${(session.metadata as SessionBlockMeta).block_id}`}>
-            Block {dayjs((session.metadata as SessionBlockMeta).block_start).format("D MMM")} ·{" "}
-            {(session.metadata as SessionBlockMeta).block_pos}/{(session.metadata as SessionBlockMeta).block_total}
-          </span>
-        )}
+  function cardClass() {
+    if (isCompleted) return styles.sessionItemCompleted;
+    if (isNoShow) return styles.sessionItemNoShow;
+    if (session.status === "rescheduled") return styles.sessionItemRescheduled;
+    return "";
+  }
+
+  function statusBadgeClass() {
+    if (isNoShow) return styles.statusNoShow;
+    if (isCompleted) return styles.statusCompleted;
+    switch (session.status) {
+      case "cancelled":
+        return styles.statusCancelled;
+      case "rescheduled":
+        return styles.statusRescheduled;
+      default:
+        return styles.statusScheduled;
+    }
+  }
+
+  function statusBadgeLabel() {
+    if (isNoShow) return "No Show";
+    if (isCompleted) return "Completed";
+    return session.status.replace("_", " ");
+  }
+
+  function attendancePillClass() {
+    if (session.attended === true) return [styles.statusPill, styles.statusPillAttended].join(" ");
+    if (session.attended === false) return [styles.statusPill, styles.statusPillNoShow].join(" ");
+    return [styles.statusPill, styles.statusPillNeutral].join(" ");
+  }
+
+  return (
+    <div className={[styles.sessionItem, cardClass()].filter(Boolean).join(" ")}>
+      {/* ── Header ─────────────────────────────────────── */}
+      <div className={styles.header}>
+        <div>
+          <p className={styles.date}>{formatSessionDate(session)}</p>
+          <div className={styles.meta}>
+            <span className={styles.duration}>{session.duration_minutes} min</span>
+            {session.metadata && (session.metadata as SessionBlockMeta).block_id && (
+              <span className={styles.blockBadge}>
+                Block {dayjs((session.metadata as SessionBlockMeta).block_start).format("D MMM")} ·{" "}
+                {(session.metadata as SessionBlockMeta).block_pos}/{(session.metadata as SessionBlockMeta).block_total}
+              </span>
+            )}
+          </div>
+        </div>
+        <span className={`${styles.badge} ${statusBadgeClass()}`}>{statusBadgeLabel()}</span>
       </div>
 
-      {session.address && dayjs(session.scheduled_at).isAfter(dayjs()) && (
-        <a
-          href={
-            session.location === "in_person"
-              ? `https://maps.google.com/?q=${encodeURIComponent(session.address)}`
-              : session.address
-          }
-          target="_blank"
-          rel="noreferrer"
-          className={styles.locationLink}
-        >
-          {session.location === "in_person" ? "Open in Maps" : "Join meeting"}
+      {/* ── Map (in-person, upcoming) ──────────────────── */}
+      {session.address && !isPast && isInPerson && (
+        <div className={styles.mapWrapper}>
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(session.address)}&output=embed`}
+            className={styles.map}
+            title="Session location"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      )}
+
+      {/* ── Remote link (upcoming only) ────────────────── */}
+      {session.address && !isPast && !isInPerson && (
+        <a href={session.address} target="_blank" rel="noreferrer" className={styles.locationLink}>
+          Join meeting
         </a>
       )}
 
+      {/* ── Notes ─────────────────────────────────────── */}
       {isAdmin && <p className={session.notes ? styles.notes : styles.noNotes}>{session.notes ?? "No notes added."}</p>}
 
-      <div className={styles.actions}>
-        {isAdmin ? (
-          <>
-            <Button variant="ghost" size="sm" onClick={toggleNoShowOrPayment} data-action-type="attendance">
-              {session.attended ? "Attended" : "No show"}
-            </Button>
-            <Button
-              size="sm"
-              data-action-type="payment"
-              onClick={toggleNoShowOrPayment}
-              variant={session.paid ? "ghost" : "secondary"}
-            >
-              {session.paid ? "Mark as unpaid" : "Mark as paid"}
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => setOpenEditSession(true)}>
-              Reschedule
-            </Button>
-            <Button variant="danger" size="sm" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
-              Delete
-            </Button>
-          </>
-        ) : (
-          <>
-            {!session.paid && (
-              <Button
-                variant="primary"
-                size="sm"
+      {/* ── Admin actions ─────────────────────────────── */}
+      {isAdmin && (
+        <div className={styles.adminActions}>
+          {isPast ? (
+            <>
+              <div className={styles.statusRow}>
+                <button
+                  type="button"
+                  className={attendancePillClass()}
+                  onClick={session.attended === true ? markNoShow : markAttended}
+                >
+                  {session.attended === true
+                    ? "✓ Attended"
+                    : session.attended === false
+                      ? "✕ No Show"
+                      : "Mark attendance"}
+                </button>
+                <button
+                  type="button"
+                  className={[styles.statusPill, session.paid ? styles.statusPillPaid : styles.statusPillNeutral].join(
+                    " ",
+                  )}
+                  data-action-type="payment"
+                  onClick={toggleNoShowOrPayment}
+                >
+                  {session.paid ? "£ Paid" : "£ Unpaid"}
+                </button>
+              </div>
+              <IconButton
+                icon={<BinIcon />}
+                label="Delete session"
+                variant="danger"
                 disabled={isDemo}
-                onClick={() => {
-                  if (isWithin48Hours) {
-                    showToast(
-                      "Sorry, its too late to pay for this session. It has automatically been cancelled.",
-                      "warning",
-                    );
-                    return;
-                  } else {
-                    setIsPayModalOpen(true);
-                  }
-                }}
-              >
-                Pay
-              </Button>
-            )}
-            {dayjs(session.scheduled_at).isAfter(dayjs()) && (
-              <>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={isDemo}
-                  onClick={() => {
-                    if (isWithin48Hours) {
-                      showToast(
-                        "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
-                        "warning",
-                      );
-                      return;
-                    } else {
-                      setIsRescheduleModalOpen(true);
-                    }
-                  }}
-                >
-                  Reschedule
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  disabled={isDemo}
-                  onClick={() => {
-                    if (isWithin48Hours) {
-                      showToast(
-                        "Sessions cannot be cancelled or rescheduled within 48 hours of the appointment",
-                        "warning",
-                      );
-                      return;
-                    } else {
-                      setIsCancelModalOpen(true);
-                    }
-                  }}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-          </>
-        )}
-      </div>
+                onClick={() => setIsDeleteModalOpen(true)}
+              />
+            </>
+          ) : (
+            <>
+              <IconButton
+                icon={<RescheduleIcon />}
+                label="Reschedule session"
+                variant="info"
+                onClick={() => setOpenEditSession(true)}
+              />
+              <IconButton
+                icon={<BinIcon />}
+                label="Delete session"
+                variant="danger"
+                disabled={isDemo}
+                onClick={() => setIsDeleteModalOpen(true)}
+              />
+            </>
+          )}
+        </div>
+      )}
 
+      {/* ── Client actions ────────────────────────────── */}
+      {!isAdmin && !isPast && (
+        <div className={styles.clientActions}>
+          <IconButton
+            icon={<PaidIcon />}
+            label="Pay"
+            variant="success"
+            disabled={isDemo || session.paid}
+            onClick={() => {
+              if (isWithin48Hours) {
+                showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment", "warning");
+                return;
+              }
+              setIsPayModalOpen(true);
+            }}
+          />
+          <IconButton
+            icon={<RescheduleIcon />}
+            label="Reschedule"
+            variant="info"
+            disabled={isDemo}
+            onClick={() => {
+              if (isWithin48Hours) {
+                showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment", "warning");
+                return;
+              }
+              setIsRescheduleModalOpen(true);
+            }}
+          />
+          <IconButton
+            icon={<CancelIcon />}
+            label="Cancel session"
+            variant="danger"
+            disabled={isDemo}
+            onClick={() => {
+              if (isWithin48Hours) {
+                showToast("Sessions cannot be cancelled or rescheduled within 48 hours of the appointment", "warning");
+                return;
+              }
+              setIsCancelModalOpen(true);
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── History ───────────────────────────────────── */}
       {events.length > 0 && (
         <div className={styles.history}>
           <button type="button" className={styles.historyToggle} onClick={() => setShowHistory((v) => !v)}>
