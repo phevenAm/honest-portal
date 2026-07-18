@@ -3,7 +3,14 @@ import { Link } from "react-router-dom";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
-import { BookIcon, CheckIcon, ClipboardIcon, PlusIcon, UsersIcon } from "@components/shared/Icons/Icons";
+import {
+  BookIcon,
+  CheckIcon,
+  ClipboardIcon,
+  PlusIcon,
+  RescheduleIcon,
+  UsersIcon,
+} from "@components/shared/Icons/Icons";
 import WIP from "@components/shared/WIP/WIP";
 import { useAuth } from "@context/AuthContext";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
@@ -55,7 +62,7 @@ export default function AdminDashboard() {
       label: "Active clients",
       value: allClients.length,
       icon: <UsersIcon />,
-      color: "teal",
+      color: "stone",
       to: "/admin/clients",
     },
     {
@@ -69,14 +76,14 @@ export default function AdminDashboard() {
       label: "Active check-ins",
       value: activeQs,
       icon: <CheckIcon />,
-      color: "sky",
+      color: "stone",
       to: "/admin/questionnaires",
     },
     {
       label: "Published resources",
       value: publishedResources,
       icon: <BookIcon />,
-      color: "peach",
+      color: "stone",
       to: "/admin/resources",
     },
   ];
@@ -84,8 +91,8 @@ export default function AdminDashboard() {
   const schedulerMetric = {
     label: "Scheduler",
     value: null,
-    icon: <BookIcon />,
-    color: "peach",
+    icon: <RescheduleIcon />,
+    color: "stone",
     to: "/admin/scheduler",
   };
 

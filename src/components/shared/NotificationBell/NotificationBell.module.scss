@@ -163,3 +163,12 @@
   color: var(--text-muted);
   margin: 0;
 }
+
+
+.demoMessage {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  padding: $sp-2;
+  font-size: .9rem;
+}
