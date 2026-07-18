@@ -1,78 +1,105 @@
 @use "../../../styles/spacing" as *;
-@use "../../../styles/mixins" as *;
 
 .heading {
-    margin-bottom: $sp-6;
+    margin-bottom: $sp-4;
 }
 
-.flexWrapper {
+// ── Next session strip ────────────────────────────────────
+.nextStrip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $sp-4;
+    padding: $sp-4 $sp-5;
+    margin-bottom: $sp-4;
+    flex-wrap: wrap;
+}
+
+.stripLeft {
     display: flex;
     flex-direction: column;
-    gap: $sp-5;
+    gap: $sp-1;
+}
 
-    @include from-lg {
-        flex-direction: row;
-        align-items: stretch;
-        height: calc(100dvh - var(--navbar-height, 64px) - var(--footer-height, 60px) - 180px);
+.stripDate {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.stripMeta {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.joinLink {
+    color: var(--accent);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
     }
 }
 
-.sessions {
-    flex: 1;
-    min-height: 400px;
-    padding: $sp-6;
-    flex-direction: column;
-    // overflow: hidden;
-
-    .noCurrentSessions {
-        height: 100%;
-        display: grid;
-        place-items: center;
-    }
-
-    @include from-lg {
-        min-height: 0;
-        overflow: auto;
-    }
+.stripRight {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
 }
 
+.paidBadge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #16a34a;
+    white-space: nowrap;
+}
+
+.unpaidBadge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    background: color-mix(in srgb, var(--text-muted) 12%, transparent);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.noUpcoming {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+// ── Sessions list card ────────────────────────────────────
 .sessionsList {
     display: flex;
     flex-direction: column;
     padding: $sp-5;
-    min-height: 0;
-
-
-    @include from-lg {
-        width: 400px;
-        flex-shrink: 0;
-        overflow: hidden;
-    }
 }
 
 .tabContainer {
     display: flex;
     justify-content: center;
     margin-bottom: $sp-4;
-    flex-shrink: 0;
 }
 
 .scrollable {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: $sp-3;
-    padding: $sp-2 $sp-4;
-    background-color: var(--bg-base);
-    // box-shadow: inset 0px 10px 15px -7px rgba(0, 0, 0, 0.08);
-    // border-radius: 0px;
+}
 
-
-    &noSessions {
-        height: 100%;
-        display: grid;
-        place-items: center;
-    }
+.emptyList {
+    margin: 0;
+    padding: $sp-6 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }

@@ -3,7 +3,14 @@ import { Link } from "react-router-dom";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
-import { BookIcon, CheckIcon, ClipboardIcon, PlusIcon, UsersIcon } from "@components/shared/Icons/Icons";
+import {
+  BookIcon,
+  CheckIcon,
+  ClipboardIcon,
+  PlusIcon,
+  RescheduleIcon,
+  UsersIcon,
+} from "@components/shared/Icons/Icons";
 import WIP from "@components/shared/WIP/WIP";
 import { useAuth } from "@context/AuthContext";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
@@ -12,6 +19,8 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchResources, selectAllResources } from "@store/slices/resourcesSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
+import { isPageStatusLoading } from "@/Helpers/Helpers";
+
 import styles from "./AdminDashboard.module.scss";
 
 export default function AdminDashboard() {
@@ -19,6 +28,10 @@ export default function AdminDashboard() {
   const allClients = useAppSelector(selectClientUsers);
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const resources = useAppSelector(selectAllResources);
+
+  const usersStatus = useAppSelector((state: RootState) => state.userDirectory.status);
+  const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const resourcesStatus = useAppSelector((state: RootState) => state.resources.status);
 
   useFetchOnIdle(
     (state: RootState) => state.userDirectory.status,
@@ -38,6 +51,9 @@ export default function AdminDashboard() {
     "Failed to fetch resources:",
   );
 
+  const guard = isPageStatusLoading(usersStatus, questionnairesStatus, resourcesStatus);
+  if (guard) return guard;
+
   const publishedResources = resources.filter((r) => r.is_published).length;
   const activeQs = questionnaires.filter((q) => q.is_active).length;
 
@@ -46,7 +62,7 @@ export default function AdminDashboard() {
       label: "Active clients",
       value: allClients.length,
       icon: <UsersIcon />,
-      color: "teal",
+      color: "stone",
       to: "/admin/clients",
     },
     {
@@ -60,14 +76,14 @@ export default function AdminDashboard() {
       label: "Active check-ins",
       value: activeQs,
       icon: <CheckIcon />,
-      color: "sky",
+      color: "stone",
       to: "/admin/questionnaires",
     },
     {
       label: "Published resources",
       value: publishedResources,
       icon: <BookIcon />,
-      color: "peach",
+      color: "stone",
       to: "/admin/resources",
     },
   ];
@@ -75,8 +91,8 @@ export default function AdminDashboard() {
   const schedulerMetric = {
     label: "Scheduler",
     value: null,
-    icon: <BookIcon />,
-    color: "peach",
+    icon: <RescheduleIcon />,
+    color: "stone",
     to: "/admin/scheduler",
   };
 

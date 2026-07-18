@@ -1,4 +1,6 @@
+import Spinner from "@/components/shared/Spinner/Spinner";
 import type { Response } from "../models/globalTypes";
+import { Button } from "@/components/shared";
 
 export const isQuestionnaireCheckInDue = (date: string, frequency: string) => {
   const now = new Date();
@@ -35,3 +37,25 @@ export const isAdultFromDob = (dob: string | null | undefined): boolean => {
   const hadBirthday = now >= new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
   return age > 18 || (age === 18 && hadBirthday);
 };
+
+export function isPageStatusLoading(...statuses: string[]) {
+  if (statuses.some((s) => s === "loading" || s === "idle")) {
+    return (
+      <div className="page">
+        <Spinner />
+      </div>
+    );
+  }
+  if (statuses.some((s) => s === "failed")) {
+    return (
+      <div className="page">
+        <h1>oops something went wrong</h1>
+        <p>Maybe give the page a reload</p>
+
+        <Button variant="secondary" onClick={() => window.location.reload()}>
+          Reload page
+        </Button>
+      </div>
+    );
+  }
+}

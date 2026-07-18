@@ -48,6 +48,12 @@
   justify-content: center;
   margin-bottom: $sp-4;
 
+  svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
   &.teal {
     background: var(--accent-light);
     color: var(--accent-dark);
@@ -65,7 +71,12 @@
 
   &.peach {
     background: var(--warning-light);
-    color: var(--warning);
+    color: #78350f;
+  }
+
+  &.coral {
+    background: var(--danger-light);
+    color: var(--danger);
   }
 }
 

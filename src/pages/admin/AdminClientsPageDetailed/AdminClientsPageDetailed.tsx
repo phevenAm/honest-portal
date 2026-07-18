@@ -14,9 +14,11 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
+import Spinner from "@/components/shared/Spinner/Spinner";
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import { isPageStatusLoading } from "@/Helpers/Helpers";
 import { useCounsellorName } from "@/Hooks/useCounsellorName";
 import { supabase } from "@/lib/supabase.js";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
@@ -36,6 +38,9 @@ export default function AdminClientsPageDetailed() {
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const usersStatus = useAppSelector((state: RootState) => state.userDirectory.status);
+  const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
+  const sessionsStatus = useAppSelector((state: RootState) => state.sessions.status);
   const clientResponses = useAppSelector(selectResponsesByUser(clientId ?? ""));
 
   const counsellorName = useCounsellorName();
@@ -199,6 +204,9 @@ export default function AdminClientsPageDetailed() {
   };
 
   const maxPageSize = 4;
+
+  const guard = isPageStatusLoading(usersStatus, questionnairesStatus, responsesStatus, sessionsStatus);
+  if (guard) return guard;
 
   if (!client) {
     return (

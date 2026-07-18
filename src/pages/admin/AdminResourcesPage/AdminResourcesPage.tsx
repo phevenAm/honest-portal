@@ -18,6 +18,7 @@ import {
   updateResource,
 } from "@store/slices/resourcesSlice";
 
+import { isPageStatusLoading } from "@/Helpers/Helpers";
 import { ResourceForm } from "./AdminResourcesPageForm";
 
 import styles from "./AdminResourcesPage.module.scss";
@@ -62,11 +63,16 @@ export default function AdminResourcesPage() {
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [typeFilter, setTypeFilter] = useState<(typeof RESOURCE_TYPES)[number]>("all");
 
+  const resourcesStatus = useAppSelector((state: RootState) => state.resources.status);
+
   useFetchOnIdle(
     (state: RootState) => state.resources.status,
     () => fetchResources(),
     "Failed to fetch resources:",
   );
+
+  const guard = isPageStatusLoading(resourcesStatus);
+  if (guard) return guard;
 
   const filtered = typeFilter === "all" ? resources : resources.filter((resource) => resource.type === typeFilter);
 

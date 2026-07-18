@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { isAdultFromDob } from "@Helpers/Helpers";
+import { isAdultFromDob, isPageStatusLoading } from "@Helpers/Helpers";
 import Card from "@components/shared/Card/Card";
 import { ArticleIcon, VideoIcon } from "@components/shared/Icons/Icons";
 import { useAuth } from "@context/AuthContext";
@@ -119,6 +119,8 @@ export default function ResourcesPage() {
     "Failed to fetch resources:",
   );
 
+  const resourcesStatus = useAppSelector((State) => State.resources.status);
+
   const contentToRender = isAdultFromDob(userProfile?.dob ?? "") ? resources : nonSensitiveResources;
   const types = ["all", ...new Set(contentToRender.map((r) => r.type))];
 
@@ -132,6 +134,9 @@ export default function ResourcesPage() {
           r.category.toLowerCase().includes(term),
       )
     : byType;
+
+  const guard = isPageStatusLoading(resourcesStatus);
+  if (guard) return guard;
 
   return (
     <div className="page">

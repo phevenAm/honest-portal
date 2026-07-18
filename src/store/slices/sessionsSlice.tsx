@@ -60,7 +60,15 @@ export const updateSession = createAsyncThunk<
   { id: string } & Partial<
     Pick<
       Session,
-      "status" | "attended" | "paid" | "notes" | "scheduled_at" | "duration_minutes" | "location" | "address"
+      | "status"
+      | "attended"
+      | "paid"
+      | "price_pence"
+      | "notes"
+      | "scheduled_at"
+      | "duration_minutes"
+      | "location"
+      | "address"
     >
   >
 >("sessions/updateSession", async (sessionToUpdate, { rejectWithValue }) => {

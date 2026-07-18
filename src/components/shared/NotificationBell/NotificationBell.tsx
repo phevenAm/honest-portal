@@ -20,7 +20,7 @@ type Notification = {
 };
 
 export function NotificationBell() {
-  const { userProfile } = useAuth();
+  const { userProfile, isDemo } = useAuth();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -94,7 +94,7 @@ export function NotificationBell() {
   };
 
   const clearAll = async () => {
-    if (!userProfile?.id) return;
+    if (!userProfile?.id || isDemo) return;
     await supabase.from("notifications").delete().eq("user_id", userProfile.id);
     setNotifications([]);
   };
@@ -128,36 +128,40 @@ export function NotificationBell() {
               </button>
             )}
           </div>
-          {notifications.length === 0 ? (
-            <p className={styles.empty}>Nothing here yet</p>
-          ) : (
+          {notifications.length === 0 && <p className={styles.empty}>Nothing here yet</p>}
+          {notifications.length > 0 && isDemo && (
+            <p className={styles.demoMessage}>Notifications are hidden in demo mode</p>
+          )}
+          {notifications.length > 0 && !isDemo && (
             <ul className={styles.list}>
               {notifications.map((n) => (
-                <li
-                  key={n.id}
-                  className={[styles.item, !n.read ? styles.unread : "", n.url ? styles.clickable : ""]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => {
-                    if (n.url) {
-                      setOpen(false);
-                      navigate(n.url.replace(window.location.origin, ""));
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if ((e.key === "Enter" || e.key === " ") && n.url) {
-                      e.preventDefault();
-                      setOpen(false);
-                      navigate(n.url.replace(window.location.origin, ""));
-                    }
-                  }}
-                  role="button"
-                  tabIndex={n.url ? 0 : -1}
-                >
-                  <div className={styles.itemBody}>
-                    <p className={styles.message}>{n.message}</p>
-                    <p className={styles.date}>{dayjs(n.created_at).format("D MMM [at] h:mma")}</p>
-                  </div>
+                <li key={n.id} className={[styles.item, !n.read ? styles.unread : ""].filter(Boolean).join(" ")}>
+                  {n.url ? (
+                    <button
+                      type="button"
+                      className={[styles.itemBody, styles.clickable].filter(Boolean).join(" ")}
+                      onClick={() => {
+                        setOpen(false);
+                        navigate(n.url!.replace(window.location.origin, ""));
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setOpen(false);
+                          navigate(n.url!.replace(window.location.origin, ""));
+                        }
+                      }}
+                    >
+                      <p className={styles.message}>{n.message}</p>
+                      <p className={styles.date}>{dayjs(n.created_at).format("D MMM [at] h:mma")}</p>
+                    </button>
+                  ) : (
+                    <div className={styles.itemBody}>
+                      <p className={styles.message}>{n.message}</p>
+                      <p className={styles.date}>{dayjs(n.created_at).format("D MMM [at] h:mma")}</p>
+                    </div>
+                  )}
+
                   <button
                     type="button"
                     className={styles.dismiss}
