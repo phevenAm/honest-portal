@@ -32,7 +32,9 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
   const [recurringWeeks, setRecurringWeeks] = useState(3);
   const [sessionDuration, setSessionDuration] = useState(session?.duration_minutes ?? 50);
   const [isPrepaid, setIsPrepaid] = useState(session?.paid ?? false);
-  const [pricePounds, setPricePounds] = useState(session?.price_pence ? (session.price_pence / 100).toFixed(2) : "");
+  const [pricePounds, setPricePounds] = useState(
+    session?.price_pence ? (session.price_pence / 100).toFixed(2) : "60.00",
+  );
   const [location, setLocation] = useState<"remote" | "in_person">(session?.location ?? "in_person");
   const [sessionAddress, setSessionAddress] = useState(session?.address ?? "");
   const [notes, setNotes] = useState(session?.notes ?? "");
@@ -218,7 +220,14 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
               id="recurring"
               type="checkbox"
               checked={isRecurring}
-              onChange={(e) => setIsRecurring(e.target.checked)}
+              onChange={(e) => {
+                setIsRecurring(e.target.checked);
+                setPricePounds((prev) => {
+                  if (e.target.checked && prev === "60.00") return "55.00";
+                  if (!e.target.checked && prev === "55.00") return "60.00";
+                  return prev;
+                });
+              }}
             />
             <label htmlFor="recurring" className={styles.checkboxLabel}>
               Repeat weekly
@@ -247,18 +256,16 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
           <label className={styles.label} htmlFor="session-price">
             Session fee (£)
           </label>
-          <div className={styles.inputWrapper}>
-            <input
-              id="session-price"
-              className={styles.input}
-              type="number"
-              min={0}
-              step={0.01}
-              placeholder="e.g. 70.00"
-              value={pricePounds}
-              onChange={(e) => setPricePounds(e.target.value)}
-            />
-          </div>
+          <input
+            id="session-price"
+            className={styles.input}
+            type="number"
+            min={0}
+            step={0.01}
+            placeholder="e.g. 70.00"
+            value={pricePounds}
+            onChange={(e) => setPricePounds(e.target.value)}
+          />
         </div>
 
         <fieldset className={styles.fieldGroup}>
