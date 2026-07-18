@@ -111,8 +111,8 @@ Deno.serve(async (req) => {
         },
       ],
       metadata: checkoutMeta,
-      success_url: `${appUrl}/schedule?payment=success`,
-      cancel_url: `${appUrl}/schedule?payment=cancelled`,
+      success_url: `${appUrl}/my-sessions?payment=success`,
+      cancel_url: `${appUrl}/my-sessions?payment=cancelled`,
     });
 
     return new Response(JSON.stringify({ url: checkoutSession.url }), {

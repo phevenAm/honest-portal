@@ -62,6 +62,23 @@ const PaySessionModal = ({ session, onClose }: PaySessionModalProps) => {
           ? `You'll be taken to our secure payment page to pay for your full session block (£${pricePounds} per session).`
           : `You'll be taken to our secure payment page to pay £${pricePounds} for this session.`}
       </p>
+      {import.meta.env.DEV && (
+        <div
+          style={{
+            marginTop: "12px",
+            padding: "10px 12px",
+            borderRadius: "6px",
+            background: "var(--bg-subtle, #f5f5f5)",
+            border: "1px dashed var(--border)",
+            fontSize: "0.8rem",
+            color: "var(--text-secondary)",
+            lineHeight: 1.6,
+          }}
+        >
+          <strong style={{ display: "block", marginBottom: "4px" }}>Test mode</strong>
+          Card: <code>4242 4242 4242 4242</code> · Expiry: <code>12/30</code> · CVC: <code>123</code>
+        </div>
+      )}
       {error && <p style={{ fontSize: "0.85rem", color: "var(--error)", marginTop: "8px" }}>{error}</p>}
     </Modal>
   );
