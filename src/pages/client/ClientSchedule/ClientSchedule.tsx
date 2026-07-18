@@ -1,23 +1,110 @@
-// client should be able to see future sessions, which the admin believes they have paid for. they can cancel any future days and move any dates. the days change sends and email to admin who can confirm that thats fine with them. it should really prompt a converation
-
 import { useMemo, useState } from "react";
+
+import dayjs from "dayjs";
 
 import { useAuth } from "@context/AuthContext";
 import { RootState } from "@/store";
 
 import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
-import { SessionCardDetailed } from "@/components/shared/SessionCard/SessionCardDetailed";
+import IconButton from "@/components/shared/IconButton/IconButton";
+import { CancelIcon, PaidIcon, RescheduleIcon } from "@/components/shared/Icons/Icons";
+import CancelSessionModal from "@/components/shared/SessionCard/CancelSessionModal/CancelSessionModal";
+import ClientRescheduleModal from "@/components/shared/SessionCard/ClientRescheduleModal/ClientRescheduleModal";
+import PaySessionModal from "@/components/shared/SessionCard/PaySessionModal/PaySessionModal";
+import useSessionCard from "@/components/shared/SessionCard/useSessionCard";
 import { ToggleButtonTabsTypes } from "@/components/shared/ToggleButtonTabs/ToggleButtonTabs";
+import { useToast } from "@/context/ToastContext";
+import { isPageStatusLoading } from "@/Helpers/Helpers";
+import type { Session } from "@/models/globalTypes";
 import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
-import { isPageStatusLoading } from "@/Helpers/Helpers";
+
+function formatStripDate(session: Session): string {
+  const scheduled = dayjs(session.scheduled_at);
+  if (scheduled.isSame(dayjs(), "day")) return `Today at ${scheduled.format("h:mma")}`;
+  if (scheduled.isSame(dayjs().add(1, "day"), "day")) return `Tomorrow at ${scheduled.format("h:mma")}`;
+  return scheduled.format("dddd D MMM · h:mma");
+}
+
+function NextSessionStrip({ session }: { session: Session }) {
+  const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const { showToast } = useToast();
+  const { isWithin48Hours } = useSessionCard(session);
+  const { isDemo } = useAuth();
+
+  const isOnline = session.location !== "in_person";
+
+  const guardAction = (fn: () => void) => {
+    if (isWithin48Hours) {
+      showToast("Sessions cannot be changed within 48 hours of the appointment", "warning");
+      return;
+    }
+    fn();
+  };
+
+  return (
+    <>
+      <Card className={styles.nextStrip}>
+        <div className={styles.stripLeft}>
+          <p className={styles.stripDate}>{formatStripDate(session)}</p>
+          <div className={styles.stripMeta}>
+            <span>{session.duration_minutes} min</span>
+            <span>·</span>
+            <span>{isOnline ? "Online" : "In person"}</span>
+            {session.address && isOnline && (
+              <>
+                <span>·</span>
+                <a href={session.address} target="_blank" rel="noreferrer" className={styles.joinLink}>
+                  Join meeting
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.stripRight}>
+          <span className={session.paid ? styles.paidBadge : styles.unpaidBadge}>
+            {session.paid ? "Paid" : "Unpaid"}
+          </span>
+          <IconButton
+            icon={<PaidIcon />}
+            label="Pay"
+            variant="success"
+            disabled={isDemo || session.paid}
+            onClick={() => guardAction(() => setIsPayModalOpen(true))}
+          />
+          <IconButton
+            icon={<RescheduleIcon />}
+            label="Reschedule"
+            variant="info"
+            disabled={isDemo}
+            onClick={() => guardAction(() => setIsRescheduleModalOpen(true))}
+          />
+          <IconButton
+            icon={<CancelIcon />}
+            label="Cancel"
+            variant="danger"
+            disabled={isDemo}
+            onClick={() => guardAction(() => setIsCancelModalOpen(true))}
+          />
+        </div>
+      </Card>
+
+      {isPayModalOpen && <PaySessionModal session={session} onClose={() => setIsPayModalOpen(false)} />}
+      {isRescheduleModalOpen && (
+        <ClientRescheduleModal session={session} onClose={() => setIsRescheduleModalOpen(false)} />
+      )}
+      {isCancelModalOpen && <CancelSessionModal session={session} onClose={() => setIsCancelModalOpen(false)} />}
+    </>
+  );
+}
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();
-  //   console.log(userProfile);
-  // const [userSessions, setUserSessions] = useState<Session[]>([]);
   const [activeTabs, setActiveTabs] = useState<"past" | "upcoming">("upcoming");
 
   useFetchOnIdle(
@@ -40,60 +127,51 @@ const ClientSchedule = () => {
   const tabsObj: ToggleButtonTabsTypes = {
     leftButtonAction: () => setActiveTabs("past"),
     leftButtonTitle: "Past sessions",
-    rightButtonTitle: "Upcoming Sessions",
+    rightButtonTitle: "Upcoming sessions",
     rightButtonAction: () => setActiveTabs("upcoming"),
     activeTab: activeTabs === "past" ? "left" : "right",
-  };
-
-  const sessionsToRender = () => {
-    return activeTabs === "past" ? pastSessions : upcomingSessions;
   };
 
   const guard = isPageStatusLoading(sessionStatus);
   if (guard) return guard;
 
+  // upcomingSessions[0] is featured in the strip above, so list starts at [1]
+  const sessionsToRender = activeTabs === "past" ? pastSessions : upcomingSessions.slice(1);
+
+  const emptyMessage =
+    activeTabs === "past"
+      ? "No past sessions"
+      : upcomingSessions.length > 0
+        ? "No other upcoming sessions"
+        : "Nothing booked yet";
+
   return (
     <div className="page">
       <div className="inner">
         <h1 className={styles.heading}>My Sessions</h1>
-        <div className={styles.flexWrapper}>
-          <Card className={styles.sessions}>
-            {/* TODO: replace with <NextSessionDashboard session={upcomingSessions[0]} /> — bespoke component
-                showing date/time prominently, duration, paid status, and a cancel button */}
-            {upcomingSessions[0] ? (
-              <SessionCardDetailed session={upcomingSessions[0]} />
-            ) : (
-              <div className={styles.noCurrentSessions}>
-                <p>No upcoming sessions</p>
-              </div>
-            )}
 
-            {/* TODO: empty state when upcomingSessions.length === 0 — "No upcoming sessions booked" */}
-
-            {/* TODO: SessionStatsStrip — X upcoming, X attended, X this month
-                computed from upcomingSessions and pastSessions, no extra fetch needed */}
+        {upcomingSessions[0] ? (
+          <NextSessionStrip session={upcomingSessions[0]} />
+        ) : (
+          <Card className={styles.nextStrip}>
+            <p className={styles.noUpcoming}>No upcoming sessions booked</p>
           </Card>
+        )}
 
-          <Card className={styles.sessionsList}>
-            {/* TODO: show past sessions count and upcoming count as small labels above tabs */}
-            <div className={styles.tabContainer}>
-              <ToggleButtonTabs {...tabsObj} />
-            </div>
+        <Card className={styles.sessionsList}>
+          <div className={styles.tabContainer}>
+            <ToggleButtonTabs {...tabsObj} />
+          </div>
+          {sessionsToRender.length === 0 ? (
+            <p className={styles.emptyList}>{emptyMessage}</p>
+          ) : (
             <div className={styles.scrollable}>
-              {sessionsToRender().length === 0 ? (
-                <div className={styles.scrollablenoSessions}>
-                  <p>{activeTabs === "upcoming" ? "Nothing booked yet" : "No past sessions"}</p>
-                </div>
-              ) : (
-                sessionsToRender()
-                  .slice(1)
-                  .map((session) => (
-                    <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
-                  ))
-              )}
+              {sessionsToRender.map((session) => (
+                <SessionCard key={session.id} session={session} isAdmin={isAdmin} isDemo={isDemo} />
+              ))}
             </div>
-          </Card>
-        </div>
+          )}
+        </Card>
       </div>
     </div>
   );
