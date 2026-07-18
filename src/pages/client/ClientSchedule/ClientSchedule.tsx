@@ -12,6 +12,7 @@ import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchSessionsByClientId } from "@/store/slices/sessionsSlice";
 
 import styles from "./ClientSchedule.module.scss";
+import { isPageStatusLoading } from "@/Helpers/Helpers";
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();
@@ -25,6 +26,7 @@ const ClientSchedule = () => {
     "Failed to fetch client's sessions",
   );
 
+  const sessionStatus = useAppSelector((state) => state.sessions.status);
   const mySessions = (useAppSelector((state) => state.sessions.sessions) ?? [])
     .slice()
     .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
@@ -46,6 +48,9 @@ const ClientSchedule = () => {
   const sessionsToRender = () => {
     return activeTabs === "past" ? pastSessions : upcomingSessions;
   };
+
+  const guard = isPageStatusLoading(sessionStatus);
+  if (guard) return guard;
 
   return (
     <div className="page">

@@ -11,6 +11,8 @@ import {
   selectAuditLogsStatus,
 } from "@store/slices/auditLogsSlice";
 
+import { isPageStatusLoading } from "@/Helpers/Helpers";
+
 import styles from "./AdminAuditLogsPage.module.scss";
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -114,6 +116,9 @@ export default function AdminAuditLogsPage() {
       dispatch(resetAuditLogs());
     };
   }, [dispatch]);
+
+  const guard = isPageStatusLoading(status);
+  if (guard) return guard;
 
   const currentFilter = FILTERS.find((f) => f.label === activeFilter)!;
   const filtered = currentFilter.tables

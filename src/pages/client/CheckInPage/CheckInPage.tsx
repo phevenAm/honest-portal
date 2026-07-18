@@ -5,7 +5,7 @@ import Button from "../../../components/shared/Button/Button";
 import Card from "../../../components/shared/Card/Card";
 import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../../context/ToastContext";
-import { getResponseDate, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
+import { getResponseDate, isPageStatusLoading, isQuestionnaireCheckInDue } from "../../../Helpers/Helpers";
 import type { Question, Questionnaire, Response } from "../../../models/globalTypes";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { fetchAssignmentsByUser, selectAllAssignments } from "../../../store/slices/questionnaireAssignmentsSlice";
@@ -89,6 +89,8 @@ export default function CheckInPage() {
   const assignments = useAppSelector(selectAllAssignments) as AssignmentWithQuestionnaire[];
 
   const allUserResponses = useAppSelector(selectUserResponses(authUser?.id ?? ""));
+  const responsesStatus = useAppSelector((state) => state.responses.status);
+  const assignmentsStatus = useAppSelector((state) => state.assignments.status);
 
   const [answers, setAnswers] = useState<Record<string, number | string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -125,6 +127,9 @@ export default function CheckInPage() {
   });
 
   const questionnaire = availableAssignments[0]?.questionnaires;
+
+  const guard = isPageStatusLoading(responsesStatus, assignmentsStatus);
+  if (guard) return guard;
 
   if (submitted) {
     return (

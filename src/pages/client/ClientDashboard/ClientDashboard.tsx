@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import { getResponseDate, isQuestionnaireCheckInDue } from "@Helpers/Helpers";
+import { getResponseDate, isPageStatusLoading, isQuestionnaireCheckInDue } from "@Helpers/Helpers";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
@@ -132,13 +132,9 @@ export default function ClientDashboard() {
     },
   ];
 
-  if (questionnairesStatus !== "succeeded" || responsesStatus !== "succeeded") {
-    return (
-      <div className="page">
-        <Spinner />
-      </div>
-    );
-  }
+  const guard = isPageStatusLoading(responsesStatus, questionnairesStatus);
+  if (guard) return guard;
+
   return (
     <div className="page">
       <div className="inner">

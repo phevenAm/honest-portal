@@ -15,6 +15,7 @@ import { fetchAllResponses, selectResponsesByUser } from "@store/slices/response
 import { fetchAllUsers, selectAllUsers } from "@store/slices/userDirectorySlice";
 
 import Search from "@/components/shared/Search/Search";
+import { isPageStatusLoading } from "@/Helpers/Helpers";
 import { getScoreAverage } from "../utils/AdminClientsPageUtils";
 import AccessTokenModal from "./modals/AccessTokenModal/AccessTokenModal";
 import DeleteClientModal from "./modals/DeleteClientModal/DeleteClientModal";
@@ -172,7 +173,9 @@ export default function AdminClientsPage() {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [manageTokensModal, setManageTokensModal] = useState(false);
   const [search, setSearch] = useState("");
+  const usersStatus = useAppSelector((state: RootState) => state.userDirectory.status);
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
 
   useEffect(() => {
     dispatch(fetchAllUsers());
@@ -185,6 +188,9 @@ export default function AdminClientsPage() {
   useEffect(() => {
     dispatch(fetchAllResponses());
   }, [dispatch]);
+
+  const guard = isPageStatusLoading(usersStatus, questionnairesStatus, responsesStatus);
+  if (guard) return guard;
 
   const allClients = allUsers.filter((user) => user.role !== "admin" && !user.deleted_at);
 

@@ -12,6 +12,8 @@ import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/ques
 import { fetchResources, selectAllResources } from "@store/slices/resourcesSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
+import { isPageStatusLoading } from "@/Helpers/Helpers";
+
 import styles from "./AdminDashboard.module.scss";
 
 export default function AdminDashboard() {
@@ -19,6 +21,10 @@ export default function AdminDashboard() {
   const allClients = useAppSelector(selectClientUsers);
   const questionnaires = useAppSelector(selectAllQuestionnaires);
   const resources = useAppSelector(selectAllResources);
+
+  const usersStatus = useAppSelector((state: RootState) => state.userDirectory.status);
+  const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const resourcesStatus = useAppSelector((state: RootState) => state.resources.status);
 
   useFetchOnIdle(
     (state: RootState) => state.userDirectory.status,
@@ -37,6 +43,9 @@ export default function AdminDashboard() {
     () => fetchResources(),
     "Failed to fetch resources:",
   );
+
+  const guard = isPageStatusLoading(usersStatus, questionnairesStatus, resourcesStatus);
+  if (guard) return guard;
 
   const publishedResources = resources.filter((r) => r.is_published).length;
   const activeQs = questionnaires.filter((q) => q.is_active).length;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { KEYWORDS } from "@constants/constants";
 
-import { pickColor } from "@Helpers/Helpers";
+import { isPageStatusLoading, pickColor } from "@Helpers/Helpers";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
@@ -14,6 +14,7 @@ import { supabase } from "@/lib/supabase";
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
+import Spinner from "@/components/shared/Spinner/Spinner";
 
 const BUSINESS_FIELDS = [
   { key: "business_name", label: "Business name" },
@@ -25,7 +26,7 @@ const BUSINESS_FIELDS = [
 type BusinessField = (typeof BUSINESS_FIELDS)[number]["key"];
 
 const SettingsPage = () => {
-  const { userProfile, updateProfile, isAdmin, isDemo } = useAuth();
+  const { userProfile, updateProfile, isAdmin, isDemo, loading } = useAuth();
   const { showToast } = useToast();
   const [name, setName] = useState(userProfile?.display_name ?? "");
   const [imageUrl, setImageUrl] = useState(userProfile?.avatar_url ?? "");
@@ -92,6 +93,15 @@ const SettingsPage = () => {
     setSavingBusiness(false);
     showToast("Business information updated.");
   };
+
+  // const guard = isPageStatusLoading();
+  // if (guard) return guard;
+  if (loading || !userProfile)
+    return (
+      <div className="page">
+        <Spinner />
+      </div>
+    );
 
   return (
     <div className="page">

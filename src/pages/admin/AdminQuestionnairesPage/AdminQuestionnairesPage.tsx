@@ -27,6 +27,8 @@ import {
 import { createTag, deleteTag, fetchTags, selectAllTags, selectTagsStatus, updateTag } from "@store/slices/tagsSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
+import { isPageStatusLoading } from "@/Helpers/Helpers";
+
 import styles from "./AdminQuestionnairesPage.module.scss";
 
 type QuestionDraft = {
@@ -489,6 +491,10 @@ export default function AdminQuestionnairesPage() {
   const clients = useAppSelector(selectClientUsers);
   const tags = useAppSelector(selectAllTags);
 
+  const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
+  const usersStatus = useAppSelector((state: RootState) => state.userDirectory.status);
+  const tagsStatus = useAppSelector(selectTagsStatus);
+
   const [showBuilder, setShowBuilder] = useState(false);
   const [editingQ, setEditingQ] = useState<Questionnaire | null>(null);
   const [isAssigningQ, setIsAssigningQ] = useState<Questionnaire | null>(null);
@@ -518,6 +524,9 @@ export default function AdminQuestionnairesPage() {
       dispatch(fetchAssignmentsByQuestionnaire(isAssigningQ.id));
     }
   }, [isAssigningQ, dispatch]);
+
+  const guard = isPageStatusLoading(questionnairesStatus, usersStatus, tagsStatus);
+  if (guard) return guard;
 
   const handleCreate = (data: QuestionnaireFormData) => dispatch(createQuestionnaire(data as unknown as Questionnaire));
 
