@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import dayjs from "dayjs";
 
@@ -105,7 +106,16 @@ function NextSessionStrip({ session }: { session: Session }) {
 
 const ClientSchedule = () => {
   const { userProfile, isDemo, isAdmin } = useAuth();
+  const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTabs, setActiveTabs] = useState<"past" | "upcoming">("upcoming");
+
+  useEffect(() => {
+    if (searchParams.get("payment") === "success") {
+      showToast("Payment successful — your session is confirmed.", "success");
+      setSearchParams({}, { replace: true });
+    }
+  }, []);
 
   useFetchOnIdle(
     (state: RootState) => state.sessions.status,

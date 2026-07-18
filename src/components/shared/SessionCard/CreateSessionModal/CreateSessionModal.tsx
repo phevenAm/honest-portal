@@ -32,6 +32,7 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
   const [recurringWeeks, setRecurringWeeks] = useState(3);
   const [sessionDuration, setSessionDuration] = useState(session?.duration_minutes ?? 50);
   const [isPrepaid, setIsPrepaid] = useState(session?.paid ?? false);
+  const [pricePounds, setPricePounds] = useState(session?.price_pence ? (session.price_pence / 100).toFixed(2) : "");
   const [location, setLocation] = useState<"remote" | "in_person">(session?.location ?? "in_person");
   const [sessionAddress, setSessionAddress] = useState(session?.address ?? "");
   const [notes, setNotes] = useState(session?.notes ?? "");
@@ -65,6 +66,7 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
             client_id: clientId,
             scheduled_at: date.toISOString(),
             paid: isPrepaid,
+            price_pence: pricePounds ? Math.round(parseFloat(pricePounds) * 100) : 0,
             duration_minutes: sessionDuration,
             notes: notes.trim() || undefined,
             location: location,
@@ -110,6 +112,7 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
         updateSession({
           id: sess.id,
           paid: isPrepaid,
+          price_pence: pricePounds ? Math.round(parseFloat(pricePounds) * 100) : 0,
           notes: notes.trim() || null,
           scheduled_at: scheduledAt.toISOString(),
           duration_minutes: sessionDuration,
@@ -239,6 +242,24 @@ const CreateSessionModal = ({ clientId, onClose, clientName, session = null }: C
             />
           </div>
         )}
+
+        <div className={styles.fieldGroup}>
+          <label className={styles.label} htmlFor="session-price">
+            Session fee (£)
+          </label>
+          <div className={styles.inputWrapper}>
+            <input
+              id="session-price"
+              className={styles.input}
+              type="number"
+              min={0}
+              step={0.01}
+              placeholder="e.g. 70.00"
+              value={pricePounds}
+              onChange={(e) => setPricePounds(e.target.value)}
+            />
+          </div>
+        </div>
 
         <fieldset className={styles.fieldGroup}>
           <legend className={styles.label}>Payment</legend>
