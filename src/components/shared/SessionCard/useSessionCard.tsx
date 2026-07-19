@@ -22,13 +22,15 @@ const useSessionCard = (session: Session) => {
   };
 
   const markAttended = () => {
-    dispatch(updateSession({ id: session.id, attended: true }));
-    showToast("Marked as attended");
+    const next = session.attended === true ? null : true;
+    dispatch(updateSession({ id: session.id, attended: next }));
+    showToast(next === true ? "Marked as attended" : "Attendance cleared");
   };
 
   const markNoShow = () => {
-    dispatch(updateSession({ id: session.id, attended: false }));
-    showToast("Marked as no show");
+    const next = session.attended === false ? null : false;
+    dispatch(updateSession({ id: session.id, attended: next }));
+    showToast(next === false ? "Marked as no show" : "Attendance cleared");
   };
 
   function getStatusClass(status: string, attended: boolean | null, paid: boolean, scheduled_at: string): string {

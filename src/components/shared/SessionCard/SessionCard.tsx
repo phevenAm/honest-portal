@@ -100,7 +100,7 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
       {isAdmin && <p className={session.notes ? styles.notes : styles.noNotes}>{session.notes ?? "No notes added."}</p>}
 
       <div className={styles.actions}>
-        {isAdmin && isPast && (
+        {isAdmin && (
           <>
             <div className={styles.attendanceGroup}>
               <button
@@ -130,6 +130,14 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
                 data-action-type="payment"
                 onClick={toggleNoShowOrPayment}
               />
+              {!isPast && (
+                <IconButton
+                  icon={<RescheduleIcon />}
+                  label="Reschedule session"
+                  variant="info"
+                  onClick={() => setOpenEditSession(true)}
+                />
+              )}
               <IconButton
                 icon={<BinIcon />}
                 label="Delete session"
@@ -139,24 +147,6 @@ export function SessionCard({ session, isDemo, isAdmin }: SessionCardProps) {
               />
             </div>
           </>
-        )}
-
-        {isAdmin && !isPast && (
-          <div className={styles.actions_Icons}>
-            <IconButton
-              icon={<RescheduleIcon />}
-              label="Reschedule session"
-              variant="info"
-              onClick={() => setOpenEditSession(true)}
-            />
-            <IconButton
-              icon={<BinIcon />}
-              label="Delete session"
-              variant="danger"
-              disabled={isDemo}
-              onClick={() => setIsDeleteModalOpen(true)}
-            />
-          </div>
         )}
 
         {!isAdmin && dayjs(session.scheduled_at).isAfter(dayjs()) && !isWithin48Hours && (
