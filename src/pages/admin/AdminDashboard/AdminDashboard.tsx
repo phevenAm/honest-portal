@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import Avatar from "@components/shared/Avatar/Avatar";
@@ -17,6 +18,7 @@ import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchResources, selectAllResources } from "@store/slices/resourcesSlice";
+import { fetchAllSessions } from "@store/slices/sessionsSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
 import { isPageStatusLoading } from "@/Helpers/Helpers";
@@ -50,6 +52,29 @@ export default function AdminDashboard() {
     () => fetchResources(),
     "Failed to fetch resources:",
   );
+
+  useFetchOnIdle(
+    (state: RootState) => state.sessions.status,
+    () => fetchAllSessions(),
+    "Failed to fetch sessions",
+  );
+
+  const allSessions = useAppSelector((state: RootState) => state.sessions.sessions);
+
+  const nextSessionByClientId = useMemo(() => {
+    const now = new Date();
+    const map: Record<string, { paid: boolean; date: Date }> = {};
+    for (const s of allSessions) {
+      const sessionDate = new Date(s.scheduled_at);
+      if (sessionDate <= now || s.status === "cancelled") continue;
+      const clientId = s.client_id ?? "";
+      const existing = map[clientId];
+      if (!existing || sessionDate < existing.date) {
+        map[clientId] = { paid: s.paid, date: sessionDate };
+      }
+    }
+    return map;
+  }, [allSessions]);
 
   const guard = isPageStatusLoading(usersStatus, questionnairesStatus, resourcesStatus);
   if (guard) return guard;
@@ -148,21 +173,27 @@ export default function AdminDashboard() {
                 {allClients
                   .filter((user) => user.role === "client")
                   .slice(0, 4)
-                  .map((u) => (
-                    <div key={u.id} className={styles.clientRow}>
-                      <Avatar name={u?.display_name || ""} color="teal" size={36} />
-                      <div className={styles.clientInfo}>
-                        {/* //!TODO: include if they've paid or not */}
-                        <p className={styles.clientName}>
-                          {u.first_name} {u.last_name}
-                        </p>
-                        <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
-                      </div>
-
-                      <small>awaiting payment</small>
-                      {/* //!TODO: have a table of whos paid for next sessions / bulk as that is linked to the users profile and the scheduler table/page */}
-                    </div>
-                  ))}
+                  .map((u) => {
+                    const nextSession = nextSessionByClientId[u.id];
+                    return (
+                      <Link key={u.id} to={`/admin/clients/${u.id}`} className={styles.clientRowLink}>
+                        <div className={styles.clientRow}>
+                          <Avatar name={u?.display_name || `${u.first_name} ${u.last_name}`} color="teal" size={36} />
+                          <div className={styles.clientInfo}>
+                            <p className={styles.clientName}>
+                              {u.first_name} {u.last_name}
+                            </p>
+                            <p className={styles.clientMeta}>Joined {u.created_at?.split("T")[0]}</p>
+                          </div>
+                          {nextSession && (
+                            <span className={nextSession.paid ? styles.paidBadge : styles.unpaidBadge}>
+                              {nextSession.paid ? "Paid" : "Unpaid"}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 {allClients.length === 0 && <p className={styles.empty}>No clients yet. Add one to get started.</p>}
               </div>
             </div>

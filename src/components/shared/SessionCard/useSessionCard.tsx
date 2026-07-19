@@ -3,6 +3,7 @@ import { type MouseEvent } from "react";
 import dayjs from "dayjs";
 
 import { useToast } from "@/context/ToastContext";
+import { supabase } from "@/lib/supabase.js";
 import { Session, SessionEvent } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { updateSession } from "@/store/slices/sessionsSlice";
@@ -17,18 +18,26 @@ const useSessionCard = (session: Session) => {
     const actionType = e.currentTarget.getAttribute("data-action-type");
     if (actionType === "payment") {
       dispatch(updateSession({ id: session.id, paid: !session.paid }));
-      showToast(`Updated payment status`);
+      showToast("Updated payment status");
+      // notify client when admin marks as paid (not when unmarking)
+      if (!session.paid) {
+        supabase.functions.invoke("send-payment-notification", {
+          body: { session_id: session.id },
+        });
+      }
     }
   };
 
   const markAttended = () => {
-    dispatch(updateSession({ id: session.id, attended: true }));
-    showToast("Marked as attended");
+    const next = session.attended === true ? null : true;
+    dispatch(updateSession({ id: session.id, attended: next }));
+    showToast(next === true ? "Marked as attended" : "Attendance cleared");
   };
 
   const markNoShow = () => {
-    dispatch(updateSession({ id: session.id, attended: false }));
-    showToast("Marked as no show");
+    const next = session.attended === false ? null : false;
+    dispatch(updateSession({ id: session.id, attended: next }));
+    showToast(next === false ? "Marked as no show" : "Attendance cleared");
   };
 
   function getStatusClass(status: string, attended: boolean | null, paid: boolean, scheduled_at: string): string {
