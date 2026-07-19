@@ -144,10 +144,22 @@
 }
 
 .clickable {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+  font: inherit;
   cursor: pointer;
+  border-radius: var(--r-sm);
 
   &:hover {
     background: var(--bg-muted);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
   }
 }
 

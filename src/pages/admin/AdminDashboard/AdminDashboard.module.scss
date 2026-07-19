@@ -131,6 +131,14 @@
   gap: $sp-3;
 }
 
+.clientRowLink {
+  text-decoration: none;
+
+  &:hover .clientRow {
+    background: var(--border);
+  }
+}
+
 .clientRow {
   display: flex;
   align-items: center;
@@ -138,6 +146,27 @@
   padding: $sp-3;
   border-radius: var(--r-md);
   background: var(--bg-muted);
+  transition: background var(--transition-base);
+}
+
+.paidBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--success, #2d6a4f) 12%, transparent);
+  color: var(--success, #2d6a4f);
+  white-space: nowrap;
+}
+
+.unpaidBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--warning, #b45309) 12%, transparent);
+  color: var(--warning, #b45309);
+  white-space: nowrap;
 }
 
 .clientInfo {
