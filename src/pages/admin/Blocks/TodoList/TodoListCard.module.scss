@@ -1,0 +1,29 @@
+@use "../../../../styles/spacing" as *;
+
+.cardPad {
+  padding: $sp-6;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $sp-5;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.CreateTodo {
+  display: flex;
+  align-items: center;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+}

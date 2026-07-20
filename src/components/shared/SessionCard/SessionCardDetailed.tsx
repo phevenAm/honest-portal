@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 
+import Button from "@components/shared/Button";
+
 import { useToast } from "@/context/ToastContext";
 import { supabase } from "@/lib/supabase.js";
 import { Session, SessionBlockMeta, SessionEvent } from "@/models/globalTypes";
-import IconButton from "../IconButton/IconButton";
-import { BinIcon, CancelIcon, PaidIcon, RescheduleIcon, UnpaidIcon } from "../Icons/Icons";
 import CancelSessionModal from "./CancelSessionModal/CancelSessionModal";
 import ClientRescheduleModal from "./ClientRescheduleModal/ClientRescheduleModal";
 import CreateSessionModal from "./CreateSessionModal/CreateSessionModal";
@@ -162,29 +162,18 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDet
                   {session.paid ? "£ Paid" : "£ Unpaid"}
                 </button>
               </div>
-              <IconButton
-                icon={<BinIcon />}
-                label="Delete session"
-                variant="danger"
-                disabled={isDemo}
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
+              <Button size="sm" variant="danger" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+                Delete
+              </Button>
             </>
           ) : (
             <>
-              <IconButton
-                icon={<RescheduleIcon />}
-                label="Reschedule session"
-                variant="info"
-                onClick={() => setOpenEditSession(true)}
-              />
-              <IconButton
-                icon={<BinIcon />}
-                label="Delete session"
-                variant="danger"
-                disabled={isDemo}
-                onClick={() => setIsDeleteModalOpen(true)}
-              />
+              <Button size="sm" variant="secondary" onClick={() => setOpenEditSession(true)}>
+                Reschedule
+              </Button>
+              <Button size="sm" variant="danger" disabled={isDemo} onClick={() => setIsDeleteModalOpen(true)}>
+                Delete
+              </Button>
             </>
           )}
         </div>
@@ -193,10 +182,9 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDet
       {/* ── Client actions ────────────────────────────── */}
       {!isAdmin && !isPast && (
         <div className={styles.clientActions}>
-          <IconButton
-            icon={<PaidIcon />}
-            label="Pay"
-            variant="success"
+          <Button
+            size="sm"
+            variant="primary"
             disabled={isDemo || session.paid}
             onClick={() => {
               if (isWithin48Hours) {
@@ -205,11 +193,12 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDet
               }
               setIsPayModalOpen(true);
             }}
-          />
-          <IconButton
-            icon={<RescheduleIcon />}
-            label="Reschedule"
-            variant="info"
+          >
+            Pay
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
             disabled={isDemo}
             onClick={() => {
               if (isWithin48Hours) {
@@ -218,10 +207,11 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDet
               }
               setIsRescheduleModalOpen(true);
             }}
-          />
-          <IconButton
-            icon={<CancelIcon />}
-            label="Cancel session"
+          >
+            Reschedule
+          </Button>
+          <Button
+            size="sm"
             variant="danger"
             disabled={isDemo}
             onClick={() => {
@@ -231,7 +221,9 @@ export function SessionCardDetailed({ session, isDemo, isAdmin }: SessionCardDet
               }
               setIsCancelModalOpen(true);
             }}
-          />
+          >
+            Cancel
+          </Button>
         </div>
       )}
 

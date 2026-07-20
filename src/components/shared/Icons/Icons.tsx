@@ -1,8 +1,10 @@
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import CreditScoreOutlinedIcon from "@mui/icons-material/CreditScoreOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import EventRepeatOutlinedIcon from "@mui/icons-material/EventRepeatOutlined";
 import InsertLinkOutlinedIcon from "@mui/icons-material/InsertLinkOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -274,3 +276,25 @@ export const RescheduleIcon = () => <EventRepeatOutlinedIcon />;
 export const PaidIcon = () => <CreditScoreOutlinedIcon />;
 export const UnpaidIcon = () => <CreditCardOutlinedIcon />;
 export const CancelIcon = () => <CancelOutlinedIcon />;
+
+export const EditIcon = () => <CreateOutlinedIcon />;
+
+export const TickIcon = () => <DoneOutlinedIcon />;
+
+export const KeyIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="7.5" cy="15.5" r="5.5" />
+    <path d="M21 2l-9.6 9.6" />
+    <path d="M15.5 7.5l3 3L22 7l-3-3" />
+  </svg>
+);

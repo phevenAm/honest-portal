@@ -1,8 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
 import { supabase } from "../../lib/supabase";
-
-import type { Todo } from "../../models/globalTypes.ts";
+import type { Todo } from "../../models/globalTypes";
 
 type ToDoState = {
   status: string;
@@ -46,7 +44,7 @@ const todoSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(fetchAllTodos.fulfilled, (state, action) => {
-        state.todos === action.payload;
+        state.todos = action.payload;
         state.status = "succeeded";
       });
   },

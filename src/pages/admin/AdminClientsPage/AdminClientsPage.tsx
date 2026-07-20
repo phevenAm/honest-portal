@@ -8,7 +8,7 @@ import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import SplitButton from "@components/shared/SplitButton/SplitButton";
 import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
-import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
+import { useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";

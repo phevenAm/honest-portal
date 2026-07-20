@@ -4,14 +4,7 @@ import { Link } from "react-router-dom";
 import Avatar from "@components/shared/Avatar/Avatar";
 import Button from "@components/shared/Button/Button";
 import Card from "@components/shared/Card/Card";
-import {
-  BookIcon,
-  CheckIcon,
-  ClipboardIcon,
-  PlusIcon,
-  RescheduleIcon,
-  UsersIcon,
-} from "@components/shared/Icons/Icons";
+import { BookIcon, CheckIcon, ClipboardIcon, KeyIcon, RescheduleIcon, UsersIcon } from "@components/shared/Icons/Icons";
 import WIP from "@components/shared/WIP/WIP";
 import { useAuth } from "@context/AuthContext";
 import { useAppSelector, useFetchOnIdle } from "@store/hooks";
@@ -22,6 +15,7 @@ import { fetchAllSessions } from "@store/slices/sessionsSlice";
 import { fetchAllUsers, selectClientUsers } from "@store/slices/userDirectorySlice";
 
 import { isPageStatusLoading } from "@/Helpers/Helpers";
+import TodoListCard from "../Blocks/TodoList/TodoListCard";
 
 import styles from "./AdminDashboard.module.scss";
 
@@ -131,8 +125,30 @@ export default function AdminDashboard() {
     <div className="page">
       <div className="inner">
         <div className={styles.header}>
-          <h1>Welcome back, {userProfile?.first_name}</h1>
-          <p>Here's a summary of your practice portal</p>
+          <div>
+            <h1>Welcome back, {userProfile?.first_name}</h1>
+            <p>Here's a summary of your practice portal</p>
+          </div>
+          <Card className={styles.quickActionsCard}>
+            <p className={styles.quickActionsLabel}>Quick actions</p>
+            <div className={styles.quickActionsRow}>
+              <Link to="/admin/questionnaires" title="New questionnaire">
+                <div className={`${styles.metricIcon} ${styles.teal}`}>
+                  <ClipboardIcon />
+                </div>
+              </Link>
+              <Link to="/admin/resources" title="New resource">
+                <div className={`${styles.metricIcon} ${styles.stone}`}>
+                  <BookIcon />
+                </div>
+              </Link>
+              <Link to="/admin/clients" title="Create sign-up token">
+                <div className={`${styles.metricIcon} ${styles.rose}`}>
+                  <KeyIcon />
+                </div>
+              </Link>
+            </div>
+          </Card>
         </div>
 
         {/* Metrics */}
@@ -199,24 +215,8 @@ export default function AdminDashboard() {
             </div>
           </Card>
 
-          {/* Quick actions */}
-          <Card>
-            <div className={styles.cardPad}>
-              <div className={styles.cardHeader}>
-                <h3>Quick actions</h3>
-              </div>
-              <div className={styles.actionList}>
-                {quickActions.map((a) => (
-                  <Link key={a.to} to={a.to} className={styles.actionLink}>
-                    <div className={`${styles.actionItem} ${styles[a.color]}`}>
-                      <PlusIcon />
-                      {a.label}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </Card>
+          {/* To-do list */}
+          <TodoListCard />
         </div>
       </div>
     </div>

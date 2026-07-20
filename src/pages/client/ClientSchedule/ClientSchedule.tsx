@@ -7,8 +7,7 @@ import { useAuth } from "@context/AuthContext";
 import { RootState } from "@/store";
 
 import { Card, SessionCard, ToggleButtonTabs } from "@/components/shared";
-import IconButton from "@/components/shared/IconButton/IconButton";
-import { CancelIcon, PaidIcon, RescheduleIcon } from "@/components/shared/Icons/Icons";
+import Button from "@/components/shared/Button/Button";
 import CancelSessionModal from "@/components/shared/SessionCard/CancelSessionModal/CancelSessionModal";
 import ClientRescheduleModal from "@/components/shared/SessionCard/ClientRescheduleModal/ClientRescheduleModal";
 import PaySessionModal from "@/components/shared/SessionCard/PaySessionModal/PaySessionModal";
@@ -71,27 +70,30 @@ function NextSessionStrip({ session }: { session: Session }) {
           <span className={session.paid ? styles.paidBadge : styles.unpaidBadge}>
             {session.paid ? "Paid" : "Unpaid"}
           </span>
-          <IconButton
-            icon={<PaidIcon />}
-            label="Pay"
-            variant="success"
+          <Button
+            size="sm"
+            variant="primary"
             disabled={isDemo || session.paid}
             onClick={() => guardAction(() => setIsPayModalOpen(true))}
-          />
-          <IconButton
-            icon={<RescheduleIcon />}
-            label="Reschedule"
-            variant="info"
+          >
+            Pay
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
             disabled={isDemo}
             onClick={() => guardAction(() => setIsRescheduleModalOpen(true))}
-          />
-          <IconButton
-            icon={<CancelIcon />}
-            label="Cancel"
+          >
+            Reschedule
+          </Button>
+          <Button
+            size="sm"
             variant="danger"
             disabled={isDemo}
             onClick={() => guardAction(() => setIsCancelModalOpen(true))}
-          />
+          >
+            Cancel
+          </Button>
         </div>
       </Card>
 
