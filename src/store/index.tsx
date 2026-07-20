@@ -20,6 +20,7 @@ import sessionsReducer from "./slices/sessionsSlice";
 import tagsReducer from "./slices/tagsSlice";
 import themeReducer from "./slices/themeSlice";
 import userDirectoryReducer from "./slices/userDirectorySlice";
+import todoReducer from "./slices/TodoSlice.tsx";
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +33,7 @@ export const store = configureStore({
     tags: tagsReducer,
     theme: themeReducer,
     auditLogs: auditLogsReducer,
+    todos: todoReducer,
     [inspirationalQuotesApi.reducerPath]: inspirationalQuotesApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(inspirationalQuotesApi.middleware as Middleware),
