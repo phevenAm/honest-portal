@@ -8,7 +8,7 @@ import Card from "@components/shared/Card/Card";
 import ProgressChart from "@components/shared/ProgressChart/ProgressChart";
 import SplitButton from "@components/shared/SplitButton/SplitButton";
 import type { Questionnaire, Response, UserProfile } from "@models/globalTypes";
-import { useAppDispatch, useAppSelector } from "@store/hooks";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@store/hooks";
 import type { RootState } from "@store/index";
 import { fetchQuestionnaires, selectAllQuestionnaires } from "@store/slices/questionnairesSlice";
 import { fetchAllResponses, selectResponsesByUser } from "@store/slices/responsesSlice";
@@ -168,7 +168,6 @@ function ClientRow({ user }: { user: UserProfile }) {
 // ── Page ──────────────────────────────────────────────────────
 
 export default function AdminClientsPage() {
-  const dispatch = useAppDispatch();
   const allUsers = useAppSelector(selectAllUsers) as UserProfile[];
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [manageTokensModal, setManageTokensModal] = useState(false);
@@ -177,17 +176,21 @@ export default function AdminClientsPage() {
   const questionnairesStatus = useAppSelector((state: RootState) => state.questionnaires.status);
   const responsesStatus = useAppSelector((state: RootState) => state.responses.status);
 
-  useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (questionnairesStatus === "idle") dispatch(fetchQuestionnaires());
-  }, [dispatch, questionnairesStatus]);
-
-  useEffect(() => {
-    dispatch(fetchAllResponses());
-  }, [dispatch]);
+  useFetchOnIdle(
+    (state: RootState) => state.userDirectory.status,
+    () => fetchAllUsers(),
+    "Failed to fetch users:",
+  );
+  useFetchOnIdle(
+    (state: RootState) => state.responses.status,
+    () => fetchAllResponses(),
+    "Failed to fetch responses:",
+  );
+  useFetchOnIdle(
+    (state: RootState) => state.questionnaires.status,
+    () => fetchQuestionnaires(),
+    "Failed to fetch questionnaires:",
+  );
 
   const guard = isPageStatusLoading(usersStatus, questionnairesStatus, responsesStatus);
   if (guard) return guard;
