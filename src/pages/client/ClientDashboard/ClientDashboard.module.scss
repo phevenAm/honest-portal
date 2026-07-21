@@ -65,6 +65,10 @@
   .statLabel {
     color: var(--accent-dark);
   }
+
+  .statSub {
+    color: var(--accent-dark);
+  }
 }
 
 .stone {
@@ -80,6 +84,10 @@
 
   .statLabel {
     color: var(--text-primary);
+  }
+
+  .statSub {
+    color: var(--text-secondary);
   }
 }
 

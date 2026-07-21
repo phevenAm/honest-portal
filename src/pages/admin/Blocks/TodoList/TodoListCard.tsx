@@ -1,15 +1,18 @@
-import { Card, Button, Modal } from "@/components/shared";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import dayjs, { Dayjs } from "dayjs";
+import { create } from "node_modules/@mui/material/styles/createTransitions.mjs";
+
+import { RootState } from "@/store";
+
+import { Button, Card, Modal } from "@/components/shared";
+import { ModalProps } from "@/components/shared/Modal/Modal";
+import { useToast } from "@/context/ToastContext";
 import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
 import { fetchAllTodos } from "@/store/slices/TodoSlice";
 import TodoList from "./TodoList";
-import { RootState } from "@/store";
+
 import styles from "./TodoListCard.module.scss";
-import { ModalProps } from "@/components/shared/Modal/Modal";
-import dayjs, { Dayjs } from "dayjs";
-import { useToast } from "@/context/ToastContext";
-import { create } from "node_modules/@mui/material/styles/createTransitions.mjs";
 
 const TodoListCard = () => {
   const [newTodoModal, setNewTodoModal] = useState(false);
@@ -84,7 +87,7 @@ const TodoListCard = () => {
       <Card>
         <div className={styles.cardPad}>
           <div className={styles.cardHeader}>
-            <h3>Todo list</h3>
+            <h2>Todo list</h2>
             <div className={styles.CreateTodo}>
               <Button variant="ghost" size="sm" onClick={() => setNewTodoModal(true)}>
                 + Todo

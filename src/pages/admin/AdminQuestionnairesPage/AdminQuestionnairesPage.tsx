@@ -576,7 +576,7 @@ export default function AdminQuestionnairesPage() {
                 <div className={styles.qCardInner}>
                   <div className={styles.qInfo}>
                     <div className={styles.qTitleRow}>
-                      <h3>{q.title}</h3>
+                      <h2>{q.title}</h2>
                       <span className={`${styles.badge} ${q.is_active ? styles.active : styles.inactive}`}>
                         {q.is_active ? "Active" : "Paused"}
                       </span>

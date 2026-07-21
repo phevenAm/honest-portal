@@ -59,8 +59,8 @@
     font-weight: 600;
     padding: 3px 10px;
     border-radius: var(--r-full);
-    background: color-mix(in srgb, #22c55e 12%, transparent);
-    color: #16a34a;
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+    color: var(--success);
     white-space: nowrap;
 }
 

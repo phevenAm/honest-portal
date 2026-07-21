@@ -98,7 +98,7 @@ export default function SignUpPage() {
 
   if (done)
     return (
-      <div className={styles.confirmPage}>
+      <main className={styles.confirmPage}>
         <div className={styles.confirmBox}>
           <div className={styles.confirmIconWrap}>
             <MailIcon />
@@ -112,11 +112,11 @@ export default function SignUpPage() {
             ← Back to sign in
           </Link>
         </div>
-      </div>
+      </main>
     );
 
   return (
-    <div className={`${styles.page} page`}>
+    <main className={`${styles.page} page`}>
       <div className={styles.blobTop} aria-hidden="true" />
       <div className={styles.blobBottom} aria-hidden="true" />
 
@@ -177,6 +177,6 @@ export default function SignUpPage() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

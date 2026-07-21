@@ -91,7 +91,7 @@ function ResourceCard({ resource, onOpen }: { resource: Resource; onOpen: (resou
           {resource.category}
         </span>
 
-        <h3 className={styles.cardTitle}>{resource.title}</h3>
+        <h2 className={styles.cardTitle}>{resource.title}</h2>
 
         <p className={styles.excerpt}>{resource.summary}</p>
 

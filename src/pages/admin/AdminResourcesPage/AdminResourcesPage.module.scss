@@ -96,7 +96,7 @@
   text-transform: uppercase;
   padding: 2px 9px;
   border-radius: var(--r-full);
-  &.published  { background: var(--accent-light); color: var(--text-muted); }
+  &.published  { background: var(--accent-light); color: var(--accent-dark); }
   &.draft      { background: var(--bg-muted);     color: var(--text-muted); }
   &.sensitive  { background: #fde8d8;             color: #a03a00; }
 }

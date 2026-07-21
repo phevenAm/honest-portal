@@ -116,7 +116,7 @@ const SettingsPage = () => {
           <div className={styles.topRow}>
             <section className={styles.left}>
               <form className={styles.form}>
-                <h3 className={styles.sectionTitle}>Edit profile</h3>
+                <h2 className={styles.sectionTitle}>Edit profile</h2>
                 <div className={styles.field}>
                   <label htmlFor="displayName">
                     Display name <small>(shown on your dashboard — use a nickname or short name)</small>
@@ -147,7 +147,7 @@ const SettingsPage = () => {
 
           {!isAdmin && (
             <section className={styles.keywords}>
-              <h3>Focus keywords</h3>
+              <h2>Focus keywords</h2>
               <p>Pick topics that shape the quotes you see on your dashboard.</p>
               <div className={styles.chipList}>
                 {KEYWORDS.map((kw) => (
@@ -189,7 +189,7 @@ const SettingsPage = () => {
         {isAdmin && (
           <Card className={styles.card}>
             <section className={styles.businessSection}>
-              <h3>Business information</h3>
+              <h2>Business information</h2>
               <p>This information can be used across the app and in client communications.</p>
               <form className={styles.form}>
                 {BUSINESS_FIELDS.map(({ key, label }) => (
