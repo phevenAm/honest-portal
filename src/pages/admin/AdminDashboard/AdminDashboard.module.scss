@@ -49,6 +49,10 @@
 
   a {
     text-decoration: none;
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+    }
   }
 
   // override metric icon size and remove card-specific bottom margin
