@@ -1,0 +1,96 @@
+@use "../../../../styles/spacing" as *;
+@use "../../../../styles/mixins" as *;
+
+.cardPad {
+  padding: $sp-6;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $sp-5;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.CreateTodo {
+  display: flex;
+  align-items: center;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── New todo modal ─────────────────────────────────────────
+
+.newItem {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+  margin-bottom: $sp-5;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-2;
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  input {
+    @include input-base;
+  }
+
+  select {
+    @include input-base;
+    cursor: pointer;
+  }
+}
+
+.checkContainer {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  padding-right: $sp-3;
+
+
+  label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+
+}
+
+.actionContainer {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: $sp-3;
+  justify-content: space-between;
+  width: 100%;
+
+  .buttons {
+    display: flex;
+    gap: $sp-3;
+  }
+}

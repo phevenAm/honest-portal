@@ -10,11 +10,11 @@ import UploadAndDisplayImage from "@components/shared/UploadAndDisplayImage/Uplo
 import { useAuth } from "@context/AuthContext";
 import { useToast } from "@context/ToastContext";
 
+import Spinner from "@/components/shared/Spinner/Spinner";
 import { supabase } from "@/lib/supabase";
 import DeleteUserModal from "./DeleteUserModal/DeleteUserModal";
 
 import styles from "./SettingsPage.module.scss";
-import Spinner from "@/components/shared/Spinner/Spinner";
 
 const BUSINESS_FIELDS = [
   { key: "business_name", label: "Business name" },

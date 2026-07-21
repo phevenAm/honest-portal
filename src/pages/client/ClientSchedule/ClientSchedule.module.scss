@@ -10,20 +10,23 @@
     align-items: center;
     justify-content: space-between;
     gap: $sp-4;
-    padding: $sp-4 $sp-5;
+    padding: $sp-5 $sp-6;
     margin-bottom: $sp-4;
     flex-wrap: wrap;
+    background: var(--bg-card);
+    border-left: 6px solid var(--accent);
+    box-shadow: var(--shadow-md);
 }
 
 .stripLeft {
     display: flex;
     flex-direction: column;
-    gap: $sp-1;
+    gap: $sp-2;
 }
 
 .stripDate {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-primary);
     margin: 0;
 }
@@ -32,8 +35,8 @@
     display: flex;
     align-items: center;
     gap: $sp-2;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
 }
 
 .joinLink {

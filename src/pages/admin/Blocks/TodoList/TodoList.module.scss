@@ -1,0 +1,13 @@
+@use "../../../../styles/spacing" as *;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-2;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}

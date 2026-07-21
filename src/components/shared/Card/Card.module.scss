@@ -7,10 +7,6 @@
   overflow: hidden;
   height: 100%;
   transition: box-shadow var(--transition-base);
-
-  &:hover {
-    box-shadow: var(--shadow-md);
-  }
 }
 
 .clickable {

@@ -191,3 +191,5 @@ export type SessionEvent = {
   metadata: { from?: string; to?: string } | null;
   created_at: string;
 };
+
+export type Todo = Tables<"admin_todos">;

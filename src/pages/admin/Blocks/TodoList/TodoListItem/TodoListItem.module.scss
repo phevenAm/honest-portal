@@ -1,0 +1,86 @@
+@use "../../../../../styles/spacing" as *;
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-3;
+  padding: $sp-3 $sp-4;
+  background: var(--bg-muted);
+  border-radius: var(--r-md);
+  transition: background var(--transition-base);
+
+  &:hover {
+    background: var(--border);
+  }
+
+  // unnamed div wrapping meta + actions
+  >div:last-child {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    flex-shrink: 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  flex: 1;
+  min-width: 0;
+
+  p {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// priority badge — the <span>{priority}</span>
+.priority {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: var(--r-full);
+  flex-shrink: 0;
+  text-transform: uppercase;
+
+  &.p1 {
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+    color: color-mix(in srgb, var(--danger) 60%, #000000 40%);
+  }
+
+  &.p2 {
+    background: color-mix(in srgb, var(--warning) 18%, transparent);
+    color: #92600a;
+  }
+
+  &.p3 {
+    background: var(--bg-muted);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $sp-1;
+}
+
+.completed h3 {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
