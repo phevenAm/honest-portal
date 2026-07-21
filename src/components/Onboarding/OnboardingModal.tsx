@@ -136,7 +136,7 @@ export default function OnboardingModal({ onComplete }: Props) {
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modal}>
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-label="Personalize your account">
         {!isAdmin && (
           <div className={styles.stepDots}>
             <span className={step === 1 ? styles.dotActive : styles.dot} />

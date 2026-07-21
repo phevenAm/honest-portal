@@ -178,7 +178,7 @@ export default function AdminDashboard() {
           <Card>
             <div className={styles.cardPad}>
               <div className={styles.cardHeader}>
-                <h3>Your clients</h3>
+                <h2>Your clients</h2>
                 <Link to="/admin/clients" style={{ textDecoration: "none" }}>
                   <Button variant="ghost" size="sm">
                     Manage

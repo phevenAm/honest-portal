@@ -247,7 +247,7 @@ export default function ProgressChart({ responses, questions, title = "Your Prog
     <Card className={styles.card}>
       <div className={styles.chartHeader}>
         <div className={styles.chartMeta}>
-          <h3>{title}</h3>
+          <h2>{title}</h2>
           <p>
             {responses.length} check-in{responses.length !== 1 ? "s" : ""} tracked
           </p>

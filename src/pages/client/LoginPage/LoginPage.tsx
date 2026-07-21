@@ -66,7 +66,7 @@ export default function LoginPage() {
   const isLoading = submitting || loading;
 
   return (
-    <div className={`${styles.page} page`}>
+    <main className={`${styles.page} page`}>
       <div className={`${styles.container} container`}>
         <div className={styles.logoWrap}>
           <div className={styles.logoMark}>
@@ -155,6 +155,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

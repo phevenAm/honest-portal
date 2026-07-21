@@ -203,7 +203,7 @@ function QuestionnaireBuilder({
 
       <div className={styles.questionsSection}>
         <div className={styles.questionsSectionHeader}>
-          <h4>Questions</h4>
+          <h3>Questions</h3>
           <Button variant="secondary" size="sm" onClick={addQuestion}>
             + Add question
           </Button>
@@ -230,7 +230,11 @@ function QuestionnaireBuilder({
               className={styles.questionTextInput}
             />
             <div className={styles.questionInputs}>
-              <select value={q.type} onChange={(e) => updateQuestion(q.id, "type", e.target.value)}>
+              <select
+                aria-label="Question type"
+                value={q.type}
+                onChange={(e) => updateQuestion(q.id, "type", e.target.value)}
+              >
                 {QUESTION_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {t === "scale" ? "Scale (1–10)" : "Free text"}
@@ -270,6 +274,7 @@ function QuestionnaireBuilder({
                       </div>
                     ) : (
                       <select
+                        aria-label="Chart tag"
                         value={q.tag_id ?? ""}
                         onChange={(e) => {
                           if (e.target.value === "__new__") {
@@ -576,7 +581,7 @@ export default function AdminQuestionnairesPage() {
                 <div className={styles.qCardInner}>
                   <div className={styles.qInfo}>
                     <div className={styles.qTitleRow}>
-                      <h3>{q.title}</h3>
+                      <h2>{q.title}</h2>
                       <span className={`${styles.badge} ${q.is_active ? styles.active : styles.inactive}`}>
                         {q.is_active ? "Active" : "Paused"}
                       </span>
