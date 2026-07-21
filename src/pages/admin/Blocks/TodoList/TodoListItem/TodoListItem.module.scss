@@ -54,7 +54,7 @@
 
   &.p1 {
     background: color-mix(in srgb, var(--danger) 12%, transparent);
-    color: var(--danger);
+    color: color-mix(in srgb, var(--danger) 60%, #000000 40%);
   }
 
   &.p2 {

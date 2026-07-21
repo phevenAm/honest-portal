@@ -6,10 +6,10 @@ import Button from "@components/shared/Button/Button";
 
 import styles from "./Modal.module.scss";
 
-type ModalProps = {
+export type ModalProps = {
   title: string;
   onClose: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   actions?: React.ReactNode;
   size?: "sm" | "md" | "lg";
 };
@@ -64,10 +64,10 @@ export default function Modal({ title, onClose, children, actions, size = "md" }
           </Button>
         </header>
 
-        <main className={styles.modalBody}>
+        <div className={styles.modalBody}>
           <div className={styles.children}>{children}</div>
           {actions && <div className={styles.modalActions}>{actions}</div>}
-        </main>
+        </div>
       </div>
     </div>
   );
