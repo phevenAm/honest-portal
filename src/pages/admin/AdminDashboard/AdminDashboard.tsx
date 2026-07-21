@@ -143,7 +143,7 @@ export default function AdminDashboard() {
                 </div>
               </Link>
               <Link to="/admin/clients" title="Create sign-up token">
-                <div className={`${styles.metricIcon} ${styles.rose}`}>
+                <div className={`${styles.metricIcon} ${styles.coral}`}>
                   <KeyIcon />
                 </div>
               </Link>

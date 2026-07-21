@@ -55,17 +55,29 @@
   &.p1 {
     background: color-mix(in srgb, var(--danger) 12%, transparent);
     color: color-mix(in srgb, var(--danger) 60%, #000000 40%);
+
+    :global(.dark) & {
+      color: var(--danger);
+    }
   }
 
   &.p2 {
     background: color-mix(in srgb, var(--warning) 18%, transparent);
     color: #92600a;
+
+    :global(.dark) & {
+      color: var(--warning);
+    }
   }
 
   &.p3 {
     background: var(--bg-muted);
     border: 1px solid var(--border);
     color: var(--text-muted);
+
+    :global(.dark) & {
+      color: var(--text-secondary);
+    }
   }
 }
 
