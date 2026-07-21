@@ -1,6 +1,8 @@
+@use '../styles/mixins' as *;
+
 .toast {
   position: fixed;
-  bottom: 24px;
+  top: 54px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-card);
@@ -13,7 +15,7 @@
   z-index: 9999;
   white-space: nowrap;
   pointer-events: none;
-  animation: slideUp 0.2s ease;
+  animation: slideDown 250ms ease-in-out;
 
   &.neutral {
     color: var(--text-primary);
@@ -33,17 +35,5 @@
     background: var(--warning-light);
     color: var(--text-primary);
 
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateX(-50%) translateY(8px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
   }
 }

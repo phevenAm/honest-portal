@@ -139,3 +139,32 @@
   position: relative;
   overflow: scroll;
 }
+
+
+
+
+// ----- Animations ---------------------------------
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
