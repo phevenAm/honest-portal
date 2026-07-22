@@ -6,12 +6,14 @@ export { default as Footer } from "./Footer/Footer";
 export { default as IconButton } from "./IconButton/IconButton";
 export {
   ArticleIcon,
+  BinIcon,
   BookIcon,
   CheckIcon,
   ChevronDown,
   ClipboardIcon,
   CloseIcon,
   DocumentIcon,
+  EditIcon,
   LinkIcon,
   LogoIcon,
   MailIcon,
@@ -19,10 +21,8 @@ export {
   MoonIcon,
   PlusIcon,
   Settingsicon,
-  TickIcon,
-  EditIcon,
-  BinIcon,
   SunIcon,
+  TickIcon,
   UsersIcon,
   VideoIcon,
 } from "./Icons/Icons";

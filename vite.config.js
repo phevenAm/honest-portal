@@ -40,6 +40,7 @@ export default defineConfig({
     historyApiFallback: true,
   },
   test: {
+    include: ["src/**/*.{test,spec}.{ts,tsx,js}"],
     environment: "jsdom",
     setupFiles: "src/test/setupTests.js",
     env: {

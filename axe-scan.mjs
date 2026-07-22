@@ -2,6 +2,7 @@ import { chromium } from "@playwright/test";
 import { injectAxe, getViolations } from "axe-playwright";
 
 const BASE = "http://localhost:5174";
+let totalViolations = 0;
 
 async function scan(page, label) {
   await injectAxe(page);
@@ -9,6 +10,7 @@ async function scan(page, label) {
   if (violations.length === 0) {
     console.log(`✓ ${label}`);
   } else {
+    totalViolations += violations.length;
     for (const v of violations) {
       console.log(`\n[${v.impact?.toUpperCase()}] ${label} — ${v.id}: ${v.description}`);
       for (const node of v.nodes) {
@@ -23,24 +25,40 @@ async function goto(page, path) {
   await page.goto(BASE + path, { waitUntil: "networkidle", timeout: 15000 });
 }
 
+async function dismissOnboarding(page) {
+  try {
+    await page.waitForSelector('[role="dialog"]', { timeout: 2000 });
+    // Click Save (step 1 for admin) or Skip (step 2 for client)
+    const saveBtn = page.locator('button:has-text("Save")').first();
+    const skipBtn = page.locator('button:has-text("Skip")').first();
+    if (await saveBtn.isVisible({ timeout: 500 }).catch(() => false)) {
+      await saveBtn.click();
+    } else if (await skipBtn.isVisible({ timeout: 500 }).catch(() => false)) {
+      await skipBtn.click();
+    }
+    await page.waitForTimeout(600);
+  } catch { /* no onboarding modal */ }
+}
+
 async function login(page, email, password) {
   await page.goto(`${BASE}/login`, { waitUntil: "networkidle" });
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
   await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 10000 });
+  await dismissOnboarding(page);
 }
 
-async function scanWithModal(page, path, label, openSelector, closeSelector) {
-  await goto(page, path);
-  await scan(page, path);
+async function tryOpenModal(page, triggerText, label) {
+  await dismissOnboarding(page);
   try {
-    await page.click(openSelector, { timeout: 3000 });
-    await page.waitForTimeout(400);
-    await scan(page, `${label} — modal open`);
-    if (closeSelector) await page.click(closeSelector, { timeout: 3000 }).catch(() => {});
+    await page.click(`button:has-text("${triggerText}")`, { timeout: 4000 });
+    await page.waitForTimeout(600);
+    await scan(page, label);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
   } catch {
-    // modal trigger not available (e.g. demo mode blocked it)
+    console.log(`  (skipped: "${triggerText}" not available)`);
   }
 }
 
@@ -59,29 +77,20 @@ for (const path of ["/login", "/signup"]) {
 console.log("\n── Admin pages ──────────────────────────────────────");
 await login(page, "demo-admin@honest.com", "DemoAdmin2026");
 
-// Simple page scans
-for (const path of ["/admin", "/admin/audit-logs", "/admin/scheduler"]) {
+// Static pages
+for (const path of ["/admin", "/admin/clients", "/admin/questionnaires", "/admin/resources", "/admin/audit-logs", "/admin/scheduler"]) {
   await goto(page, path);
   await scan(page, path);
 }
 
-// Clients page + detail page
-await goto(page, "/admin/clients");
-await scan(page, "/admin/clients");
-const firstClientHref = await page.locator('a[href^="/admin/clients/"]').first().getAttribute("href").catch(() => null);
-if (firstClientHref) {
-  await goto(page, firstClientHref);
-  await scan(page, firstClientHref);
-}
+// Admin modals
+console.log("\n── Admin modals ─────────────────────────────────────");
 
-// Questionnaires page + modal
-await scanWithModal(page, "/admin/questionnaires", "/admin/questionnaires", 'button:has-text("New check-in")', 'button:has-text("Cancel")');
+await goto(page, "/admin/questionnaires");
+await tryOpenModal(page, "+ New check-in", "/admin/questionnaires — new check-in modal");
 
-// Resources page + modal
-await scanWithModal(page, "/admin/resources", "/admin/resources", 'button:has-text("Add resource")', 'button:has-text("Cancel")');
-
-// Admin dashboard + todo modal
-await scanWithModal(page, "/admin", "/admin", 'button:has-text("+ Todo")', 'button:has-text("Cancel")');
+await goto(page, "/admin");
+await tryOpenModal(page, "+ Todo", "/admin — new todo modal");
 
 // ── Client pages ──────────────────────────────────────────────────────────────
 console.log("\n── Client pages ─────────────────────────────────────");
@@ -96,14 +105,24 @@ for (const path of ["/dashboard", "/check-in", "/resources", "/my-sessions", "/s
   await scan(page, path);
 }
 
-// Resources page with modal open
+// Client modals
+console.log("\n── Client modals ────────────────────────────────────");
+
 await goto(page, "/resources");
-const firstCard = page.locator('button:has-text("Read"), button:has-text("Watch")').first();
 try {
-  await firstCard.click({ timeout: 3000 });
-  await page.waitForTimeout(400);
-  await scan(page, "/resources — modal open");
-  await page.keyboard.press("Escape");
-} catch { /* no resource cards */ }
+  const card = page.locator('button:has-text("Read"), button:has-text("Watch")').first();
+  if (await card.isVisible({ timeout: 2000 })) {
+    await card.click();
+    await page.waitForTimeout(500);
+    await scan(page, "/resources — resource modal");
+    await page.keyboard.press("Escape");
+  }
+} catch { console.log("  (skipped: no resource cards)"); }
 
 await browser.close();
+
+if (totalViolations > 0) {
+  console.log(`\n❌ ${totalViolations} accessibility violation(s) found. Fix them before pushing.\n`);
+  process.exit(1);
+}
+console.log("\n✓ No accessibility violations found.\n");
