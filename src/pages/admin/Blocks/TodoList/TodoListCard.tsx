@@ -7,8 +7,8 @@ import { RootState } from "@/store";
 import { Button, Card, Modal } from "@/components/shared";
 import { ModalProps } from "@/components/shared/Modal/Modal";
 import { useToast } from "@/context/ToastContext";
-import { useAppSelector, useFetchOnIdle, useAppDispatch } from "@/store/hooks";
-import { fetchAllTodos, createTodoItem } from "@/store/slices/TodoSlice";
+import { useAppDispatch, useAppSelector, useFetchOnIdle } from "@/store/hooks";
+import { createTodoItem, fetchAllTodos } from "@/store/slices/TodoSlice";
 import TodoList from "./TodoList";
 
 import styles from "./TodoListCard.module.scss";
@@ -42,7 +42,6 @@ const TodoListCard = () => {
     resetAllButModal();
     setNewTodoModal(false);
   };
-  resetAllButModal;
 
   const handleCreate = async () => {
     if (!newTodoText) {
@@ -50,23 +49,22 @@ const TodoListCard = () => {
       return;
     }
     setIsLoading(true);
-    //!if successful
     const submissionInformation = {
       deadline: newTodoDate ? newTodoDate.toISOString() : null,
       text: newTodoText,
       priority: newTodoPriority,
     };
     try {
-      await dispatch(createTodoItem(submissionInformation));
+      await dispatch(createTodoItem(submissionInformation)).unwrap();
       showToast("Task created", "success");
       resetAllButModal();
       if (!isCreateMultiple) {
         setNewTodoModal(false);
       }
-    } catch (error) {
-      showToast((error.message as string) || "Somthing went wrong, please reload and try again", "danger");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Something went wrong, please reload and try again";
+      showToast(message, "danger");
     }
-    // resetAllButModal();
     setIsLoading(false);
   };
 

@@ -46,6 +46,43 @@ export const createTodoItem = createAsyncThunk<
 
   return data as Todo;
 });
+
+export const deleteTodoItem = createAsyncThunk<string, string>(
+  "todos/deleteTodoitem",
+  async (id, { rejectWithValue }) => {
+    const { error } = await supabase.from("admin_todos").delete().eq("id", id);
+
+    if (error) {
+      return rejectWithValue((error.message as string) || "Failed to delete, please reload and try again");
+    }
+    return id;
+  },
+);
+
+// export const updateResource = createAsyncThunk<Resource, UpdateResource>(
+//   "resources/updateResource",
+//   async ({ id, ...fields }, { rejectWithValue }) => {
+//     const { data, error } = await supabase
+//       .from("resources")
+//       .update({ ...fields, updated_at: new Date().toISOString() })
+//       .eq("id", id)
+//       .select()
+//       .single();
+//     if (error) return rejectWithValue(error.message);
+//     return data;
+//   },
+// );
+
+// export const deleteResource = createAsyncThunk<string, string>(
+//   "resources/deleteResource",
+//   async (id, { rejectWithValue }) => {
+//     const { error } = await supabase.from("resources").delete().eq("id", id);
+//     if (error) return rejectWithValue(error.message);
+//     return id;
+//   },
+// );
+
+//!Slice
 const todoSlice = createSlice({
   name: "todo",
   initialState,
@@ -78,6 +115,17 @@ const todoSlice = createSlice({
       .addCase(createTodoItem.fulfilled, (state, action) => {
         state.todos.unshift(action.payload);
         state.status = "succeeded";
+      })
+      .addCase(deleteTodoItem.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // const todoIndex = state.todos.indexOf(action.payload)
+        state.todos = state.todos.filter((s) => s.id !== action.payload);
+      })
+      .addCase(deleteTodoItem.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteTodoItem.rejected, (state, action) => {
+        state.status = "failed";
       });
   },
 });
