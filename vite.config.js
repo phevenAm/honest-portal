@@ -37,6 +37,7 @@ export default defineConfig({
     devSourcemap: true,
   },
   server: {
+    port: 5174,
     historyApiFallback: true,
   },
   test: {
