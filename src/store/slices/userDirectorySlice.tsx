@@ -45,38 +45,7 @@ export const deleteOwnAccount = createAsyncThunk(
 const userDirectorySlice = createSlice({
   name: "userDirectory",
   initialState,
-  reducers: {
-    addUser: (state, action) => {
-      const exists = state.users.find((u) => u.email === action.payload.email);
-
-      if (!exists) {
-        state.users.push({
-          id: `user-${Date.now()}`,
-          firstName: action.payload.first_name,
-          lastName: action.payload.last_name,
-          role: action.payload.role,
-          joinedAt: new Date().toISOString().split("T")[0],
-          avatar: action.payload.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase(),
-          color: ["sage", "lavender", "blush", "sky", "peach"][state.users.length % 5],
-          ...action.payload,
-        });
-      }
-    },
-    updateUser: (state, action) => {
-      const index = state.users.findIndex((u) => u.id === action.payload.id);
-
-      if (index !== -1) {
-        state.users[index] = {
-          ...state.users[index],
-          ...action.payload,
-        };
-      }
-    },
-  },
+  reducers: {},
 
   extraReducers: (builder) => {
     builder
@@ -109,8 +78,6 @@ const userDirectorySlice = createSlice({
       .addCase("RESET_ALL", () => initialState);
   },
 });
-
-export const { addUser, updateUser } = userDirectorySlice.actions;
 
 // Selectors
 export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users;
