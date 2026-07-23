@@ -47,7 +47,7 @@
   gap: $sp-3;
   margin-bottom: $sp-2;
 
-  h3 {
+  h2 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -171,7 +171,7 @@
   align-items: center;
   margin-bottom: $sp-3;
 
-  h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+  h3 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0; }
 }
 
 .questionBlock {

@@ -145,6 +145,14 @@
       },
       "nursery": {}
     },
-    "includes": ["**", "!**/*test.spec.*", "!**/mocks", "!**/node_modules", "!**/dist/**"]
+    "includes": [
+      "**",
+      "!**/*test.spec.*",
+      "!**/mocks",
+      "!**/node_modules",
+      "!**/dist/**",
+      "!supabase/**",
+      "!axe-scan.mjs"
+    ]
   }
 }

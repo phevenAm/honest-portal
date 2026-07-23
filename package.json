@@ -27,12 +27,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
+    "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/react-big-calendar": "^1.16.3",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/ui": "^4.1.7",
+    "axe-playwright": "^2.2.2",
     "jest-axe": "^10.0.0",
     "jsdom": "^29.1.1",
     "sass": "^1.99.0",
@@ -54,6 +56,9 @@
     "format": "biome format --write .",
     "lint:fix": "biome check --write .",
     "ci:check": "biome check .",
-    "update-types": "npx --yes supabase gen types typescript --project-id mxyfdvfbdrusbjiozuzx --schema public > src/models/database.types.ts --debug"
+    "update-types": "npx --yes supabase gen types typescript --project-id mxyfdvfbdrusbjiozuzx --schema public > src/models/database.types.ts --debug",
+    "axe": "playwright test --ui",
+    "axe:run": "playwright test",
+    "a11y": "node axe-scan.mjs"
   }
 }

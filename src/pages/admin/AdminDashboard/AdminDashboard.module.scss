@@ -124,19 +124,19 @@
   }
 
   &.peach {
-    background: var(--warning-light);
+    background: color-mix(in srgb, var(--warning) 18%, transparent);
     color: #78350f;
+
+    :global(.dark) & {
+      color: var(--warning);
+    }
   }
 
   &.coral {
-    background: var(--danger-light);
+    background: color-mix(in srgb, var(--danger) 18%, transparent);
     color: var(--danger);
   }
 
-  &.rose {
-    background: color-mix(in srgb, #e879a0 12%, transparent);
-    color: #be185d;
-  }
 }
 
 .metricValue {
@@ -180,7 +180,7 @@
   align-items: center;
   margin-bottom: $sp-5;
 
-  h3 {
+  h2 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);

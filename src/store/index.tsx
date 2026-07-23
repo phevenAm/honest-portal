@@ -17,10 +17,10 @@ import questionnairesReducer from "./slices/questionnairesSlice";
 import resourcesReducer from "./slices/resourcesSlice";
 import responsesReducer from "./slices/responsesSlice";
 import sessionsReducer from "./slices/sessionsSlice";
+import todoReducer from "./slices/TodoSlice.tsx";
 import tagsReducer from "./slices/tagsSlice";
 import themeReducer from "./slices/themeSlice";
 import userDirectoryReducer from "./slices/userDirectorySlice";
-import todoReducer from "./slices/TodoSlice.tsx";
 
 export const store = configureStore({
   reducer: {

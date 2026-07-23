@@ -37,9 +37,11 @@ export default defineConfig({
     devSourcemap: true,
   },
   server: {
+    port: 5174,
     historyApiFallback: true,
   },
   test: {
+    include: ["src/**/*.{test,spec}.{ts,tsx,js}"],
     environment: "jsdom",
     setupFiles: "src/test/setupTests.js",
     env: {

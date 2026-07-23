@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { supabase } from "../../lib/supabase.js";
 import type { UserProfile } from "../../models/globalTypes.js";
@@ -45,38 +45,7 @@ export const deleteOwnAccount = createAsyncThunk(
 const userDirectorySlice = createSlice({
   name: "userDirectory",
   initialState,
-  reducers: {
-    addUser: (state, action) => {
-      const exists = state.users.find((u) => u.email === action.payload.email);
-
-      if (!exists) {
-        state.users.push({
-          id: `user-${Date.now()}`,
-          firstName: action.payload.first_name,
-          lastName: action.payload.last_name,
-          role: action.payload.role,
-          joinedAt: new Date().toISOString().split("T")[0],
-          avatar: action.payload.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase(),
-          color: ["sage", "lavender", "blush", "sky", "peach"][state.users.length % 5],
-          ...action.payload,
-        });
-      }
-    },
-    updateUser: (state, action) => {
-      const index = state.users.findIndex((u) => u.id === action.payload.id);
-
-      if (index !== -1) {
-        state.users[index] = {
-          ...state.users[index],
-          ...action.payload,
-        };
-      }
-    },
-  },
+  reducers: {},
 
   extraReducers: (builder) => {
     builder
@@ -110,16 +79,20 @@ const userDirectorySlice = createSlice({
   },
 });
 
-export const { addUser, updateUser } = userDirectorySlice.actions;
-
 // Selectors
 export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users;
 
 export const selectUserById = (id: string) => (state: { userDirectory: UserDirectoryState }) =>
   state.userDirectory.users.find((u) => u.id === id);
 
-export const selectClientUsers = (state: { userDirectory: UserDirectoryState }) =>
-  state.userDirectory.users.filter((u) => u.role === "client");
+export const selectClientUsers = createSelector(
+  // 1. input: grab the users array from state
+  (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users,
+
+  // 2. result: filter it — only runs if users array actually changed
+  (users) => users.filter((u) => u.role === "client"),
+);
+
 export const selectUserCount = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users.length;
 
 export default userDirectorySlice.reducer;
