@@ -25,6 +25,21 @@ async function goto(page, path) {
   await page.goto(BASE + path, { waitUntil: "networkidle", timeout: 15000 });
 }
 
+async function setDarkMode(page, enabled) {
+  await page.evaluate((dark) => {
+    if (dark) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, enabled);
+}
+
+async function scanBothModes(page, label, scanFn) {
+  await setDarkMode(page, false);
+  await scanFn(`${label} [light]`);
+  await setDarkMode(page, true);
+  await scanFn(`${label} [dark]`);
+  await setDarkMode(page, false);
+}
+
 async function dismissOnboarding(page) {
   try {
     await page.waitForSelector('[role="dialog"]', { timeout: 2000 });
@@ -50,14 +65,14 @@ async function login(page, email, password) {
 
 async function scanWithModal(page, path, label, openSelector, closeSelector) {
   await goto(page, path);
-  await scan(page, path);
+  await scan(page, label);
   try {
     await page.click(openSelector, { timeout: 3000 });
     await page.waitForTimeout(400);
     await scan(page, `${label} — modal open`);
     if (closeSelector) await page.click(closeSelector, { timeout: 3000 }).catch(() => {});
   } catch {
-    // modal trigger not available (e.g. demo mode blocked it)
+    // modal trigger not available
   }
 }
 
@@ -68,33 +83,45 @@ const page = await context.newPage();
 // ── Public pages ──────────────────────────────────────────────────────────────
 console.log("\n── Public pages ─────────────────────────────────────");
 for (const path of ["/login", "/signup"]) {
-  await goto(page, path);
-  await scan(page, path);
+  await scanBothModes(page, path, async (label) => {
+    await goto(page, path);
+    await scan(page, label);
+  });
 }
 
 // ── Admin pages ───────────────────────────────────────────────────────────────
 console.log("\n── Admin pages ──────────────────────────────────────");
 await login(page, "demo-admin@honest.com", "DemoAdmin2026");
 
-for (const path of ["/admin", "/admin/audit-logs", "/admin/scheduler"]) {
-  await goto(page, path);
-  await scan(page, path);
+const adminPaths = ["/admin", "/admin/clients", "/admin/audit-logs", "/admin/scheduler"];
+for (const path of adminPaths) {
+  await scanBothModes(page, path, async (label) => {
+    await goto(page, path);
+    await scan(page, label);
+  });
 }
 
-// Clients page + first client detail page
-await goto(page, "/admin/clients");
-await scan(page, "/admin/clients");
+// First client detail page
 const firstClientHref = await page.locator('a[href^="/admin/clients/"]').first().getAttribute("href").catch(() => null);
 if (firstClientHref) {
-  await goto(page, firstClientHref);
-  await scan(page, firstClientHref);
+  await scanBothModes(page, firstClientHref, async (label) => {
+    await goto(page, firstClientHref);
+    await scan(page, label);
+  });
 }
 
 // ── Admin modals ──────────────────────────────────────────────────────────────
 console.log("\n── Admin modals ─────────────────────────────────────");
-await scanWithModal(page, "/admin/questionnaires", "/admin/questionnaires", 'button:has-text("New check-in")', 'button:has-text("Cancel")');
-await scanWithModal(page, "/admin/resources", "/admin/resources", 'button:has-text("Add resource")', 'button:has-text("Cancel")');
-await scanWithModal(page, "/admin", "/admin", 'button:has-text("+ Todo")', 'button:has-text("Cancel")');
+const adminModals = [
+  { path: "/admin/questionnaires", open: 'button:has-text("New check-in")', close: 'button:has-text("Cancel")' },
+  { path: "/admin/resources", open: 'button:has-text("Add resource")', close: 'button:has-text("Cancel")' },
+  { path: "/admin", open: 'button:has-text("+ Todo")', close: 'button:has-text("Cancel")' },
+];
+for (const { path, open, close } of adminModals) {
+  await scanBothModes(page, path, async (label) => {
+    await scanWithModal(page, path, label, open, close);
+  });
+}
 
 // ── Client pages ──────────────────────────────────────────────────────────────
 console.log("\n── Client pages ─────────────────────────────────────");
@@ -104,21 +131,26 @@ await page.reload({ waitUntil: "networkidle" });
 await page.waitForSelector('input[type="email"]', { timeout: 10000 });
 await login(page, "demo-client@honest.com", "DemoClient2026");
 
-for (const path of ["/dashboard", "/check-in", "/resources", "/my-sessions", "/settings"]) {
-  await goto(page, path);
-  await scan(page, path);
+const clientPaths = ["/dashboard", "/check-in", "/resources", "/my-sessions", "/settings"];
+for (const path of clientPaths) {
+  await scanBothModes(page, path, async (label) => {
+    await goto(page, path);
+    await scan(page, label);
+  });
 }
 
 // ── Client modals ─────────────────────────────────────────────────────────────
 console.log("\n── Client modals ────────────────────────────────────");
-await goto(page, "/resources");
 const firstCard = page.locator('button:has-text("Read"), button:has-text("Watch")').first();
-try {
-  await firstCard.click({ timeout: 3000 });
-  await page.waitForTimeout(400);
-  await scan(page, "/resources — modal open");
-  await page.keyboard.press("Escape");
-} catch { /* no resource cards */ }
+await scanBothModes(page, "/resources — modal", async (label) => {
+  await goto(page, "/resources");
+  try {
+    await firstCard.click({ timeout: 3000 });
+    await page.waitForTimeout(400);
+    await scan(page, label);
+    await page.keyboard.press("Escape");
+  } catch { /* no resource cards */ }
+});
 
 await browser.close();
 

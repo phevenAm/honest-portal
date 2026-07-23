@@ -88,6 +88,10 @@
 .meta {
   font-size: 0.75rem;
   color: var(--text-muted);
+
+  :global(.dark) & {
+    color: var(--text-secondary);
+  }
 }
 
 .actions {
@@ -98,5 +102,5 @@
 
 .completed p {
   text-decoration: line-through;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }

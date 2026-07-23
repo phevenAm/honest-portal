@@ -66,7 +66,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           to={isAdmin ? "/admin" : "/dashboard"}
-          aria-label="WithMe — home"
+          aria-label={isAdmin ? "WithMe Admin — home" : "WithMe — home"}
           className={styles.logo}
           data-testid="logo-link"
         >
@@ -78,7 +78,11 @@ export default function Navbar() {
             )}
           </div>
           <span className={styles.logoText}>WithMe</span>
-          {isAdmin && <span className={styles.adminBadge}>Admin</span>}
+          {isAdmin && (
+            <span className={styles.adminBadge} aria-hidden="true">
+              Admin
+            </span>
+          )}
         </Link>
 
         {/* Desktop nav links */}

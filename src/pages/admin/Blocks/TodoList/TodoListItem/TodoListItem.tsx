@@ -1,11 +1,12 @@
+import { useState } from "react";
+
 import { BinIcon, EditIcon, IconButton, TickIcon } from "@/components/shared";
+import { useToast } from "@/context/ToastContext";
 import type { Todo } from "@/models/globalTypes";
+import { useAppDispatch } from "@/store/hooks";
+import { deleteTodoItem, updateTodoItem } from "@/store/slices/TodoSlice";
 
 import styles from "./TodoListItem.module.scss";
-import { deleteTodoItem, updateTodoItem } from "@/store/slices/TodoSlice";
-import { useAppDispatch } from "@/store/hooks";
-import { useToast } from "@/context/ToastContext";
-import { useState } from "react";
 
 const PRIORITY_LABELS: Record<number, string> = { 1: "High", 2: "Med", 3: "Low" };
 const PRIORITY_CLASSES: Record<number, string> = { 1: styles.p1, 2: styles.p2, 3: styles.p3 };
@@ -48,7 +49,7 @@ const TodoListItem = (todo: Todo) => {
     <div className={`${styles.container} ${completed ? styles.completed : ""}`}>
       <div className={styles.header}>
         <span className={`${styles.priority} ${PRIORITY_CLASSES[priority]}`}>{PRIORITY_LABELS[priority]}</span>
-        <p aria-label={text}>{text}</p>
+        <p>{text}</p>
       </div>
 
       <div>
@@ -58,7 +59,15 @@ const TodoListItem = (todo: Todo) => {
         <div className={styles.actions}>
           <IconButton
             label="Mark as completed"
-            icon={isUpdating ? <p className={"buttonLoadingDots"}>...</p> : <TickIcon />}
+            icon={
+              isUpdating ? (
+                <span className="buttonLoadingDots" aria-hidden="true">
+                  ...
+                </span>
+              ) : (
+                <TickIcon />
+              )
+            }
             onClick={handleTodoUpdate}
             disabled={isUpdating || completed}
           />
@@ -67,7 +76,15 @@ const TodoListItem = (todo: Todo) => {
             variant="danger"
             label="Delete item"
             disabled={isDeleting}
-            icon={isDeleting ? <p className="buttonLoadingDots">...</p> : <BinIcon />}
+            icon={
+              isDeleting ? (
+                <span className="buttonLoadingDots" aria-hidden="true">
+                  ...
+                </span>
+              ) : (
+                <BinIcon />
+              )
+            }
             onClick={() => {
               handleDeleteTodo(id);
             }}
