@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import dayjs, { Dayjs } from "dayjs";
-import { create } from "node_modules/@mui/material/styles/createTransitions.mjs";
 
 import { RootState } from "@/store";
 
 import { Button, Card, Modal } from "@/components/shared";
 import { ModalProps } from "@/components/shared/Modal/Modal";
 import { useToast } from "@/context/ToastContext";
-import { useAppSelector, useFetchOnIdle } from "@/store/hooks";
-import { fetchAllTodos } from "@/store/slices/TodoSlice";
+import { useAppSelector, useFetchOnIdle, useAppDispatch } from "@/store/hooks";
+import { fetchAllTodos, createTodoItem } from "@/store/slices/TodoSlice";
 import TodoList from "./TodoList";
 
 import styles from "./TodoListCard.module.scss";
@@ -23,18 +22,19 @@ const TodoListCard = () => {
   const [isCreateMultiple, setIsCreateMultiple] = useState(false);
 
   const { showToast } = useToast();
-
+  const dispatch = useAppDispatch();
   useFetchOnIdle(
     (state: RootState) => state.todos.status,
     () => fetchAllTodos(),
     "Failed to fetch todo items",
   );
+
   const todos = useAppSelector((state: RootState) => state.todos.todos);
 
   const resetAllButModal = () => {
     setNewTodoDate(null);
     setNewTodoText("");
-    setNewTodoPriority(0);
+    setNewTodoPriority(2);
     setIsLoading(false);
   };
 
@@ -44,14 +44,30 @@ const TodoListCard = () => {
   };
   resetAllButModal;
 
-  const handleCreate = () => {
-    //!if successful
-    showToast("Task created", "success");
-    resetAllButModal();
-
-    if (!isCreateMultiple) {
-      setNewTodoModal(false);
+  const handleCreate = async () => {
+    if (!newTodoText) {
+      showToast("Your new task is missing text", "warning");
+      return;
     }
+    setIsLoading(true);
+    //!if successful
+    const submissionInformation = {
+      deadline: newTodoDate ? newTodoDate.toISOString() : null,
+      text: newTodoText,
+      priority: newTodoPriority,
+    };
+    try {
+      await dispatch(createTodoItem(submissionInformation));
+      showToast("Task created", "success");
+      resetAllButModal();
+      if (!isCreateMultiple) {
+        setNewTodoModal(false);
+      }
+    } catch (error) {
+      showToast((error.message as string) || "Somthing went wrong, please reload and try again", "danger");
+    }
+    // resetAllButModal();
+    setIsLoading(false);
   };
 
   const modalObj: ModalProps = {
@@ -73,10 +89,12 @@ const TodoListCard = () => {
         </div>
 
         <div className={styles.buttons}>
-          <Button onClick={handleCancel} variant="ghost">
+          <Button onClick={handleCancel} variant="ghost" disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleCreate}>{loading ? "Creating" : "Create"}</Button>
+          <Button onClick={handleCreate} disabled={loading}>
+            {loading ? "Creating" : "Create"}
+          </Button>
         </div>
       </div>
     ),
@@ -113,6 +131,7 @@ const TodoListCard = () => {
                 placeholder="What needs doing?"
                 value={newTodoText}
                 onChange={(e) => setNewTodoText(e.target.value)}
+                required
               />
             </div>
             <div className={styles.field}>
@@ -120,7 +139,7 @@ const TodoListCard = () => {
               <select
                 id="todoPriority"
                 value={newTodoPriority}
-                onChange={(e) => setNewTodoPriority(Number(e.target.value))}
+                onChange={(e) => setNewTodoPriority(Number(e.target.value) as 1 | 2 | 3)}
               >
                 <option value={1}>High</option>
                 <option value={2}>Medium</option>
