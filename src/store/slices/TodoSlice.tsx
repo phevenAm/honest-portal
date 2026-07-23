@@ -59,6 +59,15 @@ export const deleteTodoItem = createAsyncThunk<string, string>(
   },
 );
 
+export const updateTodoItem = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
+  "todos/updateTodoItem",
+  async ({ id, admin_id, ...rest }, { rejectWithValue }) => {
+    const { data, error } = await supabase.from("admin_todos").update(rest).eq("id", id).select().single();
+    if (error) return rejectWithValue(error.message || "Sorry, failed to update. Please refresh and try again");
+    return data as Todo;
+  },
+);
+
 // export const updateResource = createAsyncThunk<Resource, UpdateResource>(
 //   "resources/updateResource",
 //   async ({ id, ...fields }, { rejectWithValue }) => {
@@ -124,8 +133,22 @@ const todoSlice = createSlice({
       .addCase(deleteTodoItem.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(deleteTodoItem.rejected, (state, action) => {
+      .addCase(deleteTodoItem.rejected, (state) => {
         state.status = "failed";
+      })
+      .addCase(updateTodoItem.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateTodoItem.rejected, (state) => {
+        state.status = "failed";
+      })
+      .addCase(updateTodoItem.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const targetIndex = state.todos.findIndex((s) => s.id === action.payload.id);
+
+        if (targetIndex !== -1) {
+          state.todos[targetIndex] = action.payload;
+        }
       });
   },
 });

@@ -53,7 +53,7 @@
   --shadow-lg: #{$shadow-lg};
   --shadow-xl: #{$shadow-xl};
 
-  // Radius
+  // Radius 
   --r-sm: #{$r-sm};
   --r-md: #{$r-md};
   --r-lg: #{$r-lg};
@@ -247,4 +247,13 @@ textarea {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 var(--sp-6);
+}
+
+.buttonLoadingDots {
+  display: grid;
+  place-content: center;
+  font-weight: bold;
+  text-decoration: none !important;
+  height: 100%;
+  width: 100%;
 }

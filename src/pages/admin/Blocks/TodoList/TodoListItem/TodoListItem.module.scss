@@ -21,6 +21,10 @@
     gap: $sp-3;
     flex-shrink: 0;
   }
+
+  &.completed {
+    opacity: 0.85;
+  }
 }
 
 .header {
@@ -92,7 +96,7 @@
   gap: $sp-1;
 }
 
-.completed h3 {
+.completed p {
   text-decoration: line-through;
   color: var(--text-muted);
 }
