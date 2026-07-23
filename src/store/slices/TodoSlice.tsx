@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { supabase } from "../../lib/supabase";
 import type { Todo } from "../../models/globalTypes";
@@ -152,6 +152,16 @@ const todoSlice = createSlice({
       });
   },
 });
+
+export const selectOutstandingTodos = createSelector(
+  (state: { todos: ToDoState }) => state.todos.todos,
+  (todos) => todos.filter((t) => t.completed === false),
+);
+
+export const selectCompletedTodos = createSelector(
+  (state: { todos: ToDoState }) => state.todos.todos,
+  (todos) => todos.filter((t) => t.completed),
+);
 
 export const { clearResponseError } = todoSlice.actions;
 export default todoSlice.reducer;
