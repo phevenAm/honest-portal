@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { supabase } from "../../lib/supabase.js";
 import type { UserProfile } from "../../models/globalTypes.js";
@@ -118,8 +118,14 @@ export const selectAllUsers = (state: { userDirectory: UserDirectoryState }) => 
 export const selectUserById = (id: string) => (state: { userDirectory: UserDirectoryState }) =>
   state.userDirectory.users.find((u) => u.id === id);
 
-export const selectClientUsers = (state: { userDirectory: UserDirectoryState }) =>
-  state.userDirectory.users.filter((u) => u.role === "client");
+export const selectClientUsers = createSelector(
+  // 1. input: grab the users array from state
+  (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users,
+
+  // 2. result: filter it — only runs if users array actually changed
+  (users) => users.filter((u) => u.role === "client"),
+);
+
 export const selectUserCount = (state: { userDirectory: UserDirectoryState }) => state.userDirectory.users.length;
 
 export default userDirectorySlice.reducer;
