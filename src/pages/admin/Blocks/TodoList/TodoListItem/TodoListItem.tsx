@@ -5,9 +5,9 @@ import { useToast } from "@/context/ToastContext";
 import type { Todo } from "@/models/globalTypes";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteTodoItem, updateTodoItem } from "@/store/slices/TodoSlice";
+import TodoListModal from "../TodoListModal/TodoListModal";
 
 import styles from "./TodoListItem.module.scss";
-import TodoListModal from "../TodoListModal/TodoListModal";
 
 const PRIORITY_LABELS: Record<number, string> = { 1: "High", 2: "Med", 3: "Low" };
 const PRIORITY_CLASSES: Record<number, string> = { 1: styles.p1, 2: styles.p2, 3: styles.p3 };
